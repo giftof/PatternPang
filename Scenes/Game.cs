@@ -1,11 +1,18 @@
+/*
+ * Create: [Game.cs] on Thu Jan 27 2022 4:58:52 PM
+ * Author: [cloudeven@gmail.com]
+ *
+ * Copyright (c) 2022 [noname]
+ */
+
 using System;
 using System.Text;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Pattern.Managers;
 using Pattern.Objects;
+
 
 
 public class Game : MonoBehaviour
@@ -13,64 +20,24 @@ public class Game : MonoBehaviour
     
     void Start()
     {
-        Test_Three_X_Three_Board();
+        Test_N_X_M_Board(3, 3);
         Debug.Log("");
-        Test_Five_X_Five_Board();
+        Test_N_X_M_Board(5, 5);
+
+        SlotManager.Instance.CreateBoard(2, 2);
+
+        int[] test = new int[2] {0, 1};
+
+        IEnumerable<int> test2 = test.Select(e => e);
     }
 
-    private void Test_Five_X_Five_Board()
+    private void Test_N_X_M_Board(int width, int height)
     {
-        Debug.Log("Display 5x5 board");
+        Debug.Log($"Create [{width} x {height}] sized Board and display");
 
-        SlotManager.Instance.CreateBoard(5, 5);
-        SlotNode board;
-
-        board = SlotManager.Instance.Board;
-        DisplayClockWise(board);
-        board = board.Link[1];
-        DisplayClockWise(board);
-        board = board.Link[1];
-        DisplayClockWise(board);
-        board = board.Link[1];
-        DisplayClockWise(board);
-        board = board.Link[1];
-        DisplayClockWise(board);
-        board = board.Link[1];
-        DisplayClockWise(board);
-    }
-    private void Test_Three_X_Three_Board()
-    {
-        Debug.Log("Display 3x3 board");
-
-        SlotManager.Instance.CreateBoard(3, 3);
-        SlotNode board;
-
-        board = SlotManager.Instance.Board;
-        DisplayClockWise(board);
-        board = board.Link[0];
-        DisplayClockWise(board);
-        board = board.Link[0];
-        DisplayClockWise(board);
-
-        board = board.Link[3];
-        board = board.Link[2];
-        DisplayClockWise(board);
-        board = board.Link[0];
-        DisplayClockWise(board);
-        board = board.Link[0];
-        DisplayClockWise(board);
-
-        board = board.Link[3];
-        board = board.Link[3];
-        board = board.Link[2];
-        DisplayClockWise(board);
-        board = board.Link[0];
-        DisplayClockWise(board);
-        board = board.Link[0];
-        DisplayClockWise(board);
-
-        board = board.Link[0];
-        DisplayClockWise(board);
+        SlotManager.Instance.CreateBoard(width, height);
+        foreach (SlotNode node in SlotManager.Instance)
+            DisplayClockWise(node);
     }
 
     private void DisplayClockWise(SlotNode node)

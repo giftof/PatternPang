@@ -5,24 +5,20 @@
  * Copyright (c) 2022 [noname]
  */
 
-
 using System;
-using System.Linq;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Pattern.Objects;
 
 
 
 namespace Pattern.Managers
 {
-    public class SlotManager
+    public class SlotManager : IEnumerable
     {
-        public SlotNode Board { get; set; }
+        public SlotNode Board { get; private set; }
 
         public static SlotManager Instance => m_instance.Value;
-        public static int index;
+        private static int index;
         private static readonly Lazy<SlotManager> m_instance = new Lazy<SlotManager>( () => new SlotManager() );
         private SlotManager() { }
 
@@ -40,10 +36,15 @@ namespace Pattern.Managers
             Board = nodeArray[0];
         }
 
-        /* 
-         * Suture down -> up
-         * return bottom slot (by out keyword)
+        /*
+         * Implement IEnumerable
          */
+        public IEnumerator GetEnumerator() => new CustomIEnumerator(Board);
+
+        /*
+         * Privates
+         */
+        /** Suture [down -> up] return bottom slot (by out keyword) **/
         private void VerticalSuture(int height, int upIdx, int downIdx, out SlotNode node)
         {
             SlotNode slotNode = new SlotNode(index++);
@@ -57,10 +58,7 @@ namespace Pattern.Managers
             }
         }
         
-        /* 
-         * Suture down -> up
-         * nothing return
-         */
+        /** Suture [down -> up] nothing return **/
         private void ZigzagSuture(bool zigzag, SlotNode list1, SlotNode list2, (int way1, int way2) dir1, (int way1, int way2) dir2)
         {
             while (true)
@@ -87,61 +85,89 @@ namespace Pattern.Managers
                 zigzag = !zigzag;
             }
         }
-    }
-
-
-
-    public class PatternManager
-    {
-        private LinkedList<SlotNode> m_selectedList;
-        private static SlotNode s_lastSlotNode;
-
-        public static PatternManager Instance => m_instance.Value;
-        private static readonly Lazy<PatternManager> m_instance = new Lazy<PatternManager>( () => new PatternManager() );
-        private PatternManager() 
-        {
-            m_selectedList = new LinkedList<SlotNode>();
-        }
-
-        public void Add(SlotNode slotNode)
-        {
-            if (m_selectedList.Count.Equals(0) 
-            || (CompareColor(slotNode) && IsNear(slotNode)))
-                m_selectedList.AddFirst(slotNode);
-            
-            if (IsCancel(slotNode))
-                Remove();
-
-            s_lastSlotNode = slotNode;
-        }
-
-        public void Remove()
-        {
-            if (m_selectedList.Count > 0)
-                m_selectedList.RemoveFirst();
-        }
-
-        public void Clear() => m_selectedList.Clear();
-
-        public int[] Shape()
-        {
-            List<int> list = new List<int>();
-            LinkedListNode<SlotNode> current = m_selectedList.First;
-
-            while (current.Next != null)
-            {
-                list.Add(current.Value.FindLinkIndex(current.Next.Value));
-                current = current.Next;
-            }
-
-            return list.ToArray();
-        }
 
         /*
-         * Privates
+         * Nest Class: IEnumerator
          */
-        private bool IsCancel(SlotNode slotNode) => m_selectedList.Count > 1 && m_selectedList.First.Value.Equals(s_lastSlotNode);
-        private bool CompareColor(SlotNode slotNode) => m_selectedList.First.Value.Color.Equals(slotNode.Color);
-        private bool IsNear(SlotNode slotNode) => m_selectedList.First.Value.Link.FirstOrDefault(e => e.Equals(slotNode)) != null;
+        private class CustomIEnumerator : IEnumerator
+        {
+            public SlotNode Board;
+            private bool m_begin;
+
+            public CustomIEnumerator(SlotNode board)
+            {
+                m_begin = false;
+                Board = board;
+            }
+
+            public bool MoveNext()
+            {
+                if (!m_begin || MoveUp() || MoveNextLineBottom())
+                    return m_begin = true;
+                return false;
+            }
+
+            public void Reset()
+            {
+                while (MovePreviousLineBottom());
+                MoveBottom();
+                m_begin = false;
+            }
+
+            public object Current 
+            {
+                get
+                {
+                    if (Board != null)
+                        return Board;
+                    return new Exception("[null Exception]");
+                }
+            }
+
+            private bool MoveUp()
+            {
+                if (Board.Link[(int)ClockWise.up] != null)
+                {
+                    Board = Board.Link[(int)ClockWise.up];
+                    return true;
+                }
+
+                return false;
+            }
+
+            private bool MoveNextLineBottom()
+            {
+                if (Board.Link[(int)ClockWise.downRight] != null)
+                    Board = Board.Link[(int)ClockWise.downRight];
+                else if (Board.Link[(int)ClockWise.upRight] != null)
+                    Board = Board.Link[(int)ClockWise.upRight];
+                else
+                    return false;
+
+                MoveBottom();
+
+                return true;
+            }
+
+            private bool MovePreviousLineBottom()
+            {
+                if (Board.Link[(int)ClockWise.downLeft] != null)
+                    Board = Board.Link[(int)ClockWise.downLeft];
+                else if (Board.Link[(int)ClockWise.upLeft] != null)
+                    Board = Board.Link[(int)ClockWise.upLeft];
+                else
+                    return false;
+                    
+                MoveBottom();
+
+                return true;
+            }
+
+            private void MoveBottom()
+            {
+                while (Board.Link[(int)ClockWise.down] != null)
+                    Board = Board.Link[(int)ClockWise.down];
+            }
+        }
     }
 }
