@@ -42,11 +42,13 @@ namespace Pattern.Objects
 
     public class SlotNode
     {
+        public int Id { get; set; }
         public SlotNode[] Link { get; set; }
         public PatternColor Color { get; set; }
 
-        public SlotNode()
+        public SlotNode(int id)
         {
+            Id = id;
             Color = PatternColor.none;
             Link = new SlotNode[(int)ClockWise.count];
         }

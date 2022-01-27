@@ -22,6 +22,7 @@ namespace Pattern.Managers
         public SlotNode Board { get; set; }
 
         public static SlotManager Instance => m_instance.Value;
+        public static int index;
         private static readonly Lazy<SlotManager> m_instance = new Lazy<SlotManager>( () => new SlotManager() );
         private SlotManager() { }
 
@@ -29,71 +30,61 @@ namespace Pattern.Managers
         {
             SlotNode[] nodeArray = new SlotNode[width];
 
+            index = 0;
             for (int w = 0; w < width; ++w)
-                nodeArray[w] = VerticalSuture(height, (int)ClockWise.up, (int)ClockWise.down);
+                VerticalSuture(height, (int)ClockWise.up, (int)ClockWise.down, out nodeArray[w]);
 
             for (int w = 0; w < width - 1; ++w)
-            {
-                if (w % 2 == 0)
-                    ZigzagSuture(nodeArray[w], nodeArray[w + 1], ((int)ClockWise.upRight, (int)ClockWise.downRight), ((int)ClockWise.downLeft, (int)ClockWise.upLeft));
-                else
-                    ZigzagSuture(nodeArray[w], nodeArray[w + 1], ((int)ClockWise.downRight, (int)ClockWise.upRight), ((int)ClockWise.upLeft, (int)ClockWise.downLeft));
-            }
+                ZigzagSuture((w % 2 == 0), nodeArray[w], nodeArray[w + 1], ((int)ClockWise.upRight, (int)ClockWise.downRight), ((int)ClockWise.downLeft, (int)ClockWise.upLeft));
 
             Board = nodeArray[0];
         }
 
-        /*
-         *
+        /* 
+         * Suture down -> up
+         * return bottom slot (by out keyword)
          */
-        private SlotNode VerticalSuture(int height, int upIdx, int downIdx)
+        private void VerticalSuture(int height, int upIdx, int downIdx, out SlotNode node)
         {
-            SlotNode slotNode = null;
-
-            for (int h = 0; h < height; ++h)
+            SlotNode slotNode = new SlotNode(index++);
+            
+            node = slotNode;
+            for (int h = 1; h < height; ++h)
             {
-                if (slotNode == null)
-                    slotNode = new SlotNode();
-                else
-                {
-                    slotNode.Link[upIdx] = new SlotNode();
-                    slotNode.Link[upIdx].Link[downIdx] = slotNode;
-                    slotNode = slotNode.Link[upIdx];
-                }
+                slotNode.Link[upIdx] = new SlotNode(index++);
+                slotNode.Link[upIdx].Link[downIdx] = slotNode;
+                slotNode = slotNode.Link[upIdx];
             }
-
-            return slotNode;
         }
-
-        /* Suture top -> down */
-        private void ZigzagSuture(SlotNode list1, SlotNode list2, (int way1, int way2) dir1, (int way1, int way2) dir2)
+        
+        /* 
+         * Suture down -> up
+         * nothing return
+         */
+        private void ZigzagSuture(bool zigzag, SlotNode list1, SlotNode list2, (int way1, int way2) dir1, (int way1, int way2) dir2)
         {
-            bool side = false;
-
             while (true)
             {
-                if (side)
+                if (zigzag)
                 {
                     list1.Link[dir1.way1] = list2;
                     list2.Link[dir2.way1] = list1;
 
-                    if (list1.Link[(int)ClockWise.down] == null)
+                    if (list1.Link[(int)ClockWise.up] == null)
                         break;
-
-                    list1 = list1.Link[(int)ClockWise.down];
+                    list1 = list1.Link[(int)ClockWise.up];
                 }
                 else
                 {
                     list1.Link[dir1.way2] = list2;
                     list2.Link[dir2.way2] = list1;
 
-                    if (list2.Link[(int)ClockWise.down] == null)
+                    if (list2.Link[(int)ClockWise.up] == null)
                         break;
-
-                    list2 = list2.Link[(int)ClockWise.down];
+                    list2 = list2.Link[(int)ClockWise.up];
                 }
 
-                side = !side;
+                zigzag = !zigzag;
             }
         }
     }
