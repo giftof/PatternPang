@@ -6,11 +6,8 @@
  */
 
 
+
 using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Pattern.Objects;
 
 
@@ -87,61 +84,5 @@ namespace Pattern.Managers
                 zigzag = !zigzag;
             }
         }
-    }
-
-
-
-    public class PatternManager
-    {
-        private LinkedList<SlotNode> m_selectedList;
-        private static SlotNode s_lastSlotNode;
-
-        public static PatternManager Instance => m_instance.Value;
-        private static readonly Lazy<PatternManager> m_instance = new Lazy<PatternManager>( () => new PatternManager() );
-        private PatternManager() 
-        {
-            m_selectedList = new LinkedList<SlotNode>();
-        }
-
-        public void Add(SlotNode slotNode)
-        {
-            if (m_selectedList.Count.Equals(0) 
-            || (CompareColor(slotNode) && IsNear(slotNode)))
-                m_selectedList.AddFirst(slotNode);
-            
-            if (IsCancel(slotNode))
-                Remove();
-
-            s_lastSlotNode = slotNode;
-        }
-
-        public void Remove()
-        {
-            if (m_selectedList.Count > 0)
-                m_selectedList.RemoveFirst();
-        }
-
-        public void Clear() => m_selectedList.Clear();
-
-        public int[] Shape()
-        {
-            List<int> list = new List<int>();
-            LinkedListNode<SlotNode> current = m_selectedList.First;
-
-            while (current.Next != null)
-            {
-                list.Add(current.Value.FindLinkIndex(current.Next.Value));
-                current = current.Next;
-            }
-
-            return list.ToArray();
-        }
-
-        /*
-         * Privates
-         */
-        private bool IsCancel(SlotNode slotNode) => m_selectedList.Count > 1 && m_selectedList.First.Value.Equals(s_lastSlotNode);
-        private bool CompareColor(SlotNode slotNode) => m_selectedList.First.Value.Color.Equals(slotNode.Color);
-        private bool IsNear(SlotNode slotNode) => m_selectedList.First.Value.Link.FirstOrDefault(e => e.Equals(slotNode)) != null;
     }
 }

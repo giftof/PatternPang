@@ -5,12 +5,6 @@
  * Copyright (c) 2022 [noname]
  */
 
-using System;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 
 
 namespace Pattern.Objects
@@ -52,9 +46,5 @@ namespace Pattern.Objects
             Color = PatternColor.none;
             Link = new SlotNode[(int)ClockWise.count];
         }
-
-        public int FindLinkIndex(SlotNode slotNode) => Link.Select((node, index) => new {node, index}).First(e => e.node.Equals(slotNode) || e.index == (int)ClockWise.count).index;
-        // public int MirrorSideLink(ClockWise clockWise) => ((int)clockWise + ((int)ClockWise.count/2)) % (int)ClockWise.count;
-        // public int MirrorSideLinkIndex(SlotNode slotNode) => FindLinkIndex(slotNode) + ( ( (int)ClockWise.count/2 ) % (int)ClockWise.count );
     }
 }
