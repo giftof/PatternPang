@@ -1,11 +1,18 @@
+/*
+ * Create: [Game.cs] on Thu Jan 27 2022 4:58:52 PM
+ * Author: [cloudeven@gmail.com]
+ *
+ * Copyright (c) 2022 [noname]
+ */
+
 using System;
 using System.Text;
 using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Pattern.Managers;
 using Pattern.Objects;
+
 
 
 public class Game : MonoBehaviour
