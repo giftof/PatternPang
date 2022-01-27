@@ -1,16 +1,13 @@
 using System;
 using System.Text;
-using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Pattern.Managers;
 using Pattern.Objects;
 
 
+
 public class Game : MonoBehaviour
 {
-    
     void Start()
     {
         Test_Three_X_Three_Board();
