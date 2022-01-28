@@ -22,7 +22,6 @@ namespace Pattern.Managers
     public class PatternManager
     {
         public LinkedList<SlotNode> m_selectedList;
-        private static SlotNode m_lastSlotNode;
 
         public static PatternManager Instance => m_instance.Value;
         private static readonly Lazy<PatternManager> m_instance = new Lazy<PatternManager>( () => new PatternManager() );
@@ -30,27 +29,18 @@ namespace Pattern.Managers
 
         public void Add(SlotNode slotNode)
         {
-            if (m_selectedList.Count.Equals(0) 
-            || (CompareColor(slotNode) && IsNear(slotNode)))
-                m_selectedList.AddFirst(slotNode);
-
-            else if (IsCancel(slotNode))
+            if (!IsChain(slotNode))
+                return;
+            
+            else if (IsTryRemove(slotNode))
                 Remove();
 
-            m_lastSlotNode = slotNode;
-        }
-
-        public void Remove()
-        {
-            if (m_selectedList.Count > 0)
-                m_selectedList.RemoveFirst();
+            else if (IsSameColor(slotNode))
+                m_selectedList.AddFirst(slotNode);
         }
 
         public void Clear()
-        {
-            m_lastSlotNode = null;
-            m_selectedList.Clear();
-        } 
+            => m_selectedList.Clear();
 
         public int[] Shape()
         {
@@ -72,16 +62,29 @@ namespace Pattern.Managers
         /*
          * Privates
          */
-        private bool CompareColor(SlotNode slotNode) => m_selectedList.First.Value.Color.Equals(slotNode.Color);
+        /** US prefix means un-safe : no null guard **/
+        private void Remove()
+        {
+            if (m_selectedList.Count > 0)
+                m_selectedList.RemoveFirst();
+        }
 
-        private bool IsNear(SlotNode slotNode) 
-            => !IsCancel(slotNode)
-            && !slotNode.Equals(m_lastSlotNode) 
-            && m_selectedList.First.Value.Link.FirstOrDefault(e => slotNode.Equals(e)) != null;
+        private bool IsChain(SlotNode slotNode) 
+            => slotNode != null 
+            && (IsFirst() || IsContact(slotNode));
+        
+        private bool IsSameColor(SlotNode slotNode)
+            => IsFirst()
+            || m_selectedList.First.Value.Color.Equals(slotNode.Color);
 
-        private bool IsCancel(SlotNode slotNode) 
-            => m_selectedList.Count > 1 
-            && m_selectedList.First.Value.Equals(m_lastSlotNode)
+        private bool IsTryRemove(SlotNode slotNode)
+            => m_selectedList.Count > 1
             && m_selectedList.First.Next.Value.Equals(slotNode);
+
+        private bool IsFirst()
+            => m_selectedList.Count == 0;
+
+        private bool IsContact(SlotNode slotNode)
+            => m_selectedList.First.Value.Link.FirstOrDefault(e => slotNode.Equals(e)) != null;
     }
 }

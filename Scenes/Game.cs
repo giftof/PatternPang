@@ -36,8 +36,8 @@ public class Game : MonoBehaviour
     
     private void AddButtonAction()
     {
-        width.text = "7";
-        height.text = "8";
+        width.text = "3"; // 7
+        height.text = "3"; // 8
         add.onClick.AddListener(Add);
         shape.onClick.AddListener(Shape);
         end.onClick.AddListener(End);
