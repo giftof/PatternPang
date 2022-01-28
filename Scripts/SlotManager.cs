@@ -16,6 +16,7 @@ namespace Pattern.Managers
     public class SlotManager : IEnumerable
     {
         public SlotNode Board { get; private set; }
+        private int boardSize;
 
         public static SlotManager Instance => m_instance.Value;
         private static int index;
@@ -27,6 +28,8 @@ namespace Pattern.Managers
             SlotNode[] nodeArray = new SlotNode[width];
 
             index = 0;
+            boardSize = width * height;
+            
             for (int w = 0; w < width; ++w)
                 VerticalSuture(height, (int)ClockWise.up, (int)ClockWise.down, out nodeArray[w]);
 
@@ -170,4 +173,9 @@ namespace Pattern.Managers
             }
         }
     }
+
+
+
+
+
 }
