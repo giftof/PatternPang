@@ -7,7 +7,9 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Pattern.Objects;
+using Pattern.Configs;
 
 
 
@@ -15,7 +17,8 @@ namespace Pattern.Managers
 {
     public class SlotManager : IEnumerable
     {
-        public SlotNode Board { get; private set; }
+        public SlotNode[] BottomLineArray { get; private set; } = null;
+        public SlotNode Board { get; private set; } = null;
         private int boardSize;
 
         public static SlotManager Instance => m_instance.Value;
@@ -37,6 +40,7 @@ namespace Pattern.Managers
                 ZigzagSuture((w % 2 == 0), nodeArray[w], nodeArray[w + 1], ((int)ClockWise.upRight, (int)ClockWise.downRight), ((int)ClockWise.downLeft, (int)ClockWise.upLeft));
 
             Board = nodeArray[0];
+            BottomLineArray = nodeArray;
         }
 
         /*
@@ -59,6 +63,9 @@ namespace Pattern.Managers
                 slotNode.Link[upIdx].Link[downIdx] = slotNode;
                 slotNode = slotNode.Link[upIdx];
             }
+
+            slotNode.Link[upIdx] = new ColorGenerator(index++);
+            slotNode.Link[upIdx].Link[downIdx] = slotNode;
         }
         
         /** Suture [down -> up] nothing return **/

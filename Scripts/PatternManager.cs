@@ -9,16 +9,12 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Pattern.Objects;
+using Pattern.Configs;
 
 
 
 namespace Pattern.Managers
 {
-    public static class CONST
-    {
-        public static readonly int MIN_SELECT = 3;
-    }
-
     public class PatternManager
     {
         public LinkedList<SlotNode> m_selectedList;
@@ -58,6 +54,9 @@ namespace Pattern.Managers
 
             return list.ToArray();
         }
+
+        public SlotNode First
+            => m_selectedList.First?.Value;
 
         /*
          * Privates
