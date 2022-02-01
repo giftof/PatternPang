@@ -7,6 +7,7 @@
 
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using Pattern.Managers;
 using Pattern.Objects;
 using Pattern.Configs;
@@ -61,6 +62,9 @@ namespace Pattern.Business
             PatternManager.Instance.Clear();
         }
 
+        public SlotNode Board
+            => SlotManager.Instance.Board;
+            
         /*
          * Privates
          */
@@ -75,12 +79,12 @@ namespace Pattern.Business
             foreach (SlotNode node in SlotManager.Instance)
             {
                 SlotNode temp = node;
+
                 int zeroQuery = shape?
                     .Where(e
                         => temp != null 
                         && (temp = temp.NextSameColorNode(e)) != null)
-                    .Sum(e
-                        => e)
+                    .Sum(e => e)
                     .CompareTo(verify) ?? 1;
                 
                 if (zeroQuery.Equals(0))
@@ -92,8 +96,7 @@ namespace Pattern.Business
                         .Where(e
                             => temp.Link[e].Increment() > 0
                             && (temp = temp.Link[e]) != null)
-                        .Select(e
-                            => e)
+                        .Select(e => e)
                         .ToArray();
                 }
             }
@@ -138,3 +141,31 @@ namespace Pattern.Business
         }
     }
 }
+
+
+
+                // PatternColor beginColor = node.Color;
+
+                // var zero = shape
+                //     .Where(e1 => temp != null && (temp = temp.NextSameColorNode(e1)) != null)
+                //     .Select(e1 => temp.Color.Equals(beginColor))
+                //     .GroupBy(
+                //         e => beginColor,
+                //         e => temp,
+                //         (key, value) => new {
+                //             Color = key,
+                //             Count = value.Count(),
+                //             Begin = node,
+                //             Value = value
+                //         }
+                //     );
+
+                // UnityEngine.Debug.Log($"{zero.Count()}");
+                // foreach (var item in zero)
+                // {
+                //     UnityEngine.Debug.Log($"{item}");
+                //     UnityEngine.Debug.Log($"???");
+                //     UnityEngine.Debug.Log($"color = {item.Color}, bc = {item.Begin.Color}, vcnt = {item.Value.Count()}");
+                // }
+
+                // UnityEngine.Debug.Log($"----------------------------------");

@@ -137,6 +137,7 @@ namespace Pattern.Managers
             private bool MoveUp()
             {
                 if (Board.Link[(int)ClockWise.up] != null)
+                // if (Board.Link[(int)ClockWise.up].Color != PatternColor.generator)
                 {
                     Board = Board.Link[(int)ClockWise.up];
                     return true;

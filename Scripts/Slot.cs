@@ -25,9 +25,6 @@ namespace Pattern.Objects
         {
             Id = id;
             Dispose();
-            // Color = PatternColor.none;
-            // Color = (PatternColor)UnityEngine.Random.Range(1, (int)PatternColor.count - 5); // 5 means remove (yellow, purple, bomb 1~3)
-            // Link = new SlotNode[(int)ClockWise.count];
         }
 
         public void Dispose()

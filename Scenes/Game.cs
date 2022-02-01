@@ -28,6 +28,7 @@ public class Game : MonoBehaviour
     [SerializeField] Button add;
     [SerializeField] Button shape;
     [SerializeField] Button end;
+    [SerializeField] BoardPrefab Board;
 
 
 
@@ -128,12 +129,17 @@ public class Game : MonoBehaviour
 /**/            return;
 /**/        }
 
-        GameLogic.Instance.BoardWidth = Math.Abs(width);
-        GameLogic.Instance.BoardHeight = Math.Abs(height);
+        width = Math.Abs(width);
+        height = Math.Abs(height);
+
+        GameLogic.Instance.BoardWidth = width;
+        GameLogic.Instance.BoardHeight = height;
         GameLogic.Instance.Generate();
         GameLogic.Instance.Dispose();
 
-        View();
+        Board.Board = GameLogic.Instance.Board;
+        Board.CreateBoard(width, height);
+        // View();
     }
 
     private void DisplayClockWise(SlotNode node)
