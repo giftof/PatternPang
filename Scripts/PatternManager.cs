@@ -61,7 +61,6 @@ namespace Pattern.Managers
         /*
          * Privates
          */
-        /** US prefix means un-safe : no null guard **/
         private void Remove()
         {
             if (m_selectedList.Count > 0)
