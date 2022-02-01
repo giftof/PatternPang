@@ -7,9 +7,6 @@
 
 using System;
 using System.Linq;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Pattern.Managers;
 using Pattern.Objects;
 using Pattern.Configs;
@@ -57,7 +54,7 @@ namespace Pattern.Business
                 MarkingSelected();
                 RemoveMarked();
 
-                if (FillColors() == 0)
+                if (!FillColors(out int count))
                     break;
             }
 
@@ -77,9 +74,6 @@ namespace Pattern.Business
 
             foreach (SlotNode node in SlotManager.Instance)
             {
-                // if (node.Color == PatternColor.generator)
-                //     continue;
-
                 SlotNode temp = node;
                 int zeroQuery = shape?
                     .Where(e
@@ -115,14 +109,14 @@ namespace Pattern.Business
                     node.Dispose();
         }
 
-        private int FillColors()
+        private bool FillColors(out int count)
         {
             SlotNode[] bottomLine = SlotManager.Instance.BottomLineArray;
             int fillCount = 0;
 
             while (bottomLine != null && bottomLine.Where(e => RequestUpper(e) == true && ++fillCount > 0).Select(e => e).Count() != 0);
 
-            return fillCount;
+            return (count = fillCount) > 0;
         }
 
         private bool RequestUpper(SlotNode slotNode)

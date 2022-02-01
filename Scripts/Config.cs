@@ -5,10 +5,6 @@
  * Copyright (c) 2022 [noname]
  */
 
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 
 
 namespace Pattern.Configs
@@ -18,11 +14,6 @@ namespace Pattern.Configs
         public static readonly int MIN_SELECT = 3;
         public static readonly int BOMB = 3;
     }
-
-    // public enum Const
-    // {
-    //     bomb = 3;
-    // }
 
     public enum PatternColor
     {
