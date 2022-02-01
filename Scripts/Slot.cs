@@ -14,11 +14,20 @@ using Pattern.Configs;
 
 namespace Pattern.Objects
 {
+    public class Slot
+    {
+        public SlotAttribute Color { get; set; } = SlotAttribute.none;
+        public uint MatchCount { get; set; } = 0;
+        public uint Id { get; set; } = 0;
+    }
+
+
+
     public class SlotNode
     {
         public int Id { get; set; } = 0;
         public SlotNode[] Link { get; set; } = new SlotNode[(int)ClockWise.count];
-        public PatternColor Color { get; set; } = PatternColor.none;
+        public SlotAttribute Color { get; set; } = SlotAttribute.none;
         public int MatchCount { get; set; } = 0;
 
 
@@ -36,31 +45,31 @@ namespace Pattern.Objects
                     break;
                 case 1:
                 case 2:
-                    Color = PatternColor.none;
+                    Color = SlotAttribute.none;
                     break;
                 case 3:
-                    Color = PatternColor.bomb1;
-                    Color = PatternColor.none;
+                    Color = SlotAttribute.bomb1;
+                    Color = SlotAttribute.none;
                     break;
                 case 4:
-                    Color = PatternColor.bomb2;
-                    Color = PatternColor.none;
+                    Color = SlotAttribute.bomb2;
+                    Color = SlotAttribute.none;
                     break;
                 default:
-                    Color = PatternColor.bomb3;
-                    Color = PatternColor.none;
+                    Color = SlotAttribute.bomb3;
+                    Color = SlotAttribute.none;
                     break;
             }
-            
+
             MatchCount = 0;
         }
 
-        public virtual PatternColor Request
+        public virtual SlotAttribute Request
         {
             get 
             {
-                PatternColor color = Color;
-                Color = PatternColor.none;
+                SlotAttribute color = Color;
+                Color = SlotAttribute.none;
                 return color;
             }
         }
@@ -71,26 +80,26 @@ namespace Pattern.Objects
             return MatchCount;
         }
 
-        // public SlotNode NextSameColorNode(int dir)
-        //     => Color != PatternColor.generator 
-        //     && Link[dir] != null 
-        //     && Link[dir].Color.Equals(Color) 
-        //     ? Link[dir] : null;
         public SlotNode NextSameColorNode(int dir)
-        {
-Debug.Log($"ENTER NEXTSAMECOLORNODE >> ID = {Id}, dir = {(ClockWise)dir}, Link[dir] = {Link[dir]}");
-            if (Color == PatternColor.generator)
-                Debug.LogError("Color == PatternColor.generator");
-            else if (Link[dir] == null)
-                Debug.LogError($"Link[dir] == null, dir = {(ClockWise)dir}, really? = {Link[dir]}");
-            else if (!Link[dir].Color.Equals(Color))
-                Debug.LogError("!Link[dir].Color.Equals(Color)");
-
-            return Color != PatternColor.generator 
-            && Link[dir] != null 
-            && Link[dir].Color.Equals(Color) 
+            => Color != SlotAttribute.generator
+            && Link[dir] != null
+            && Link[dir].Color.Equals(Color)
             ? Link[dir] : null;
-        }
+//        public SlotNode NextSameColorNode(int dir)
+//        {
+//Debug.Log($"ENTER NEXTSAMECOLORNODE >> ID = {Id}, dir = {(ClockWise)dir}, Link[dir] = {Link[dir]}");
+//if (Color == PatternColor.generator)
+//    Debug.LogError("Color == PatternColor.generator");
+//else if (Link[dir] == null)
+//    Debug.LogError($"Link[dir] == null, dir = {(ClockWise)dir}, really? = {Link[dir]}");
+//else if (!Link[dir].Color.Equals(Color))
+//    Debug.LogError("!Link[dir].Color.Equals(Color)");
+
+//            return Color != PatternColor.generator 
+//            && Link[dir] != null 
+//            && Link[dir].Color.Equals(Color) 
+//            ? Link[dir] : null;
+//        }
 
         public int FindLinkIndex(SlotNode slotNode) => Link.Select((node, index) => new {node, index}).First(tp => slotNode.Equals(tp.node) || tp.index == (int)ClockWise.count).index;
     }
@@ -101,12 +110,12 @@ Debug.Log($"ENTER NEXTSAMECOLORNODE >> ID = {Id}, dir = {(ClockWise)dir}, Link[d
     {
         public ColorGenerator(int id) : base(id) 
         { 
-            Color = PatternColor.generator;
+            Color = SlotAttribute.generator;
         }
 
-        public override PatternColor Request
+        public override SlotAttribute Request
         {
-            get { return (PatternColor)UnityEngine.Random.Range(1, (int)PatternColor.count - 5); /* 5 means remove (yellow, purple, bomb 1~3)*/ }
+            get { return (SlotAttribute)UnityEngine.Random.Range(1, (int)SlotAttribute.count - 5); /* 5 means remove (yellow, purple, bomb 1~3)*/ }
         }
     }
 }

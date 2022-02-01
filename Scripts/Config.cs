@@ -11,11 +11,19 @@ namespace Pattern.Configs
 {
     public static class CONST
     {
-        public static readonly int MIN_SELECT = 3;
-        public static readonly int BOMB = 3;
+        public static readonly uint MIN_SELECT = 3;
+        public static readonly uint BOMB = 3;
+        public static readonly uint GENERATOR_LINE = 1;
+        public static float MAX_DISTANCE;
     }
 
-    public enum PatternColor
+    public static class PATH
+    {
+        public static readonly string SLOT = "Prefabs/SlotPrefab";
+        public static readonly string BALL = "Prefabs/BallPrefab";
+    }
+
+    public enum SlotAttribute
     {
         none,
         red,
@@ -27,6 +35,7 @@ namespace Pattern.Configs
         bomb2,
         bomb3,
         generator,
+        test,
         count,
     }
 

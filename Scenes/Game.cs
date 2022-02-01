@@ -14,158 +14,27 @@ using UnityEngine.UI;
 using Pattern.Managers;
 using Pattern.Objects;
 using Pattern.Configs;
-using Pattern.Business;
 
 
 
 public class Game : MonoBehaviour
 {
-    [SerializeField] InputField inputField;
-    [SerializeField] InputField width;
-    [SerializeField] InputField height;
-    [SerializeField] Button generate;
-    [SerializeField] Button view;
-    [SerializeField] Button add;
-    [SerializeField] Button shape;
-    [SerializeField] Button end;
-    [SerializeField] BoardPrefab Board;
-
-
+    [SerializeField] GamePrefab gamePrefab;
 
     void Start()
     {
-        AddButtonAction();
-        GameLogic.Instance.RemoveBall = Board.RemoveBall;
-    }
+        PatternHandler.Instance.Size = (7, 8 + CONST.GENERATOR_LINE);
+        gamePrefab.Generate();
 
-    
-    private void AddButtonAction()
-    {
-        width.text = "3"; // 7
-        height.text = "3"; // 8
-        add.onClick.AddListener(Add);
-        shape.onClick.AddListener(Shape);
-        // end.onClick.AddListener(GameLogic.Instance.ClearTrace);
-        end.onClick.AddListener(GameLogic.Instance.Dispose);
-        generate.onClick.AddListener(Generate);
-        view.onClick.AddListener(View);
-    }
-
-    private void Add()
-    {
-/**/        Debug.Log("press Add");
-
-/**/        if (!int.TryParse(inputField.text, out int slotId))
-/**/            throw new Exception("[numeric only]");
-
-/**/        SlotNode node = FindSlotNode(slotId);
-        GameLogic.Instance.AddTrace(node);
-        
-/**/        Debug.LogWarning($"{node.Id}");
-    }
-
-    private void Shape()
-    {
-/**/        Debug.Log("press Shape");
-        int[] shape = GameLogic.Instance.Shape;
-
-/**/        StringBuilder stringBuilder = new StringBuilder("Shape = { ");
-        
-/**/        if (shape == null)
-/**/        {
-/**/            Debug.LogWarning("selected amount less then 3");
-/**/            if (PatternManager.Instance.m_selectedList.Count > 0)
-/**/                foreach (SlotNode item in PatternManager.Instance.m_selectedList)
-/**/                    Debug.LogWarning($"selected = {item.Id}");
-/**/            else
-/**/                Debug.LogWarning("selected count = 0");
-/**/            return;
-/**/        }
-
-/**/        foreach (int dir in shape)
-/**/            stringBuilder.Append($"{((ClockWise)dir).ToString()}, ");
-
-/**/        stringBuilder.Append(" }");
-
-/**/        Debug.LogWarning(stringBuilder);
-
-            // SlotNode[] array = GameLogic.Instance.SearchPattern();
-            // Debug.Log($"match count = {array.Length}");
-            // foreach (SlotNode node in array)
-            //     Debug.Log($"id = {node.Id}, color = {node.Color}");
-    }
-
-    private SlotNode FindSlotNode(int id)
-    {
-/**/        foreach (SlotNode node in SlotManager.Instance)
-/**/        {
-/**/            if (id == 0)
-/**/                return node;
-/**/            --id;
-/**/        }
-
-/**/        throw new Exception("[id Error!]");
-    }
-
-    private void View()
-    {
-        if (SlotManager.Instance.Board != null)
-            foreach (SlotNode node in SlotManager.Instance)
-                DisplayClockWise(node);
-    }
-
-    private void Generate()
-    {
-/**/        Debug.Log("press Generate");
-
-/**/        if (!int.TryParse(this.width.text, out int width))
-/**/        {
-/**/            Debug.LogWarning($"Wrong input width = ({this.width.text}_");
-/**/            return;
-/**/        }
-
-/**/        if (!int.TryParse(this.height.text, out int height))
-/**/        {
-/**/            Debug.LogWarning($"Wrong input height = ({this.height.text}_");
-/**/            return;
-/**/        }
-
-        width = Math.Abs(width);
-        height = Math.Abs(height);
-
-        GameLogic.Instance.BoardWidth = width;
-        GameLogic.Instance.BoardHeight = height;
-        GameLogic.Instance.Generate();
-        // GameLogic.Instance.Dispose();
-        GameLogic.Instance.Fill();
-
-        View();
-
-        Board.Board = GameLogic.Instance.Board;
-        Board.CreateBoard(width, height);
-        Board.FillColor();
-    }
-
-    private void DisplayClockWise(SlotNode node)
-    {
-        StringBuilder stringBuilder = new StringBuilder("Node = {");
-
-        if (node == null)
-            stringBuilder.Append("[null object!]");
-        else
+        SlotPrefab[] generator = gamePrefab.BallGenerator();
+        foreach (var item in generator)
         {
-            stringBuilder.Append($"[{node.Id}: {node.Color.ToString()}({node.MatchCount})] == ");
-            foreach ( int index in Enum.GetValues( typeof( ClockWise ) ) )
-            {
-                if (index < (int)ClockWise.count)
-                {
-                    stringBuilder.Append($"{index}: [{(node.Link[index] != null ? node.Link[index].Id.ToString() : "_")}:");
-                    stringBuilder.Append($"{(node.Link[index] != null ? node.Link[index].Color.ToString() : "_")}], ");
-                }
-            }
+            Debug.Log($"generator item.name = {item.name}");
         }
-        
-        stringBuilder.Append("}");
-        Debug.LogWarning(stringBuilder);
+        SlotPrefab[] baseLine = gamePrefab.BaseLine;
+        foreach (var item in baseLine)
+        {
+            Debug.Log($"baseline item.name = {item.name}");
+        }
     }
 }
