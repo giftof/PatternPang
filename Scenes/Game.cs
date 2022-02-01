@@ -13,6 +13,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using Pattern.Managers;
 using Pattern.Objects;
+using Pattern.Configs;
+using Pattern.Business;
 
 
 
@@ -22,6 +24,7 @@ public class Game : MonoBehaviour
     [SerializeField] InputField width;
     [SerializeField] InputField height;
     [SerializeField] Button generate;
+    [SerializeField] Button view;
     [SerializeField] Button add;
     [SerializeField] Button shape;
     [SerializeField] Button end;
@@ -40,99 +43,97 @@ public class Game : MonoBehaviour
         height.text = "3"; // 8
         add.onClick.AddListener(Add);
         shape.onClick.AddListener(Shape);
-        end.onClick.AddListener(End);
+        // end.onClick.AddListener(GameLogic.Instance.ClearTrace);
+        end.onClick.AddListener(GameLogic.Instance.Dispose);
         generate.onClick.AddListener(Generate);
+        view.onClick.AddListener(View);
     }
 
     private void Add()
     {
-        Debug.Log("press Add");
+/**/        Debug.Log("press Add");
 
-        if (!int.TryParse(inputField.text, out int slotId))
-            throw new Exception("[numeric only]");
+/**/        if (!int.TryParse(inputField.text, out int slotId))
+/**/            throw new Exception("[numeric only]");
 
-        SlotNode node = FindSlotNode(slotId);
-        PatternManager.Instance.Add(node);
+/**/        SlotNode node = FindSlotNode(slotId);
+        GameLogic.Instance.AddTrace(node);
         
-        Debug.LogWarning($"{node.Id}");
+/**/        Debug.LogWarning($"{node.Id}");
     }
 
     private void Shape()
     {
-        Debug.Log("press Shape");
+/**/        Debug.Log("press Shape");
+        int[] shape = GameLogic.Instance.Shape;
 
-        int[] shape = PatternManager.Instance.Shape();
-        StringBuilder stringBuilder = new StringBuilder("Shape = { ");
+/**/        StringBuilder stringBuilder = new StringBuilder("Shape = { ");
         
-        if (shape == null)
-        {
-            Debug.LogWarning("selected amount less then 3");
-            if (PatternManager.Instance.m_selectedList.Count > 0)
-                foreach (SlotNode item in PatternManager.Instance.m_selectedList)
-                    Debug.LogWarning($"selected = {item.Id}");
-            else
-                Debug.LogWarning("selected count = 0");
-            return;
-        }
+/**/        if (shape == null)
+/**/        {
+/**/            Debug.LogWarning("selected amount less then 3");
+/**/            if (PatternManager.Instance.m_selectedList.Count > 0)
+/**/                foreach (SlotNode item in PatternManager.Instance.m_selectedList)
+/**/                    Debug.LogWarning($"selected = {item.Id}");
+/**/            else
+/**/                Debug.LogWarning("selected count = 0");
+/**/            return;
+/**/        }
 
-        foreach (int dir in shape)
-            stringBuilder.Append($"{((ClockWise)dir).ToString()}, ");
+/**/        foreach (int dir in shape)
+/**/            stringBuilder.Append($"{((ClockWise)dir).ToString()}, ");
 
-        stringBuilder.Append(" }");
+/**/        stringBuilder.Append(" }");
 
-        Debug.LogWarning(stringBuilder);
+/**/        Debug.LogWarning(stringBuilder);
+
+            // SlotNode[] array = GameLogic.Instance.SearchPattern();
+            // Debug.Log($"match count = {array.Length}");
+            // foreach (SlotNode node in array)
+            //     Debug.Log($"id = {node.Id}, color = {node.Color}");
     }
 
     private SlotNode FindSlotNode(int id)
     {
-        foreach (SlotNode node in SlotManager.Instance)
-        {
-            if (id == 0)
-                return node;
-            --id;
-        }
+/**/        foreach (SlotNode node in SlotManager.Instance)
+/**/        {
+/**/            if (id == 0)
+/**/                return node;
+/**/            --id;
+/**/        }
 
-        throw new Exception("[id Error!]");
+/**/        throw new Exception("[id Error!]");
     }
 
-    private void End()
+    private void View()
     {
-        Debug.Log("press End");
-        PatternManager.Instance.Clear();
+        if (SlotManager.Instance.Board != null)
+            foreach (SlotNode node in SlotManager.Instance)
+                DisplayClockWise(node);
     }
 
     private void Generate()
     {
-        Debug.Log("press Generate");
-        PatternManager.Instance.Clear();
+/**/        Debug.Log("press Generate");
 
-        if (!int.TryParse(this.width.text, out int width))
-        {
-            Debug.LogWarning($"Wrong input width = ({this.width.text}_");
-            return;
-        }
+/**/        if (!int.TryParse(this.width.text, out int width))
+/**/        {
+/**/            Debug.LogWarning($"Wrong input width = ({this.width.text}_");
+/**/            return;
+/**/        }
 
-        if (!int.TryParse(this.height.text, out int height))
-        {
-            Debug.LogWarning($"Wrong input height = ({this.height.text}_");
-            return;
-        }
+/**/        if (!int.TryParse(this.height.text, out int height))
+/**/        {
+/**/            Debug.LogWarning($"Wrong input height = ({this.height.text}_");
+/**/            return;
+/**/        }
 
-        width = Math.Abs(width);
-        height = Math.Abs(height);
+        GameLogic.Instance.BoardWidth = Math.Abs(width);
+        GameLogic.Instance.BoardHeight = Math.Abs(height);
+        GameLogic.Instance.Generate();
+        GameLogic.Instance.Dispose();
 
-        Debug.Log($"w = {width.ToString()}, h = {height.ToString()}");
-
-        Test_N_X_M_Board(width, height);
-    }
-
-    private void Test_N_X_M_Board(int width, int height)
-    {
-        Debug.Log($"Create [{width} x {height}] sized Board and display");
-
-        SlotManager.Instance.CreateBoard(width, height);
-        foreach (SlotNode node in SlotManager.Instance)
-            DisplayClockWise(node);
+        View();
     }
 
     private void DisplayClockWise(SlotNode node)
