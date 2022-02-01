@@ -23,7 +23,7 @@ public class Game : MonoBehaviour
 
     void Start()
     {
-        PatternHandler.Instance.Size = (7, 8 + CONST.GENERATOR_LINE);
+        gamePrefab.Size = (7, 8 + CONST.GENERATOR_LINE);
         gamePrefab.Generate();
 
         SlotPrefab[] generator = gamePrefab.BallGenerator();

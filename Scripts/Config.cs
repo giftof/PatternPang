@@ -14,14 +14,15 @@ namespace Pattern.Configs
         public static readonly uint MIN_SELECT = 3;
         public static readonly uint BOMB = 3;
         public static readonly uint GENERATOR_LINE = 1;
+        public static readonly uint EVEN_COLUMN_UP = 1;
         public static float MAX_DISTANCE;
     }
 
-    public static class PATH
-    {
-        public static readonly string SLOT = "Prefabs/SlotPrefab";
-        public static readonly string BALL = "Prefabs/BallPrefab";
-    }
+    //public static class PATH
+    //{
+    //    public static readonly string SLOT = "Prefabs/SlotPrefab";
+    //    public static readonly string BALL = "Prefabs/BallPrefab";
+    //}
 
     public enum SlotAttribute
     {
