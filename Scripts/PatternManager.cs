@@ -25,6 +25,7 @@ namespace Pattern.Managers
 
         public void Add(SlotNode slotNode)
         {
+UnityEngine.Debug.Log("ADD");
             if (!IsChain(slotNode))
                 return;
             
@@ -40,6 +41,10 @@ namespace Pattern.Managers
 
         public int[] Shape()
         {
+// UnityEngine.Debug.Log("SHAPE");
+// foreach(var item in m_selectedList)
+//     UnityEngine.Debug.Log($"id = {item.Id}, color = {item.Color}");
+
             if (m_selectedList.Count < CONST.MIN_SELECT)
                 return null;
 

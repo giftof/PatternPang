@@ -35,6 +35,7 @@ public class Game : MonoBehaviour
     void Start()
     {
         AddButtonAction();
+        GameLogic.Instance.RemoveBall = Board.RemoveBall;
     }
 
     
@@ -135,11 +136,14 @@ public class Game : MonoBehaviour
         GameLogic.Instance.BoardWidth = width;
         GameLogic.Instance.BoardHeight = height;
         GameLogic.Instance.Generate();
-        GameLogic.Instance.Dispose();
+        // GameLogic.Instance.Dispose();
+        GameLogic.Instance.Fill();
+
+        View();
 
         Board.Board = GameLogic.Instance.Board;
         Board.CreateBoard(width, height);
-        // View();
+        Board.FillColor();
     }
 
     private void DisplayClockWise(SlotNode node)
@@ -150,7 +154,7 @@ public class Game : MonoBehaviour
             stringBuilder.Append("[null object!]");
         else
         {
-            stringBuilder.Append($"[{node.Id}: {node.Color.ToString()}] == ");
+            stringBuilder.Append($"[{node.Id}: {node.Color.ToString()}({node.MatchCount})] == ");
             foreach ( int index in Enum.GetValues( typeof( ClockWise ) ) )
             {
                 if (index < (int)ClockWise.count)

@@ -8,6 +8,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using UnityEngine;
 using Pattern.Managers;
 using Pattern.Objects;
 using Pattern.Configs;
@@ -22,7 +23,9 @@ namespace Pattern.Business
         public int BoardHeight { get; set; }
         public static GameLogic Instance => m_instance.Value;
         private static readonly Lazy<GameLogic> m_instance = new Lazy<GameLogic>( () => new GameLogic() );
+        public Action RemoveBall {get; set;}
         private GameLogic() {}
+
 
 
 
@@ -37,18 +40,15 @@ namespace Pattern.Business
 
                 if (shape == null)
                     PatternManager.Instance.Clear();
-
+                
                 return shape;
             }
         }
 
         public void Generate()
-        {
-            Dispose();
-            SlotManager.Instance.CreateBoard(BoardWidth, BoardHeight);
-        }
+            => SlotManager.Instance.CreateBoard(BoardWidth, BoardHeight);
 
-        public void Dispose()
+        public void Fill()
         {
             while (true)
             {
@@ -62,9 +62,28 @@ namespace Pattern.Business
             PatternManager.Instance.Clear();
         }
 
+        public void Dispose()
+        {
+            MarkingSelected();
+            RemoveMarked();
+            RemoveBall?.Invoke();
+
+            // while (true)
+            // {
+            //     MarkingSelected();
+            //     RemoveMarked();
+
+            //     if (!FillColors(out int count))
+            //         break;
+            // }
+
+            // m_shape = null;
+            // PatternManager.Instance.Clear();
+        }
+
         public SlotNode Board
             => SlotManager.Instance.Board;
-            
+
         /*
          * Privates
          */
@@ -78,6 +97,31 @@ namespace Pattern.Business
 
             foreach (SlotNode node in SlotManager.Instance)
             {
+//                 SlotNode temp = node;
+
+// Debug.Log($"--------->> current node = {node.Id}");
+//                 for (int i = 0; i < shape.Length; ++i)
+//                 {
+// Debug.Log($"temp id = {temp.Id}, dir = {(ClockWise)shape[i]}");
+//                     temp = temp.NextSameColorNode(shape[i]);
+//                     if (temp == null)
+//                     {
+// Debug.LogWarning($"break temp id = {temp?.Id}");
+//                         break;
+//                     }
+                    
+//                     if (i == shape.Length - 1)
+//                     {
+//                         temp = node;
+//                         temp.Increment();
+//                         for (int j = 0; j < shape.Length; ++j)
+//                         {
+//                             temp = temp.NextSameColorNode(shape[j]);
+//                             temp.Increment();
+//                         }
+//                     }
+//                 }
+
                 SlotNode temp = node;
 
                 int zeroQuery = shape?
@@ -102,16 +146,6 @@ namespace Pattern.Business
             }
         }
 
-        private void RemoveMarked()
-        {
-            if (SlotManager.Instance.Board == null)
-                return;
-
-            foreach (SlotNode node in SlotManager.Instance)
-                if (node.MatchCount > 0)
-                    node.Dispose();
-        }
-
         private bool FillColors(out int count)
         {
             SlotNode[] bottomLine = SlotManager.Instance.BottomLineArray;
@@ -120,6 +154,16 @@ namespace Pattern.Business
             while (bottomLine != null && bottomLine.Where(e => RequestUpper(e) == true && ++fillCount > 0).Select(e => e).Count() != 0);
 
             return (count = fillCount) > 0;
+        }
+
+        private void RemoveMarked()
+        {
+            // if (SlotManager.Instance.Board == null)
+            //     return;
+
+            foreach (SlotNode node in SlotManager.Instance)
+                if (node.MatchCount > 0)
+                    node.Dispose();
         }
 
         private bool RequestUpper(SlotNode slotNode)
