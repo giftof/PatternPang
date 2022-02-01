@@ -20,11 +20,15 @@ using Pattern.Configs;
 public class Game : MonoBehaviour
 {
     [SerializeField] GamePrefab gamePrefab;
+    [SerializeField] PlayPrefab playPrefab;
 
     void Start()
     {
         gamePrefab.Size = (7, 8 + CONST.GENERATOR_LINE);
         gamePrefab.Generate();
+
+        playPrefab.Generator = gamePrefab.BallGenerator();
+        playPrefab.BaseLine = gamePrefab.BaseLine;
 
         SlotPrefab[] generator = gamePrefab.BallGenerator();
         foreach (var item in generator)

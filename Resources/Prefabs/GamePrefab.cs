@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Pattern.Configs;
 using Pattern.Objects;
 using Pattern.Managers;
@@ -62,6 +63,7 @@ public class GamePrefab : MonoBehaviour
     {
         return BaseLine.Select(e => {
             while (e.Upper != null) e = e.Upper;
+            e.GetComponent<Image>().raycastTarget = false;
             return e;
         }).ToArray();
     }
@@ -99,5 +101,32 @@ public class GamePrefab : MonoBehaviour
         if (lower != null)
             lower.Upper = upper;
         lower = upper;
+    }
+
+    private void Dispose()
+    {
+        Vector3[] shape = PatternHandler.Instance.ShapeOffset();
+
+        if (shape == null)
+            return;
+
+        foreach (SlotPrefab item in slotArray)
+        {
+            SlotAttribute attribute = item.Slot.Color;
+            Vector3 position = item.transform.localPosition;
+
+            var group = shape.GroupBy(
+                    e => PatternHandler.Instance.rayPrefab.Shot(position += e).Slot.Color.Equals(attribute),
+                    e => PatternHandler.Instance.rayPrefab.Shot(position),
+                    (key, value) => new {
+                        Key = key,
+                        Count = value.Count(),
+                    }
+                );
+
+            Debug.Log($">> group.Count = {group.Count()}");
+            foreach (var g in group)
+                Debug.Log($"g.Key = {g.Key}, g.Count = {g.Count}");
+        }
     }
 }

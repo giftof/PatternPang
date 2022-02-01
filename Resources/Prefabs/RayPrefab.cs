@@ -10,11 +10,11 @@ public class RayPrefab : MonoBehaviour
     RaycastHit m_hit;
     float m_maxDistance = 1000;
 
-    public SlotAttribute? Shot(Vector3 position)
+    public SlotPrefab Shot(Vector3 position)
     {
         if (Physics.Raycast(position, transform.forward, out m_hit, m_maxDistance))
             if (m_hit.transform.TryGetComponent(out SlotPrefab slotPrefab))
-                return slotPrefab.Slot.Color;
+                return slotPrefab;
         return null;
     }
 }

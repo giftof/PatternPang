@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Pattern.Objects;
-using Pattern.Business;
 using Pattern.Configs;
+using Pattern.Managers;
 
 
 
@@ -14,6 +14,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
     public Slot Slot { get; set; } = null;
     public SlotPrefab Upper { get; set; } = null;
     public BallPrefab Ball { get; set; } = null;
+    public Action Disposer { get; set; } = null;
     private static bool activate = false;
 
     private void Awake() { }
@@ -23,14 +24,14 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
         if (!activate)
         {
             activate = true;
-            //GameLogic.Instance.AddTrace(SlotNode);
+            PatternHandler.Instance.Add(transform.localPosition, Slot.Color);
         }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        //if (activate)
-        //    GameLogic.Instance.AddTrace(SlotNode);
+        if (activate)
+            PatternHandler.Instance.AddChecker(this);
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -38,7 +39,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
         if (activate && Input.touchCount == 0)
         {
             activate = false;
-            //GameLogic.Instance.Dispose();
+            Disposer?.Invoke();
         }
     }
 }
