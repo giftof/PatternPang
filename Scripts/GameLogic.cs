@@ -67,52 +67,41 @@ namespace Pattern.Business
         /*
          * Privates
          */
-        public SlotNode[] SearchPattern()
+        public void MarkingSelected()
         {
             int[] shape = Shape;
             int verify = shape?.Sum() ?? 0;
-            List<SlotNode> list = new List<SlotNode>();
 
             if (verify.Equals(0))
-                return null;
+                return;
 
             foreach (SlotNode node in SlotManager.Instance)
             {
-                if (node.Color == PatternColor.generator)
-                    continue;
+                // if (node.Color == PatternColor.generator)
+                //     continue;
+
                 SlotNode temp = node;
-                int zero = shape?
-                    .Where(e 
+                int zeroQuery = shape?
+                    .Where(e
                         => temp != null 
                         && (temp = temp.NextSameColorNode(e)) != null)
-                    .Sum(e => e)
+                    .Sum(e
+                        => e)
                     .CompareTo(verify) ?? 1;
                 
-                if (zero.Equals(0))
-                    list.Add(node);
-            }
+                if (zeroQuery.Equals(0))
+                {
+                    temp = node;
+                    temp.Increment();
 
-            return list.ToArray();
-        }
-
-        private void MarkingSelected()
-        {
-            int[] shape = Shape;
-            SlotNode[] array = SearchPattern();
-
-            if (array == null)
-                return;
-
-            foreach (SlotNode node in array)
-            {
-                SlotNode temp = node;
-                temp.Increment();
-                
-                shape
-                    .Where(e 
-                        => temp.Link[e].Increment() > 0 
-                        && (temp = temp.Link[e]) != null)
-                    .Select(e => e).ToArray();
+                    shape
+                        .Where(e
+                            => temp.Link[e].Increment() > 0
+                            && (temp = temp.Link[e]) != null)
+                        .Select(e
+                            => e)
+                        .ToArray();
+                }
             }
         }
 

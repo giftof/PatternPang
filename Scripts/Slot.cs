@@ -71,7 +71,10 @@ namespace Pattern.Objects
         }
 
         public SlotNode NextSameColorNode(int dir)
-            => (Color != PatternColor.generator && Link[dir] != null && Link[dir].Color.Equals(Color)) ? Link[dir] : null;
+            => Color != PatternColor.generator 
+            && Link[dir] != null 
+            && Link[dir].Color.Equals(Color) 
+            ? Link[dir] : null;
 
         public int FindLinkIndex(SlotNode slotNode) => Link.Select((node, index) => new {node, index}).First(tp => slotNode.Equals(tp.node) || tp.index == (int)ClockWise.count).index;
     }

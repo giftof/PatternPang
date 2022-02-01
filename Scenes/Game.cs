@@ -87,10 +87,10 @@ public class Game : MonoBehaviour
 
 /**/        Debug.LogWarning(stringBuilder);
 
-            SlotNode[] array = GameLogic.Instance.SearchPattern();
-            Debug.Log($"match count = {array.Length}");
-            foreach (SlotNode node in array)
-                Debug.Log($"id = {node.Id}, color = {node.Color}");
+            // SlotNode[] array = GameLogic.Instance.SearchPattern();
+            // Debug.Log($"match count = {array.Length}");
+            // foreach (SlotNode node in array)
+            //     Debug.Log($"id = {node.Id}, color = {node.Color}");
     }
 
     private SlotNode FindSlotNode(int id)
