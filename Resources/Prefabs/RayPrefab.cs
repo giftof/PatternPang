@@ -9,7 +9,7 @@ using Pattern.Managers;
 public class RayPrefab : MonoBehaviour
 {
     RaycastHit m_hit;
-    float m_maxDistance = 1200;
+    float m_maxDistance = 1500;
 
     private void Awake()
     {
@@ -19,7 +19,7 @@ public class RayPrefab : MonoBehaviour
     public SlotPrefab Shot(Vector3 position)
     {
         Debug.LogError("will shot debugray");
-        Debug.DrawRay(position, Vector3.forward * m_maxDistance, Color.red, 1000);
+        Debug.DrawRay(position, Vector3.forward * m_maxDistance, Color.red, m_maxDistance);
 
 
 

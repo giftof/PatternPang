@@ -47,7 +47,6 @@ Debug.Log($"ray result = {rayPrefab.Shot(m_selected.First.Next.Value.transform.p
                 && Vector3.Distance(m_selected.First.Value.transform.position, target.transform.position) < CONST.MAX_DISTANCE)
                 m_selected.AddFirst(target);
 
-
             /* test code */
             Debug.Log($"selected count = {m_selected.Count}");
         }
