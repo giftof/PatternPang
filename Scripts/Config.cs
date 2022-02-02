@@ -19,6 +19,8 @@ namespace Pattern.Configs
         public static readonly float MOVE_DURATION = .5f;
         public static readonly uint LEVEL1 = 7;
         public static readonly uint LEVEL2 = 5;
+        public static readonly (uint, uint) SIZE1 = (7, 8 + GENERATOR_LINE);
+        public static readonly (uint, uint) SIZE2 = (9, 11 + GENERATOR_LINE);
     }
 
     //public static class PATH

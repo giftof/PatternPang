@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,7 +18,7 @@ public class ObjectPool : MonoBehaviour
         if (queue.Count > 0)
         {
             obj = queue.Dequeue();
-            obj.gameObject.SetActive(true);
+            obj.SetActive(true);
         }
         else
             obj = Instantiate(prefab);
@@ -35,6 +34,6 @@ public class ObjectPool : MonoBehaviour
     {
         queue.Enqueue(obj);
         obj.transform.SetParent(transform);
-        obj.gameObject.SetActive(false);
+        obj.SetActive(false);
     }
 }
