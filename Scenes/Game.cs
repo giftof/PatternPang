@@ -24,21 +24,22 @@ public class Game : MonoBehaviour
 
     void Start()
     {
-        gamePrefab.Size = (7, 8 + CONST.GENERATOR_LINE);
-        gamePrefab.Generate();
+        gamePrefab.Initialize((7, 8 + CONST.GENERATOR_LINE));
+        //gamePrefab.Size = (7, 8 + CONST.GENERATOR_LINE);
+        //gamePrefab.Generate();
 
-        playPrefab.Generator = gamePrefab.BallGenerator();
-        playPrefab.BaseLine = gamePrefab.BaseLine;
+        //playPrefab.Generator = gamePrefab.BallGenerator();
+        //playPrefab.BaseLine = gamePrefab.BaseLine;
 
-        SlotPrefab[] generator = gamePrefab.BallGenerator();
-        foreach (var item in generator)
-        {
-            Debug.Log($"generator item.name = {item.name}");
-        }
-        SlotPrefab[] baseLine = gamePrefab.BaseLine;
-        foreach (var item in baseLine)
-        {
-            Debug.Log($"baseline item.name = {item.name}");
-        }
+        //SlotPrefab[] generator = gamePrefab.BallGenerator();
+        //foreach (var item in generator)
+        //{
+        //    Debug.Log($"generator item.name = {item.name}");
+        //}
+        //SlotPrefab[] baseLine = gamePrefab.BaseLine;
+        //foreach (var item in baseLine)
+        //{
+        //    Debug.Log($"baseline item.name = {item.name}");
+        //}
     }
 }

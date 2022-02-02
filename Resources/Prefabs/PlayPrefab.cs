@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Pattern.Configs;
+using DG.Tweening;
 
 
 
@@ -16,16 +17,35 @@ public class PlayPrefab : MonoBehaviour
     {
         foreach (var item in BaseLine)
         {
-            SlotPrefab current = item;
-            while (current.Slot.Color != SlotAttribute.none)
-                RecursiceRequest(current);
+            RecursiceRequest(item);
+            //SlotPrefab current = item;
+            //while (current.Slot.Color != SlotAttribute.none)
+            //    RecursiceRequest(current);
         }
     }
 
 
 
+    private void RequestBall(SlotPrefab slotPrefab)
+    {
+        if (slotPrefab.Upper != null)
+        {
+            if (slotPrefab.Slot.Color == SlotAttribute.none
+                && slotPrefab.Upper.Slot.Color != SlotAttribute.none)
+                slotPrefab.Upper.Ball.SendTo(slotPrefab);
+                
+            //RequestBall(slotPrefab.Upper);
+        }
+    }
+
     private void RecursiceRequest(SlotPrefab slotPrefab)
     {
+        while (slotPrefab.Upper != null
+            && slotPrefab.Slot.Color != SlotAttribute.none)
+            slotPrefab = slotPrefab.Upper;
+
+        //while (slotPrefab.Upper != null)
+
 
     }
 }
