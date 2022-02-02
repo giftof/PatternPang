@@ -61,12 +61,10 @@ Debug.Log($"select = {e?.name}");
 
     private void GenerateBall(SlotPrefab destination)
     {
-        BallPrefab ballPrefab = ballPool.Request(destination.transform.parent.transform, destination.transform.position).GetComponent<BallPrefab>();
-        //ballPrefab.Color = (SlotAttribute)UnityEngine.Random.Range(0, (int)SlotAttribute.count - CONST.LEVEL1);
-        destination.Slot.Color = (SlotAttribute)UnityEngine.Random.Range(0, (int)SlotAttribute.count - CONST.LEVEL1);
-        destination.Ball = ballPrefab;
-
-        //destination.Ball = ballPool.Request(destination.transform.parent.transform, destination.transform.position).GetComponent<BallPrefab>();
+        if (ballPool.Request<BallPrefab>(destination.transform.parent, destination.transform.localPosition) is BallPrefab ballPrefab)
+            destination.Ball = ballPrefab;
+        else
+            throw new Exception("objectPool make error");
     }
 
     private void Generate()
@@ -85,15 +83,18 @@ Debug.Log($"select = {e?.name}");
                 currentPosition += Vector3.up * slotSize.y * .5f;
             for (uint h = 0; h < Size.Column; ++h)
             {
-                SlotPrefab slot = slotPool.Request(transform, currentPosition).GetComponent<SlotPrefab>();
-                BaseLine[w] = BaseLine[w] ?? slot;
-                slot.Slot = new Slot();
-                slot.Slot.Id = w * Size.Column + h;
-                slotArray[slot.Slot.Id] = slot;
+                if (slotPool.Request<SlotPrefab>(transform, currentPosition) is SlotPrefab slot)
+                {
+                    BaseLine[w] = BaseLine[w] ?? slot;
+                    slot.Slot = new Slot(w * Size.Column + h);
+                    slotArray[slot.Slot.Id] = slot;
 /* debug code */slot.name = slot.Slot.Id.ToString();
-                currentPosition += Vector3.up * slotSize.y;
+                    currentPosition += Vector3.up * slotSize.y;
 
-                Sewing(slot, ref lower);
+                    Sewing(slot, ref lower);
+                }
+                else
+                    throw new Exception("objectPool make error");
             }
             currentPosition = beginPosition + Vector3.right * (w + 1) * widthUnit;
         }
@@ -134,7 +135,7 @@ Debug.Log($"select = {e?.name}");
         lower = upper;
     }
 
-    private void Dispose()
+/*    private void Dispose()
     {
         Vector3[] shape = PatternHandler.Instance.ShapeOffset();
 
@@ -160,4 +161,4 @@ Debug.Log($"select = {e?.name}");
                 Debug.Log($"g.Key = {g.Key}, g.Count = {g.Count}");
         }
     }
-}
+*/}

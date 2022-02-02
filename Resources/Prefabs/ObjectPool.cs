@@ -11,7 +11,7 @@ public class ObjectPool : MonoBehaviour
     private void Awake()
         => queue = new Queue<GameObject>();
 
-    public GameObject Request(Transform parent = null, Vector3 position = default)
+    public T Request<T>(Transform parent = null, Vector3 position = default) where T : class
     {
         GameObject obj;
 
@@ -27,7 +27,7 @@ public class ObjectPool : MonoBehaviour
         obj.transform.localScale = Vector3.one;
         obj.transform.localPosition = position;
 
-        return obj;
+        return obj.TryGetComponent(out T result) ? result : null;
     }
 
     public void Release(GameObject obj)

@@ -17,10 +17,9 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
 {
     public Slot Slot { get; set; } = null;
     public SlotPrefab Upper { get; set; } = null;
-    //public BallPrefab Ball { get; set; } = null;
-    public BallPrefab m_ball { get; set; } = null;
     public DELEGATE_T<SlotPrefab> Generate;
     private static bool activate = false;
+    private BallPrefab m_ball { get; set; } = null;
 
     private void Awake() { }
 
@@ -29,6 +28,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
         get { return m_ball; }
         set
         {
+            Slot.Color = (SlotAttribute)UnityEngine.Random.Range(1, (int)SlotAttribute.count - CONST.LEVEL1);
             m_ball = value;
             m_ball.GetComponent<Image>().color = ConvertToColor();
         }

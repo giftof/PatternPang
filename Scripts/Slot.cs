@@ -19,5 +19,10 @@ namespace Pattern.Objects
         public SlotAttribute Color { get; set; } = SlotAttribute.none;
         public uint MatchCount { get; set; } = 0;
         public uint Id { get; set; } = 0;
+
+        public Slot(uint id)
+        {
+            Id = id;
+        }
     }
 }
