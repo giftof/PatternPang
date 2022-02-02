@@ -1,13 +1,8 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Pattern.Objects;
-using Pattern.Configs;
 using Pattern.Managers;
-using DG.Tweening;
 
 
 
@@ -18,20 +13,17 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
     public Slot Slot { get; set; } = null;
     public SlotPrefab Upper { get; set; } = null;
     public DELEGATE_T<SlotPrefab> Generate;
+    public BallPrefab Ball { get; set; } = null;
     private static bool activate = false;
-    private BallPrefab m_ball { get; set; } = null;
 
     private void Awake() { }
 
-    public BallPrefab Ball
+    public void Initialize(Slot slot)
     {
-        get { return m_ball; }
-        set
-        {
-            Slot.Color = (SlotAttribute)UnityEngine.Random.Range(1, (int)SlotAttribute.count - CONST.LEVEL1);
-            m_ball = value;
-            m_ball.GetComponent<Image>().color = ConvertToColor();
-        }
+        name = slot.Id.ToString();
+        Slot = slot;
+        Generate = null;
+        GetComponent<Image>().raycastTarget = true;
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -39,7 +31,8 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
         if (!activate)
         {
             activate = true;
-            PatternHandler.Instance.Add(transform.localPosition, Slot.Color);
+            /*PatternHandler.Instance.Add(transform.localPosition, Slot.Color);*/
+            PatternHandler.Instance.Add(this, Slot.Color);
         }
     }
 
@@ -54,7 +47,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
         if (activate && Input.touchCount == 0)
         {
             activate = false;
-            Dispose();
+            /*Dispose();*/
             //Disposer?.Invoke(this);
         }
     }
@@ -62,38 +55,12 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
     public void Dispose()
     {
         if (Upper == null)
-        {
             Generate?.Invoke(this);
-            return;
-        }
 
-        if (Ball == null && Upper.Ball != null)
-            Upper.Ball.SendTo(this);
-
-        Upper?.Dispose();
-    }
-
-    private Color ConvertToColor()
-    {
-        return Slot.Color switch
+        if (Upper != null ? Upper.Ball : null != null)
         {
-            SlotAttribute.red => Color.red,
-            SlotAttribute.green => Color.green,
-            SlotAttribute.blue => Color.blue,
-            SlotAttribute.yellow => Color.yellow,
-            SlotAttribute.purple => Color.cyan,
-            SlotAttribute.bomb1 => Color.black,
-            SlotAttribute.bomb2 => Color.black,
-            SlotAttribute.bomb3 => Color.black,
-            _ => Color.white,
-        };
+            Upper.Ball.SendTo(this);
+            Upper.Ball = null;
+        }
     }
 }
-
-//public static class SlotPrefabExtension
-//{
-//    public static void Dispose(this SlotPrefab me)
-//    {
-
-//    }
-//}

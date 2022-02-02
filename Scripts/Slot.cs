@@ -5,9 +5,6 @@
  * Copyright (c) 2022 [noname]
  */
 
-using UnityEngine;
-using System;
-using System.Linq;
 using Pattern.Configs;
 
 
@@ -21,8 +18,6 @@ namespace Pattern.Objects
         public uint Id { get; set; } = 0;
 
         public Slot(uint id)
-        {
-            Id = id;
-        }
+            => Id = id;
     }
 }

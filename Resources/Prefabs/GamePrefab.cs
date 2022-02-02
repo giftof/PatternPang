@@ -33,41 +33,32 @@ public class GamePrefab : MonoBehaviour
         Size = size;
 
         Clear();
-        Generate();
+        CreateBoard();
         SetDistance();
-        TEST_GENERATE();
+        SetBallGenerator();
+        StartCoroutine(FillBoard());
     }
 
-    public SlotPrefab[] BallGenerator()
+    private void SetBallGenerator()
     {
-        return BaseLine.Select(e => {
+        BaseLine.Select(e => {
             while (e.Upper != null) e = e.Upper;
             e.GetComponent<Image>().raycastTarget = false;
             e.Generate = GenerateBall;
-Debug.Log($"select = {e?.name}");
+            e.Slot.Color = SlotAttribute.generator;
             return e;
         }).ToArray();
     }
 
-    private void TEST_GENERATE()
-    {
-        SlotPrefab[] generator = BallGenerator();
-        foreach (var item in generator)
-        {
-            item.Dispose();
-            //item.Disposer(item);
-        }
-    }
-
     private void GenerateBall(SlotPrefab destination)
     {
-        if (ballPool.Request<BallPrefab>(destination.transform.parent, destination.transform.localPosition) is BallPrefab ballPrefab)
-            destination.Ball = ballPrefab;
-        else
-            throw new Exception("objectPool make error");
+        if (destination.Ball != null)
+            return;
+
+        StartCoroutine(CreateBall(destination));
     }
 
-    private void Generate()
+    private void CreateBoard()
     {
         Vector3 beginPosition = Vector3.left * (Size.Row - 1) * widthUnit * .5f;
         Vector3 currentPosition = beginPosition;
@@ -85,16 +76,16 @@ Debug.Log($"select = {e?.name}");
             {
                 if (slotPool.Request<SlotPrefab>(transform, currentPosition) is SlotPrefab slot)
                 {
-                    BaseLine[w] = BaseLine[w] ?? slot;
-                    slot.Slot = new Slot(w * Size.Column + h);
+                    slot.Initialize(new Slot(w * Size.Column + h));
+
                     slotArray[slot.Slot.Id] = slot;
-/* debug code */slot.name = slot.Slot.Id.ToString();
                     currentPosition += Vector3.up * slotSize.y;
 
+                    BaseLine[w] = BaseLine[w] ?? slot;
                     Sewing(slot, ref lower);
                 }
                 else
-                    throw new Exception("objectPool make error");
+                    throw new Exception("slotPool make Exception");
             }
             currentPosition = beginPosition + Vector3.right * (w + 1) * widthUnit;
         }
@@ -110,19 +101,18 @@ Debug.Log($"select = {e?.name}");
         BaseLine = null;
     }
 
+    /* at least 3 x 3 brard */
     private void SetDistance()
     {
         float[] distance = new float[5];
-        distance[0] = Vector3.Distance(slotArray[0].transform.localPosition, slotArray[Size.Column * 2 + 1].transform.localPosition);
-        distance[1] = Vector3.Distance(slotArray[0].transform.localPosition, slotArray[2].transform.localPosition);
-        distance[2] = Vector3.Distance(slotArray[0].transform.localPosition, slotArray[Size.Column + 1].transform.localPosition);
-        distance[3] = Vector3.Distance(slotArray[0].transform.localPosition, slotArray[Size.Column].transform.localPosition);
-        distance[4] = Vector3.Distance(slotArray[0].transform.localPosition, slotArray[1].transform.localPosition);
+        distance[0] = Vector3.Distance(slotArray[0].transform.position, slotArray[Size.Column * 2 + 1].transform.position);
+        distance[1] = Vector3.Distance(slotArray[0].transform.position, slotArray[2].transform.position);
+        distance[2] = Vector3.Distance(slotArray[0].transform.position, slotArray[Size.Column + 1].transform.position);
+        distance[3] = Vector3.Distance(slotArray[0].transform.position, slotArray[Size.Column].transform.position);
+        distance[4] = Vector3.Distance(slotArray[0].transform.position, slotArray[1].transform.position);
         float min = Mathf.Min(distance[0], distance[1], distance[2]);
         float max = Mathf.Max(distance[3], distance[4]);
         CONST.MAX_DISTANCE = (min + max) * .5f;
-
-        //Debug.Log($"CONST.MAX_DISTANCE = {CONST.MAX_DISTANCE}");
     }
 
     private bool IsFloating(uint row)
@@ -135,30 +125,63 @@ Debug.Log($"select = {e?.name}");
         lower = upper;
     }
 
-/*    private void Dispose()
+    private Color ConvertToColor(SlotAttribute attribute)
     {
-        Vector3[] shape = PatternHandler.Instance.ShapeOffset();
-
-        if (shape == null)
-            return;
-
-        foreach (SlotPrefab item in slotArray)
+        return attribute switch
         {
-            SlotAttribute attribute = item.Slot.Color;
-            Vector3 position = item.transform.localPosition;
-
-            var group = shape.GroupBy(
-                    e => PatternHandler.Instance.rayPrefab.Shot(position += e).Slot.Color.Equals(attribute),
-                    e => PatternHandler.Instance.rayPrefab.Shot(position),
-                    (key, value) => new {
-                        Key = key,
-                        Count = value.Count(),
-                    }
-                );
-
-            Debug.Log($">> group.Count = {group.Count()}");
-            foreach (var g in group)
-                Debug.Log($"g.Key = {g.Key}, g.Count = {g.Count}");
-        }
+            SlotAttribute.red => Color.red,
+            SlotAttribute.green => Color.green,
+            SlotAttribute.blue => Color.blue,
+            SlotAttribute.yellow => Color.yellow,
+            SlotAttribute.purple => Color.cyan,
+            SlotAttribute.bomb1 => Color.black,
+            SlotAttribute.bomb2 => Color.black,
+            SlotAttribute.bomb3 => Color.black,
+            _ => Color.white,
+        };
     }
-*/}
+
+    IEnumerator FillBoard()
+    {
+        while (BallPrefab.TweeningCount > 0)
+            yield return null;
+
+        int nullCount = 0;
+
+        foreach (var item in slotArray)
+        {
+            if (item.Ball == null)
+            {
+                ++nullCount;
+                item.Dispose();
+            }
+        }
+
+        if (nullCount > 0)
+            StartCoroutine(FillBoard());
+
+        /* test code begin */
+        else
+        {
+            foreach (var item in slotArray)
+            {
+                Debug.Log($"id = {item.Slot.Id}, color = {item.Slot.Color}");
+            }
+        }
+        /* test code end */
+    }
+
+    IEnumerator CreateBall(SlotPrefab destination)
+    {
+        while (BallPrefab.TweeningCount > 0)
+            yield return null;
+
+        if (ballPool.Request<BallPrefab>(destination.transform.parent, destination.transform.localPosition) is BallPrefab ballPrefab)
+        {
+            ballPrefab.Color = (SlotAttribute)UnityEngine.Random.Range(1, (int)SlotAttribute.count - CONST.LEVEL1);
+            destination.Ball = ballPrefab;
+        }
+        else
+            throw new Exception("ballPool make Exception");
+    }
+}

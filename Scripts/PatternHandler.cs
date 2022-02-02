@@ -12,30 +12,31 @@ namespace Pattern.Managers
 {
     public class PatternHandler
     {
-        private LinkedList<Vector3> m_selectedPosition;
-        private SlotAttribute? m_fixedAttribute = null;
+        private LinkedList<SlotPrefab> m_selected;
+        private SlotAttribute m_fixedAttribute = SlotAttribute.none;
 
         public RayPrefab rayPrefab;
         public static PatternHandler Instance => m_instance.Value;
         private static readonly Lazy<PatternHandler> m_instance = new Lazy<PatternHandler>(() => new PatternHandler());
-        private PatternHandler() => m_selectedPosition = new LinkedList<Vector3>();
+        private PatternHandler() => m_selected = new LinkedList<SlotPrefab>();
 
-        public void Add(Vector3 position, SlotAttribute attribute)
+        public void Add(SlotPrefab slot, SlotAttribute attribute)
         {
-            if (m_fixedAttribute == null)
+            if (m_fixedAttribute.Equals(SlotAttribute.none))
             {
-                m_selectedPosition.AddFirst(position);
+                m_selected.AddFirst(slot);
                 m_fixedAttribute = attribute;
             }
             else if (m_fixedAttribute.Equals(attribute))
-                m_selectedPosition.AddFirst(position);
+                m_selected.AddFirst(slot);
         }
 
         public void AddChecker(SlotPrefab target)
         {
-            if (m_selectedPosition.Count > 1)
+            if (m_selected.Count > 1)
             {
-                if (rayPrefab.Shot(m_selectedPosition.First.Next.Value).Equals(target))
+Debug.Log($"ray result = {rayPrefab.Shot(m_selected.First.Next.Value.transform.position)}");
+                if (target.Equals(rayPrefab.Shot(m_selected.First.Next.Value.transform.position)))
                 {
                     Remove();
                     return;
@@ -43,30 +44,35 @@ namespace Pattern.Managers
             }
 
             if (m_fixedAttribute.Equals(target.Slot.Color)
-                && Vector3.Distance(m_selectedPosition.First.Value, target.transform.localPosition) < CONST.MAX_DISTANCE)
-                m_selectedPosition.AddFirst(target.transform.localPosition);
+                && Vector3.Distance(m_selected.First.Value.transform.position, target.transform.position) < CONST.MAX_DISTANCE)
+                m_selected.AddFirst(target);
+
+
+            /* test code */
+            Debug.Log($"selected count = {m_selected.Count}");
         }
 
         public void Remove()
-            => m_selectedPosition.RemoveFirst();
+            => m_selected.RemoveFirst();
+
 
         public void Clear()
         {
-            m_selectedPosition.Clear();
-            m_fixedAttribute = null;
+            m_selected.Clear();
+            m_fixedAttribute = SlotAttribute.none;
         }
 
         public Vector3[] ShapeOffset()
         {
-            if (m_selectedPosition.Count < CONST.MIN_SELECT)
+            if (m_selected.Count < CONST.MIN_SELECT)
                 return null;
 
-            LinkedListNode<Vector3> node = m_selectedPosition.First;
+            LinkedListNode<SlotPrefab> node = m_selected.First;
             List<Vector3> list = new List<Vector3>();
 
-            for (int i = 0; i < m_selectedPosition.Count - 1; ++i)
+            for (int i = 0; i < m_selected.Count - 1; ++i)
             {
-                list.Add(node.Value - node.Next.Value);
+                list.Add(node.Value.transform.position - node.Next.Value.transform.position);
                 node = node.Next;
             }
 

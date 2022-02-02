@@ -24,7 +24,7 @@ public class Game : MonoBehaviour
 
     void Start()
     {
-        gamePrefab.Initialize(CONST.SIZE1);
+        gamePrefab.Initialize(CONST.SIZE0);
         //gamePrefab.Size = (7, 8 + CONST.GENERATOR_LINE);
         //gamePrefab.Generate();
 

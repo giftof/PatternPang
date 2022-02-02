@@ -233,6 +233,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91f97270a155544be8b19521950972b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &282388096 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -7687523659287740828, guid: d50796424e11f4b2794831820ab73a9d,
+    type: 3}
+  m_PrefabInstance: {fileID: 4218544920248113889}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b70c87a46d1724a2e9c1a39ac74987d8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &494440772
 GameObject:
   m_ObjectHideFlags: 0
@@ -646,6 +658,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -3294132035252067893, guid: 8893331dad9b34ec08e1171713b59bef,
         type: 3}
+      propertyPath: ray
+      value: 
+      objectReference: {fileID: 282388096}
+    - target: {fileID: -3294132035252067893, guid: 8893331dad9b34ec08e1171713b59bef,
+        type: 3}
       propertyPath: ballPool
       value: 
       objectReference: {fileID: 1817034802}
@@ -942,6 +959,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: PlayPrefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 1645028195411941043, guid: dc5925ba2cd4e4ef7a4370698e396bd1,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4361734847055190184, guid: dc5925ba2cd4e4ef7a4370698e396bd1,
         type: 3}
