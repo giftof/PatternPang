@@ -8,9 +8,6 @@ using Pattern.Managers;
 
 public class RayPrefab : MonoBehaviour
 {
-    RaycastHit m_hit;
-    float m_maxDistance = 1500;
-
     private void Awake()
     {
         PatternHandler.Instance.rayPrefab = this;
@@ -18,15 +15,12 @@ public class RayPrefab : MonoBehaviour
 
     public SlotPrefab Shot(Vector3 position)
     {
-        Debug.LogError("will shot debugray");
-        Debug.DrawRay(position, Vector3.forward * m_maxDistance, Color.red, m_maxDistance);
+        RaycastHit2D hit;
 
+        hit = Physics2D.Raycast(position, transform.forward);
 
-
-
-        if (Physics.Raycast(position, transform.forward, out m_hit, m_maxDistance))
-            if (m_hit.transform.TryGetComponent(out SlotPrefab slotPrefab))
-                return slotPrefab;
+        if (hit && hit.transform.TryGetComponent(out SlotPrefab slotPrefab))
+            return slotPrefab;
         return null;
     }
 }

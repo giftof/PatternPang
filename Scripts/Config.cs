@@ -16,7 +16,7 @@ namespace Pattern.Configs
         public static readonly uint GENERATOR_LINE = 1;
         public static readonly uint EVEN_COLUMN_UP = 1;
         public static float MAX_DISTANCE;
-        public static readonly float MOVE_DURATION = .5f;
+        public static readonly float MOVE_DURATION = .2f;
         public static readonly uint LEVEL1 = 6;
         public static readonly uint LEVEL2 = 4;
         public static readonly (uint, uint) SIZE0 = (3, 3 + GENERATOR_LINE);

@@ -35,10 +35,11 @@ namespace Pattern.Managers
         {
             if (m_selected.Count > 1)
             {
-Debug.Log($"ray result = {rayPrefab.Shot(m_selected.First.Next.Value.transform.position)}");
                 if (target.Equals(rayPrefab.Shot(m_selected.First.Next.Value.transform.position)))
                 {
                     Remove();
+/* test code */ Debug.Log($"selected count = {m_selected.Count}");
+TEST_SHOW();
                     return;
                 }
             }
@@ -47,9 +48,17 @@ Debug.Log($"ray result = {rayPrefab.Shot(m_selected.First.Next.Value.transform.p
                 && Vector3.Distance(m_selected.First.Value.transform.position, target.transform.position) < CONST.MAX_DISTANCE)
                 m_selected.AddFirst(target);
 
-            /* test code */
-            Debug.Log($"selected count = {m_selected.Count}");
+/* test code */ Debug.Log($"selected count = {m_selected.Count}");
+TEST_SHOW();
         }
+
+private void TEST_SHOW()
+{
+string str = "";
+foreach (var item in m_selected)
+str += item.name + ", ";
+Debug.Log($"selected = {str}");
+}
 
         public void Remove()
             => m_selected.RemoveFirst();
