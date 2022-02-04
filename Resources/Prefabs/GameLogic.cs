@@ -113,7 +113,7 @@ public class GameLogic : MonoBehaviour
             {
                 if (slotPool.Request<SlotPrefab>(transform, currentPosition) is SlotPrefab slot)
                 {
-                    slot.Initialize(new Slot(w * Size.Column + h));
+                    slot.Initialize(new Slot(w * Size.Column + h), PatternHandler.Instance.Clear, AfterDraw);
 
                     slotArray[slot.Slot.Id] = slot;
                     currentPosition += Vector3.up * slotSize.y;
@@ -194,5 +194,10 @@ public class GameLogic : MonoBehaviour
             yield return null;
 
         action?.Invoke();
+    }
+
+    private void AfterDraw()
+    {
+        Debug.Log("call After Draw");
     }
 }

@@ -68,6 +68,7 @@ Debug.Log($"selected = {str}"); }
         {
             m_selected.Clear();
             m_fixedAttribute = SlotAttribute.none;
+Debug.Log("call clear");
         }
 
         public Vector3[] ShapeOffset()

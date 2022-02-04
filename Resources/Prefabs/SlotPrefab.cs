@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -13,14 +14,18 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
     public Slot Slot { get; set; } = null;
     public SlotPrefab Upper { get; set; } = null;
     public DELEGATE_T<SlotPrefab> Generate;
+    public Action finishAction;
     public BallPrefab Ball { get; set; } = null;
     private static bool activate = false;
 
     private void Awake() { }
 
-    public void Initialize(Slot slot)
+    public void Initialize(Slot slot, Action clearSelectedAction, Action afterDraw)
     {
         name = slot.Id.ToString();
+
+        finishAction = afterDraw;
+        finishAction += clearSelectedAction;
         Slot = slot;
         Generate = null;
         GetComponent<Image>().raycastTarget = true;
@@ -45,6 +50,8 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
     {
         if (activate && Input.touchCount == 0)
         {
+            /* dispose selected and find same pattern */
+            finishAction?.Invoke();
             activate = false;
         }
     }
