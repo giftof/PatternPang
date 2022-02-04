@@ -6,11 +6,11 @@ using Pattern.Managers;
 
 
 
-public class RayPrefab : MonoBehaviour
+public class Ray : MonoBehaviour
 {
     private void Awake()
     {
-        PatternHandler.Instance.rayPrefab = this;
+        PatternHandler.Instance.ray = this;
     }
 
     public SlotPrefab Shot(Vector3 position)

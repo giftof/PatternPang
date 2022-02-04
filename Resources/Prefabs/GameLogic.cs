@@ -4,16 +4,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using Pattern.Configs;
 using Pattern.Objects;
 using Pattern.Managers;
 
 
 
-public class GamePrefab : MonoBehaviour
+public class GameLogic : MonoBehaviour
 {
     [SerializeField] ObjectPool slotPool;
     [SerializeField] ObjectPool ballPool;
+    [SerializeField] EventSystem eventSystem;
     public SlotPrefab[] BaseLine { get; set; } = null;
     public (uint Row, uint Column) Size { get; set; } = (0, 0);
     private Vector2 slotSize;
@@ -28,15 +30,50 @@ public class GamePrefab : MonoBehaviour
         widthUnit = slotSize.x * 0.75f;
     }
 
-    public void Initialize((uint row, uint column) size)
+    public void Initialize()
     {
-        Size = size;
+        eventSystem.enabled = false;
 
-        Clear();
+        ClearBoard();
         CreateBoard();
         SetDistance();
         SetBallGenerator();
-        StartCoroutine(FillBoard());
+        StartCoroutine(FillBoard(() => {
+            eventSystem.enabled = true;
+        }));
+    }
+
+    public void ClearBall()
+    {
+        eventSystem.enabled = false;
+
+        if (slotArray != null)
+            foreach (var item in slotArray)
+            {
+                if (item.Ball != null)
+                    item.Ball.Drop(ballPool.Release, item.Ball.gameObject);
+                item.Ball = null;
+            }
+
+        StartCoroutine(WaitDrop(() => {
+            eventSystem.enabled = true;
+        }));
+    }
+
+    public void ClearBoard()
+    {
+        if (slotArray != null)
+            foreach (var item in slotArray)
+            {
+                if (item.Ball != null)
+                    ballPool.Release(item.Ball.gameObject);
+                item.Ball = null;
+                slotPool.Release(item.gameObject);
+            }
+
+
+        slotArray = null;
+        BaseLine = null;
     }
 
     private void SetBallGenerator()
@@ -91,16 +128,6 @@ public class GamePrefab : MonoBehaviour
         }
     }
 
-    public void Clear()
-    {
-        if (slotArray != null)
-            foreach (var item in slotArray)
-                slotPool.Release(item.gameObject);
-
-        slotArray = null;
-        BaseLine = null;
-    }
-
     /* at least 3 x 3 brard */
     private void SetDistance()
     {
@@ -125,23 +152,7 @@ public class GamePrefab : MonoBehaviour
         lower = upper;
     }
 
-    private Color ConvertToColor(SlotAttribute attribute)
-    {
-        return attribute switch
-        {
-            SlotAttribute.red => Color.red,
-            SlotAttribute.green => Color.green,
-            SlotAttribute.blue => Color.blue,
-            SlotAttribute.yellow => Color.yellow,
-            SlotAttribute.purple => Color.cyan,
-            SlotAttribute.bomb1 => Color.black,
-            SlotAttribute.bomb2 => Color.black,
-            SlotAttribute.bomb3 => Color.black,
-            _ => Color.white,
-        };
-    }
-
-    IEnumerator FillBoard()
+    IEnumerator FillBoard(Action action)
     {
         while (BallPrefab.TweeningCount > 0)
             yield return null;
@@ -158,17 +169,9 @@ public class GamePrefab : MonoBehaviour
         }
 
         if (nullCount > 0)
-            StartCoroutine(FillBoard());
-
-        /* test code begin */
+            StartCoroutine(FillBoard(action));
         else
-        {
-            foreach (var item in slotArray)
-            {
-                Debug.Log($"id = {item.Slot.Id}, color = {item.Slot.Color}");
-            }
-        }
-        /* test code end */
+            action?.Invoke();
     }
 
     IEnumerator CreateBall(SlotPrefab destination)
@@ -183,5 +186,13 @@ public class GamePrefab : MonoBehaviour
         }
         else
             throw new Exception("ballPool make Exception");
+    }
+
+    IEnumerator WaitDrop(Action action)
+    {
+        while (BallPrefab.TweeningCount > 0)
+            yield return null;
+
+        action?.Invoke();
     }
 }

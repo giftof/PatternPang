@@ -31,7 +31,6 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
         if (!activate)
         {
             activate = true;
-            /*PatternHandler.Instance.Add(transform.localPosition, Slot.Color);*/
             PatternHandler.Instance.Add(this, Slot.Color);
         }
     }
@@ -47,8 +46,6 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
         if (activate && Input.touchCount == 0)
         {
             activate = false;
-            /*Dispose();*/
-            //Disposer?.Invoke(this);
         }
     }
 

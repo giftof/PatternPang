@@ -19,27 +19,21 @@ using Pattern.Configs;
 
 public class Game : MonoBehaviour
 {
-    [SerializeField] GamePrefab gamePrefab;
-    [SerializeField] PlayPrefab playPrefab;
+    [SerializeField] GameLogic gamePrefab;
+    [SerializeField] Button generate;
+    [SerializeField] Button clear;
+    [SerializeField] Button re;
 
     void Start()
     {
-        gamePrefab.Initialize(CONST.SIZE1);
-        //gamePrefab.Size = (7, 8 + CONST.GENERATOR_LINE);
-        //gamePrefab.Generate();
+        gamePrefab.Size = CONST.SIZE1;
+        SetButtonAction();
+    }
 
-        //playPrefab.Generator = gamePrefab.BallGenerator();
-        //playPrefab.BaseLine = gamePrefab.BaseLine;
-
-        //SlotPrefab[] generator = gamePrefab.BallGenerator();
-        //foreach (var item in generator)
-        //{
-        //    Debug.Log($"generator item.name = {item.name}");
-        //}
-        //SlotPrefab[] baseLine = gamePrefab.BaseLine;
-        //foreach (var item in baseLine)
-        //{
-        //    Debug.Log($"baseline item.name = {item.name}");
-        //}
+    private void SetButtonAction()
+    {
+        generate.onClick.AddListener(gamePrefab.Initialize);
+        clear.onClick.AddListener(gamePrefab.ClearBoard);
+        re.onClick.AddListener(gamePrefab.ClearBall);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,6 +32,16 @@ public class BallPrefab : MonoBehaviour
             .OnComplete(() => {
                 destination.Ball = this;
                 destination.Slot.Color = Color;
+                TweeningCount -= 1;
+            });
+    }
+
+    public void Drop<T>(DELEGATE_T<T> finishAction, T obj)
+    {
+        TweeningCount += 1;
+        transform.DOMoveY(transform.position.y - CONST.TEMP_DROP_DISTANCE, CONST.MOVE_DURATION * CONST.TEMP_DROP_DISTANCE).SetEase(Ease.Linear)
+            .OnComplete(() => {
+                finishAction?.Invoke(obj);
                 TweeningCount -= 1;
             });
     }
