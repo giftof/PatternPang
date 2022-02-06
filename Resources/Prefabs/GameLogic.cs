@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -15,6 +16,7 @@ public class GameLogic : MonoBehaviour
     [SerializeField] ObjectPool slotPool;
     [SerializeField] ObjectPool ballPool;
     [SerializeField] EventSystem eventSystem;
+    [SerializeField] Ray ray;
 
     public SlotPrefab[] BaseLine { get; set; } = null;
     public (uint Row, uint Column) Size { get; set; } = (0, 0);
@@ -34,6 +36,7 @@ public class GameLogic : MonoBehaviour
     public void Initialize()
     {
         eventSystem.enabled = false;
+        LineManager.Instance.Clear();
 
         ClearBoard();
         CreateBoard();
@@ -47,6 +50,7 @@ public class GameLogic : MonoBehaviour
     public void ClearBall()
     {
         eventSystem.enabled = false;
+        LineManager.Instance.Clear();
 
         if (slotArray != null)
             foreach (var item in slotArray)
@@ -63,6 +67,8 @@ public class GameLogic : MonoBehaviour
 
     public void ClearBoard()
     {
+        LineManager.Instance.Clear();
+
         if (slotArray != null)
             foreach (var item in slotArray)
             {
@@ -199,7 +205,47 @@ public class GameLogic : MonoBehaviour
     private void AfterDraw()
     {
         Vector3[] shape = PatternHandler.Instance.ShapeOffset();
+        
+        SearchSamePattern(shape);
+
         PatternHandler.Instance.Clear();
-        LineManager.Instance.Clear();
+        /*LineManager.Instance.Clear();*/
+    }
+
+
+
+    private List<SlotPrefab> selected = new List<SlotPrefab>();
+
+    private void SearchSamePattern(Vector3[] shape)
+    {
+        List<SlotPrefab> same = new List<SlotPrefab>();
+        selected.Clear();
+
+        foreach (var item in slotArray)
+        {
+            if (item.Slot.Color.Equals(SlotAttribute.generator))
+                continue;
+
+            if (same.Count == shape.Count() + 1)
+            {
+                selected.AddRange(same);
+                LineManager.Instance.ToLine(same);
+            }
+            same.Clear();
+
+            Vector3 position = item.transform.position;
+            same.Add(item);
+
+            foreach (var offset in shape)
+            {
+                position -= offset;
+                SlotPrefab hitSlot = ray.Shot(position);
+
+                if (!item.Slot.Color.Equals(hitSlot?.Slot.Color))
+                    break;
+                else
+                    same.Add(hitSlot);
+            }
+        }
     }
 }

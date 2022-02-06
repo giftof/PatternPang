@@ -20,6 +20,7 @@ public class LineManager : MonoBehaviour
         (SlotPrefab begin, SlotPrefab end) = PatternHandler.Instance.LastLine();
         LinePrefab unit = linePool.Request<LinePrefab>(transform);
         unit.Position((begin.transform.position, end.transform.position));
+        
         lineArray.AddFirst(unit);
     }
 
@@ -31,8 +32,23 @@ public class LineManager : MonoBehaviour
 
     public void Clear()
     {
+        if (lineArray == null)
+            return;
+
         foreach (var item in lineArray)
             linePool.Release(item.gameObject);
         lineArray.Clear();
+    }
+
+    public void ToLine(List<SlotPrefab> list)
+    {
+        for (int i = 1; i < list.Count; ++i)
+        {
+            LinePrefab unit = linePool.Request<LinePrefab>(transform);
+
+            unit.Position((list[i - 1].transform.position, list[i].transform.position));
+            
+            lineArray.AddFirst(unit);
+        }
     }
 }
