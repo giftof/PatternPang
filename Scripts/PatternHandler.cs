@@ -20,7 +20,7 @@ namespace Pattern.Managers
         private static readonly Lazy<PatternHandler> m_instance = new Lazy<PatternHandler>(() => new PatternHandler());
         private PatternHandler() => m_selected = new LinkedList<SlotPrefab>();
 
-        public void Add(SlotPrefab slot, SlotAttribute attribute)
+        public void Begin(SlotPrefab slot, SlotAttribute attribute)
         {
             if (m_fixedAttribute.Equals(SlotAttribute.none))
             {
@@ -31,38 +31,37 @@ namespace Pattern.Managers
                 m_selected.AddFirst(slot);
         }
 
-        public void AddChecker(SlotPrefab target)
+        public AddBall Append(SlotPrefab target)
         {
             if (m_selected.Count > 1)
             {
                 if (target.Equals(ray.Shot(m_selected.First.Next.Value.transform.position)))
                 {
-                    Remove();
-/* test code */ Debug.Log($"selected count = {m_selected.Count}");
-TEST_SHOW();
-                    return;
+                    m_selected.RemoveFirst();
+                    return AddBall.remove;
                 }
             }
 
             if (m_fixedAttribute.Equals(target.Slot.Color)
-                && Vector3.Distance(m_selected.First.Value.transform.position, target.transform.position) < CONST.MAX_DISTANCE)
+                && Vector3.Distance(m_selected.First.Value.transform.position, target.transform.position) < CONST.MAX_DISTANCE
+                && !m_selected.Contains(target))
+            {
                 m_selected.AddFirst(target);
+                return AddBall.add;
+            }
 
-/* test code */ Debug.Log($"selected count = {m_selected.Count}");
-TEST_SHOW();
+            return AddBall.none;
         }
 
-/* test code begin */
-private void TEST_SHOW() {
-string str = "";
-foreach (var item in m_selected)
-str += item.name + ", ";
-Debug.Log($"selected = {str}"); }
-/* test code end */
+        public SlotPrefab First()
+        {
+            return m_selected.First.Value;
+        }
 
-        public void Remove()
-            => m_selected.RemoveFirst();
-
+        public (SlotPrefab begin, SlotPrefab end) LastLine()
+        {
+            return (m_selected.First.Value, m_selected.First.Next.Value);
+        }
 
         public void Clear()
         {

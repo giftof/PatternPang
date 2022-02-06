@@ -31,6 +31,13 @@ namespace Pattern.Configs
     //    public static readonly string BALL = "Prefabs/BallPrefab";
     //}
 
+    public enum AddBall
+    {
+        remove = -1,
+        none,
+        add,
+    }
+
     public enum SlotAttribute
     {
         none,

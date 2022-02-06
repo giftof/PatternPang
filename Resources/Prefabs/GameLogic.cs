@@ -16,8 +16,10 @@ public class GameLogic : MonoBehaviour
     [SerializeField] ObjectPool slotPool;
     [SerializeField] ObjectPool ballPool;
     [SerializeField] EventSystem eventSystem;
+
     public SlotPrefab[] BaseLine { get; set; } = null;
     public (uint Row, uint Column) Size { get; set; } = (0, 0);
+
     private Vector2 slotSize;
     private float widthUnit;
     private SlotPrefab[] slotArray = null;
@@ -36,7 +38,7 @@ public class GameLogic : MonoBehaviour
 
         ClearBoard();
         CreateBoard();
-        SetDistance();
+        PresetDistance();
         SetBallGenerator();
         StartCoroutine(FillBoard(() => {
             eventSystem.enabled = true;
@@ -70,7 +72,6 @@ public class GameLogic : MonoBehaviour
                 item.Ball = null;
                 slotPool.Release(item.gameObject);
             }
-
 
         slotArray = null;
         BaseLine = null;
@@ -113,7 +114,11 @@ public class GameLogic : MonoBehaviour
             {
                 if (slotPool.Request<SlotPrefab>(transform, currentPosition) is SlotPrefab slot)
                 {
-                    slot.Initialize(new Slot(w * Size.Column + h), PatternHandler.Instance.Clear, AfterDraw);
+                    slot.Initialize(new Slot(w * Size.Column + h),
+                        LineManager.Instance.Begin,
+                        LineManager.Instance.Append,
+                        LineManager.Instance.Remove,
+                        AfterDraw);
 
                     slotArray[slot.Slot.Id] = slot;
                     currentPosition += Vector3.up * slotSize.y;
@@ -129,7 +134,7 @@ public class GameLogic : MonoBehaviour
     }
 
     /* at least 3 x 3 brard */
-    private void SetDistance()
+    private void PresetDistance()
     {
         float[] distance = new float[5];
         distance[0] = Vector3.Distance(slotArray[0].transform.position, slotArray[Size.Column * 2 + 1].transform.position);
@@ -198,6 +203,8 @@ public class GameLogic : MonoBehaviour
 
     private void AfterDraw()
     {
-        Debug.Log("call After Draw");
+        Vector3[] shape = PatternHandler.Instance.ShapeOffset();
+        PatternHandler.Instance.Clear();
+        LineManager.Instance.Clear();
     }
 }
