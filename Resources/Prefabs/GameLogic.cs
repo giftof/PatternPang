@@ -214,7 +214,7 @@ public class GameLogic : MonoBehaviour
 
 
 
-    private List<SlotPrefab> selected = new List<SlotPrefab>();
+    private List<SlotPrefab> selected = new List<SlotPrefab>(); /* temp */
 
     private void SearchSamePattern(Vector3[] shape)
     {
