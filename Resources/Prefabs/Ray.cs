@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Pattern.Configs;
 using Pattern.Managers;
 
 
@@ -9,9 +6,7 @@ using Pattern.Managers;
 public class Ray : MonoBehaviour
 {
     private void Awake()
-    {
-        PatternHandler.Instance.ray = this;
-    }
+        => PatternHandler.Instance.ray = this;
 
     public SlotPrefab Shot(Vector3 position)
     {

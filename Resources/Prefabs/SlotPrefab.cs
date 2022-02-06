@@ -16,25 +16,33 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
     public SlotPrefab Upper { get; set; } = null;
     public DELEGATE_T<SlotPrefab> Generate;
     public Action finishAction;
-    public Action beginAction;
-    public Action addAction;
-    public Action removeAction;
+
+    private Action beginAction;
+    private Action addAction;
+    private Action removeAction;
+
     public BallPrefab Ball { get; set; } = null;
+    
     private static bool activate = false;
 
-    private void Awake() { }
 
-    public void Initialize(Slot slot, Action beginAction, Action addAction, Action removeAction, Action finishAction)
+
+    private void Awake() 
+    {
+        beginAction = LineManager.Instance.Begin;
+        addAction = LineManager.Instance.Append;
+        removeAction = LineManager.Instance.Remove;
+    }
+
+    public void Initialize(Slot slot, Action finishAction)
     {
         name = slot.Id.ToString();
 
-        this.beginAction = beginAction;
-        this.addAction = addAction;
-        this.removeAction = removeAction;
-        this.finishAction = finishAction;
         Slot = slot;
         Generate = null;
         GetComponent<Image>().raycastTarget = true;
+
+        this.finishAction = finishAction;
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -71,7 +79,6 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
     {
         if (activate && Input.touchCount == 0)
         {
-            /* dispose selected and find same pattern */
             finishAction?.Invoke();
             activate = false;
         }

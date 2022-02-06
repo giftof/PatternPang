@@ -1,9 +1,6 @@
 using System;
-using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Pattern.Objects;
 using Pattern.Configs;
 
 
@@ -17,8 +14,11 @@ namespace Pattern.Managers
 
         public Ray ray;
         public static PatternHandler Instance => m_instance.Value;
+
         private static readonly Lazy<PatternHandler> m_instance = new Lazy<PatternHandler>(() => new PatternHandler());
         private PatternHandler() => m_selected = new LinkedList<SlotPrefab>();
+
+
 
         public void Begin(SlotPrefab slot, SlotAttribute attribute)
         {
@@ -54,20 +54,15 @@ namespace Pattern.Managers
         }
 
         public SlotPrefab First()
-        {
-            return m_selected.First.Value;
-        }
+            => m_selected.First.Value;
 
         public (SlotPrefab begin, SlotPrefab end) LastLine()
-        {
-            return (m_selected.First.Value, m_selected.First.Next.Value);
-        }
+            => (m_selected.First.Value, m_selected.First.Next.Value);
 
         public void Clear()
         {
             m_selected.Clear();
             m_fixedAttribute = SlotAttribute.none;
-Debug.Log("call clear");
         }
 
         public Vector3[] ShapeOffset()

@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -114,11 +113,7 @@ public class GameLogic : MonoBehaviour
             {
                 if (slotPool.Request<SlotPrefab>(transform, currentPosition) is SlotPrefab slot)
                 {
-                    slot.Initialize(new Slot(w * Size.Column + h),
-                        LineManager.Instance.Begin,
-                        LineManager.Instance.Append,
-                        LineManager.Instance.Remove,
-                        AfterDraw);
+                    slot.Initialize(new Slot(w * Size.Column + h), AfterDraw);
 
                     slotArray[slot.Slot.Id] = slot;
                     currentPosition += Vector3.up * slotSize.y;

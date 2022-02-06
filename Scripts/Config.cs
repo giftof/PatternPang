@@ -25,12 +25,6 @@ namespace Pattern.Configs
         public static readonly uint TEMP_DROP_DISTANCE = 9;
     }
 
-    //public static class PATH
-    //{
-    //    public static readonly string SLOT = "Prefabs/SlotPrefab";
-    //    public static readonly string BALL = "Prefabs/BallPrefab";
-    //}
-
     public enum AddBall
     {
         remove = -1,
