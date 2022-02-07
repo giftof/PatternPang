@@ -42,6 +42,7 @@ public class GameLogic : MonoBehaviour
 
     IEnumerator Init()
     {
+        Score = 0;
         m_matchCount = 0;
         eventSystem.enabled = false;
         LineManager.Instance.Clear();
@@ -213,7 +214,7 @@ Debug.LogWarning($"m_unitScore = {m_unitScore}");
         {
             m_unitScore = 0;
             for (int i = 0; i < shape.Length;)
-                m_unitScore += ++i * 2;
+                m_unitScore += ++i;
 
             SearchSamePattern(shape);
         }

@@ -18,7 +18,8 @@ namespace Pattern.Configs
         public static readonly uint EVEN_COLUMN_UP = 1;
         public static readonly float MOVE_DURATION = .1f;
         public static readonly uint LEVEL1 = 6;
-        public static readonly uint LEVEL2 = 4;
+        public static readonly uint LEVEL2 = 5;
+        public static readonly uint LEVEL3 = 4;
         public static readonly (uint, uint) SIZE0 = (3, 3 + GENERATOR_LINE);
         public static readonly (uint, uint) SIZE1 = (7, 8 + GENERATOR_LINE);
         public static readonly (uint, uint) SIZE2 = (9, 11 + GENERATOR_LINE);
