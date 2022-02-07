@@ -20,18 +20,21 @@ public class GameLogic : MonoBehaviour
 
     public SlotPrefab[] BaseLine { get; set; } = null;
     public (uint Row, uint Column) Size { get; set; } = (0, 0);
+    public uint BallVar { get; set; } = 0;
 
-    private Vector2 slotSize;
-    private float widthUnit;
-    private SlotPrefab[] slotArray;
-    private List<SlotPrefab> matched;
+    public int Score { get; private set; } = 0;
+    private Vector2 m_slotSize;
+    private float m_widthUnit;
+    private SlotPrefab[] m_slotArray;
+    private int m_matchCount;
+    private int m_unitScore;
 
 
 
     private void Awake()
     {
-        slotSize = slotPool.prefab.GetComponent<RectTransform>().sizeDelta;
-        widthUnit = slotSize.x * 0.75f;
+        m_slotSize = slotPool.prefab.GetComponent<RectTransform>().sizeDelta;
+        m_widthUnit = m_slotSize.x * 0.75f;
     }
 
     public void Initialize()
@@ -39,8 +42,8 @@ public class GameLogic : MonoBehaviour
 
     IEnumerator Init()
     {
+        m_matchCount = 0;
         eventSystem.enabled = false;
-        matched = new List<SlotPrefab>();
         LineManager.Instance.Clear();
 
         ClearBoard();
@@ -48,9 +51,10 @@ public class GameLogic : MonoBehaviour
         PresetOffset();
 
         yield return null;
-
         SetBallGenerator();
-        StartCoroutine(FillBoard(() => { eventSystem.enabled = true; }));
+
+        yield return null;
+        StartCoroutine(FillBoard(() => { Finish(); }));
     }
 
     public void ClearBall()
@@ -58,23 +62,23 @@ public class GameLogic : MonoBehaviour
         eventSystem.enabled = false;
         LineManager.Instance.Clear();
 
-        if (slotArray != null)
-            foreach (var item in slotArray)
+        if (m_slotArray != null)
+            foreach (var item in m_slotArray)
             {
                 if (item.Ball != null)
                     item.Ball.Drop(ballPool.Release, item.Ball.gameObject);
                 item.Ball = null;
             }
 
-        StartCoroutine(WaitDrop(() => { eventSystem.enabled = true; }));
+        StartCoroutine(WaitDrop(() => { Finish(); }));
     }
 
     public void ClearBoard()
     {
         LineManager.Instance.Clear();
 
-        if (slotArray != null)
-            foreach (var item in slotArray)
+        if (m_slotArray != null)
+            foreach (var item in m_slotArray)
             {
                 if (item.Ball != null)
                     ballPool.Release(item.Ball.gameObject);
@@ -82,8 +86,16 @@ public class GameLogic : MonoBehaviour
                 slotPool.Release(item.gameObject);
             }
 
-        slotArray = null;
+        m_slotArray = null;
         BaseLine = null;
+    }
+
+    private void Finish()
+    {
+        m_matchCount = 0;
+        eventSystem.enabled = true;
+        LineManager.Instance.Clear();
+        PatternHandler.Instance.Clear();
     }
 
     private void SetBallGenerator()
@@ -115,31 +127,31 @@ public class GameLogic : MonoBehaviour
 
     private void CreateBoard()
     {
-        Vector3 beginPosition = Vector3.left * (Size.Row - 1) * widthUnit * .5f;
+        Vector3 beginPosition = Vector3.left * (Size.Row - 1) * m_widthUnit * .5f;
         Vector3 currentPosition = beginPosition;
 
         BaseLine = new SlotPrefab[Size.Row];
-        slotArray = new SlotPrefab[Size.Row * Size.Column];
+        m_slotArray = new SlotPrefab[Size.Row * Size.Column];
 
         for (uint w = 0; w < Size.Row; ++w)
         {
             if (IsFloating(w))
-                currentPosition += Vector3.up * slotSize.y * .5f;
+                currentPosition += Vector3.up * m_slotSize.y * .5f;
             for (uint h = 0; h < Size.Column; ++h)
             {
                 if (slotPool.Request<SlotPrefab>(transform, currentPosition) is SlotPrefab slot)
                 {
                     slot.Initialize(new Slot(w * Size.Column + h), AfterDraw);
 
-                    slotArray[slot.Slot.Id] = slot;
-                    currentPosition += Vector3.up * slotSize.y;
+                    m_slotArray[slot.Slot.Id] = slot;
+                    currentPosition += Vector3.up * m_slotSize.y;
 
                     BaseLine[w] = BaseLine[w] ?? slot;
                 }
                 else
                     throw new Exception("slotPool make Exception");
             }
-            currentPosition = beginPosition + Vector3.right * (w + 1) * widthUnit;
+            currentPosition = beginPosition + Vector3.right * (w + 1) * m_widthUnit;
         }
     }
 
@@ -153,7 +165,7 @@ public class GameLogic : MonoBehaviour
 
         int nullCount = 0;
 
-        foreach (var item in slotArray)
+        foreach (var item in m_slotArray)
         {
             if (item.Ball == null)
             {
@@ -175,7 +187,7 @@ public class GameLogic : MonoBehaviour
 
         if (ballPool.Request<BallPrefab>(destination.transform.parent, destination.transform.localPosition) is BallPrefab ballPrefab)
         {
-            ballPrefab.Color = (SlotAttribute)UnityEngine.Random.Range(1, (int)SlotAttribute.count - CONST.LEVEL1);
+            ballPrefab.Color = (SlotAttribute)UnityEngine.Random.Range(1, (int)SlotAttribute.count - BallVar);
             destination.Ball = ballPrefab;
         }
         else
@@ -192,22 +204,28 @@ public class GameLogic : MonoBehaviour
 
     private void AfterDraw()
     {
+        eventSystem.enabled = false;
         Vector3[] shape = PatternHandler.Instance.ShapeOffset();
+        /*m_unitScore = shape.Select((e, index) => (e, index)).Select(t => t.index).Sum();*/
 
-        matched.Clear();
-
+Debug.LogWarning($"m_unitScore = {m_unitScore}");
         if (shape != null)
-            SearchSamePattern(shape);
+        {
+            m_unitScore = 0;
+            for (int i = 0; i < shape.Length;)
+                m_unitScore += ++i * 2;
 
-        PatternHandler.Instance.Clear();
-        /*LineManager.Instance.Clear();*/
+            SearchSamePattern(shape);
+        }
+        else
+            Finish();
     }
 
     private void SearchSamePattern(Vector3[] shape)
     {
         List<SlotPrefab> list = new List<SlotPrefab>();
 
-        slotArray
+        m_slotArray
             .Where(slot =>
             {
                 if (slot.Slot.Color.Equals(SlotAttribute.generator))
@@ -219,131 +237,97 @@ public class GameLogic : MonoBehaviour
             .Select(slot => slot)
             .Select(head =>
             {
+                List<SlotPrefab> local = new List<SlotPrefab>();
                 Vector3 position = head.transform.position;
 
-                list.Add(head);
-                list.AddRange(shape.Select(offset => ray.Shot(position -= offset)));
+                ++m_matchCount;
+                Score += m_matchCount * m_unitScore;
+Debug.Log($"inc score = {m_matchCount} * {m_unitScore} = {m_matchCount * m_unitScore}");
+
+                local.Add(head);
+                local.AddRange(shape.Select(offset => ray.Shot(position -= offset)));
+                list.AddRange(local);
+                LineManager.Instance.ToLine(local);
                 return list;
             }).ToArray();
 
-        var group = list.GroupBy(e => e.Slot.Id);
+        IEnumerable<IGrouping<uint, SlotPrefab>> group = list.GroupBy(e => e.Slot.Id).ToArray();
+
+        if (group.Count() > 0)
+            StartCoroutine(RemoveMatchedBall(group, shape.Length));
+        else
+            Finish();
+    }
+
+    IEnumerator RemoveMatchedBall(IEnumerable<IGrouping<uint, SlotPrefab>> group, int mod)
+    {
+        Debug.LogWarning("call [RemoveMatchedBall]");
+
+        yield return new WaitForSecondsRealtime(1.0f);
+
+        LineManager.Instance.Clear();
+
+        yield return new WaitForSecondsRealtime(0.5f);
 
         foreach (var g in group)
-            Debug.Log($"key = {g.Key}, cnt = {g.Count()}");
-        
+        {
+            /*Debug.Log($"key = {g.Key}, cnt = {g.Count()}");*/
+            switch (g.Count())
+            {
+                case 1:
+                    /*Debug.Log("case 1 normal remove");*/
+                    ballPool.Release(m_slotArray[g.Key].Ball.gameObject);
+                    m_slotArray[g.Key].Ball = null;
+                    m_slotArray[g.Key].Slot.Color = SlotAttribute.none;
+                    break;
+                case 2:
+                    /*Debug.Log("case 2 normal remove");*/
+                    ballPool.Release(m_slotArray[g.Key].Ball.gameObject);
+                    m_slotArray[g.Key].Ball = null;
+                    m_slotArray[g.Key].Slot.Color = SlotAttribute.none;
+                    break;
+                case 3:     // bomb level 1
+                    /*Debug.Log("case 3 bomb level 1");*/
+                    ballPool.Release(m_slotArray[g.Key].Ball.gameObject);
+                    m_slotArray[g.Key].Ball = null;
+                    m_slotArray[g.Key].Slot.Color = SlotAttribute.none;
+                    break;
+                case 4:     // bomb level 2
+                    /*Debug.Log("case 4 bomb level 2");*/
+                    ballPool.Release(m_slotArray[g.Key].Ball.gameObject);
+                    m_slotArray[g.Key].Ball = null;
+                    m_slotArray[g.Key].Slot.Color = SlotAttribute.none;
+                    break;
+                default:    // bomb level 3
+                    /*Debug.Log("case 5~ bomb level 3");*/
+                    ballPool.Release(m_slotArray[g.Key].Ball.gameObject);
+                    m_slotArray[g.Key].Ball = null;
+                    m_slotArray[g.Key].Slot.Color = SlotAttribute.none;
+                    break;
+            }
+        }
 
-        /*        Debug.Log($"selected count = {selected.Count()}");
-                foreach (var item in selected)
-                    foreach (var it in item)
-                        *//*Debug.Log($"item = {item}");*//*
-                        Debug.Log($"it = {it}");
-        */
-
-        //var array = slotArray
-        //    .Where(slot => !slot.Slot.Color.Equals(SlotAttribute.generator))
-        //    .SelectMany()
-        //    .SelectMany(slot => shape.Where(offset => {
-
-        //    }));
-        //{
-        //    if (!slot.Slot.Color.Equals(SlotAttribute.generator))
-        //        return false;
-
-        //    Vector3 position = slot.transform.position;
-        //    var arr2 = shape.Where(offset => {
-        //        position -= offset;
-        //        return slot.Slot.Color.Equals(ray.Shot(position)?.Slot.Color);
-        //    }).Select(offset => ray.Shot(position));
-
-        //    foreach (var it in arr2)
-        //    {
-        //        Debug.Log($"it = {it}");
-        //    }
-
-        //    return arr2.Count() == shape.Length;
-        //})
-        //.Select(slot =>
-        //{
-
-        //})
-        //.Select(slot => {
-        //Vector3 position = slot.transform.position;
-
-        //var arr2 = shape.Where(offset =>
-        //{
-        //    position -= offset;
-        //    return slot.Slot.Color.Equals(ray.Shot(position)?.Slot.Color);
-        //}).Select(offset => ray.Shot(position));
-
-
-
-        //    foreach (var it in arr2)
-        //    {
-        //        Debug.Log($"it = {it}");
-        //    }
-
-        //    return arr2.Count() == shape.Length;
-        //    //if (list.Count == shape.Length + 1)
-        //    //    return list;
-        //    //return false;
-        //});
-
-        //foreach (var item in array)
-        //{
-        //    Debug.Log($"item = {item}");
-        //}
-
-
-
-
-
-
-        //List<SlotPrefab> same = new List<SlotPrefab>();
-
-        //foreach (var item in slotArray)
-        //{
-        //    if (item.Slot.Color.Equals(SlotAttribute.generator))
-        //        continue;
-
-        //    if (same.Count == shape.Count() + 1)
-        //    {
-        //        matched.AddRange(same);
-        //        LineManager.Instance.ToLine(same);
-        //    }
-        //    same.Clear();
-
-        //    Vector3 position = item.transform.position;
-        //    same.Add(item);
-
-        //    foreach (var offset in shape)
-        //    {
-        //        position -= offset;
-        //        SlotPrefab hitSlot = ray.Shot(position);
-
-        //        if (!item.Slot.Color.Equals(hitSlot?.Slot.Color))
-        //            break;
-        //        else
-        //            same.Add(hitSlot);
-        //    }
-        //}
+        StartCoroutine(FillBoard(() => {
+            SearchSamePattern(PatternHandler.Instance.ShapeOffset());
+        }));
     }
 
     /* at least 3 x 3 brard */
     private void PresetOffset()
     {
         float[] distance = new float[5];
-        distance[0] = Vector3.Distance(slotArray[0].transform.position, slotArray[Size.Column * 2 + 1].transform.position);
-        distance[1] = Vector3.Distance(slotArray[0].transform.position, slotArray[2].transform.position);
-        distance[2] = Vector3.Distance(slotArray[0].transform.position, slotArray[Size.Column + 1].transform.position);
-        distance[3] = Vector3.Distance(slotArray[0].transform.position, slotArray[Size.Column].transform.position);
-        distance[4] = Vector3.Distance(slotArray[0].transform.position, slotArray[1].transform.position);
+        distance[0] = Vector3.Distance(m_slotArray[0].transform.position, m_slotArray[Size.Column * 2 + 1].transform.position);
+        distance[1] = Vector3.Distance(m_slotArray[0].transform.position, m_slotArray[2].transform.position);
+        distance[2] = Vector3.Distance(m_slotArray[0].transform.position, m_slotArray[Size.Column + 1].transform.position);
+        distance[3] = Vector3.Distance(m_slotArray[0].transform.position, m_slotArray[Size.Column].transform.position);
+        distance[4] = Vector3.Distance(m_slotArray[0].transform.position, m_slotArray[1].transform.position);
         float min = Mathf.Min(distance[0], distance[1], distance[2]);
         float max = Mathf.Max(distance[3], distance[4]);
 
         CONST.MAX_DISTANCE = (min + max) * .5f;
-        CONST.DIRECTION_OFFSET[0] = slotArray[1].transform.position - slotArray[0].transform.position;
+        CONST.DIRECTION_OFFSET[0] = m_slotArray[1].transform.position - m_slotArray[0].transform.position;
         CONST.DIRECTION_OFFSET[3] = CONST.DIRECTION_OFFSET[0] * -1;
-        CONST.DIRECTION_OFFSET[1] = slotArray[Size.Column].transform.position - slotArray[0].transform.position;
+        CONST.DIRECTION_OFFSET[1] = m_slotArray[Size.Column].transform.position - m_slotArray[0].transform.position;
         CONST.DIRECTION_OFFSET[4] = CONST.DIRECTION_OFFSET[1] * -1;
         CONST.DIRECTION_OFFSET[2] = CONST.DIRECTION_OFFSET[1] + Vector3.down * CONST.DIRECTION_OFFSET[1].y * 2;
         CONST.DIRECTION_OFFSET[5] = CONST.DIRECTION_OFFSET[2] * -1;

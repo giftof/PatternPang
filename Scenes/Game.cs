@@ -8,32 +8,70 @@
 using System;
 using System.Text;
 using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using Pattern.Managers;
 using Pattern.Objects;
 using Pattern.Configs;
-
+using DG.Tweening;
 
 
 public class Game : MonoBehaviour
 {
-    [SerializeField] GameLogic gamePrefab;
+    [SerializeField] GameLogic gameLogic;
     [SerializeField] Button generate;
     [SerializeField] Button clear;
     [SerializeField] Button re;
+    [SerializeField] Text score;
+    [SerializeField] Image progressBar;
+    [SerializeField] EventSystem eventSystem;
+    [SerializeField] GameObject gameOverPannel;
 
     void Start()
     {
-        gamePrefab.Size = CONST.SIZE0;
+        gameLogic.Size = CONST.SIZE1;
+        gameLogic.BallVar = CONST.LEVEL2;
         SetButtonAction();
     }
 
     private void SetButtonAction()
     {
-        generate.onClick.AddListener(gamePrefab.Initialize);
-        clear.onClick.AddListener(gamePrefab.ClearBoard);
-        re.onClick.AddListener(gamePrefab.ClearBall);
+        generate.onClick.AddListener(gameLogic.Initialize);
+        generate.onClick.AddListener(BeginTimer);
+        clear.onClick.AddListener(gameLogic.ClearBoard);
+        re.onClick.AddListener(gameLogic.ClearBall);
+    }
+
+    private void BeginTimer()
+    {
+        progressBar.fillAmount = 1;
+        DOTween.To(() => progressBar.fillAmount, x => progressBar.fillAmount = x, 0, 60).SetId("timer")
+            .OnComplete( ()=> {
+                StartCoroutine(FIN());
+            });
+    }
+
+    IEnumerator FIN()
+    {
+        gameOverPannel.SetActive(true);
+        eventSystem.enabled = false;
+
+        yield return new WaitForSecondsRealtime(5);
+
+        eventSystem.enabled = true;
+        gameOverPannel.SetActive(false);
+    }
+
+    private void Update()
+    {
+        if (eventSystem.enabled)
+            DOTween.Play("timer");
+        if (!eventSystem.enabled)
+            DOTween.Pause("timer");
+
+        score.text = gameLogic.Score.ToString();
     }
 }
