@@ -1,13 +1,16 @@
 using UnityEngine;
+using Pattern.Configs;
+
+
 
 public class LinePrefab : MonoBehaviour
 {
-    [SerializeField] LineRenderer line;
+    public LineRenderer line;
 
     private void Start()
     {
         line.SetColors(Color.cyan, Color.cyan);
-        line.SetWidth(.1f, .1f);
+        line.SetWidth(CONST.LINE_WIDTH, CONST.LINE_WIDTH);
     }
 
     public void Position((Vector3 begin, Vector3 end) unit)

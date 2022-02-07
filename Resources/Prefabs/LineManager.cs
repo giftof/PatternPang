@@ -7,27 +7,40 @@ public class LineManager : MonoBehaviour
 {
     [SerializeField] ObjectPool linePool;
 
-    public static LineManager Instance;
+    public static LineManager Instance = null;
     private LinkedList<LinePrefab> lineArray;
+    LinePrefab currentLine;
+    int jointCount;
 
-    private void Awake() => Instance = this;
+    private void Awake()
+    {
+        lineArray = new LinkedList<LinePrefab>();
+        Instance = this;
+    }
 
     public void Begin()
-        => lineArray = new LinkedList<LinePrefab>();
+    {
+        Clear();
+
+        SlotPrefab slot = PatternHandler.Instance.First();
+        currentLine = linePool.Request<LinePrefab>(transform);
+        jointCount = 0;
+
+        currentLine.line.positionCount = ++jointCount;
+        currentLine.line.SetPosition(jointCount - 1, slot.transform.position);
+
+        lineArray.AddFirst(currentLine);
+    }
 
     public void Append()
     {
-        (SlotPrefab begin, SlotPrefab end) = PatternHandler.Instance.LastLine();
-        LinePrefab unit = linePool.Request<LinePrefab>(transform);
-        unit.Position((begin.transform.position, end.transform.position));
-        
-        lineArray.AddFirst(unit);
+        currentLine.line.positionCount = ++jointCount;
+        currentLine.line.SetPosition(jointCount - 1, PatternHandler.Instance.First().transform.position);
     }
 
     public void Remove()
     {
-        linePool.Release(lineArray.First.Value.gameObject);
-        lineArray.RemoveFirst();
+        currentLine.line.positionCount = --jointCount;
     }
 
     public void Clear()
@@ -42,13 +55,15 @@ public class LineManager : MonoBehaviour
 
     public void ToLine(List<SlotPrefab> list)
     {
-        for (int i = 1; i < list.Count; ++i)
-        {
-            LinePrefab unit = linePool.Request<LinePrefab>(transform);
+        int joint = list.Count;
+        LinePrefab unit = linePool.Request<LinePrefab>(transform);
 
-            unit.Position((list[i - 1].transform.position, list[i].transform.position));
-            
-            lineArray.AddFirst(unit);
-        }
+        unit.line.positionCount = joint;
+        unit.line.SetPosition(0, list[0].transform.position);
+
+        for (int i = 0; i < list.Count; ++i)
+            unit.line.SetPosition(i, list[i].transform.position);
+
+        lineArray.AddFirst(unit);
     }
 }

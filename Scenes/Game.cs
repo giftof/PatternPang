@@ -26,7 +26,7 @@ public class Game : MonoBehaviour
 
     void Start()
     {
-        gamePrefab.Size = CONST.SIZE1;
+        gamePrefab.Size = CONST.SIZE0;
         SetButtonAction();
     }
 

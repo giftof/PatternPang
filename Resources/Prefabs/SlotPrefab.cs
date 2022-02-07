@@ -13,7 +13,6 @@ public delegate void DELEGATE_T<T>(T t);
 public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler, IPointerUpHandler
 {
     public Slot Slot { get; set; } = null;
-    public SlotPrefab Upper { get; set; } = null;
     public DELEGATE_T<SlotPrefab> Generate;
     public Action finishAction;
 
@@ -86,13 +85,15 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
 
     public void Dispose()
     {
-        if (Upper == null)
+        SlotPrefab upper = Ray.Instance.Shot(transform.position + CONST.DIRECTION_OFFSET[(int)ClockWise.up]);
+
+        if (upper == null)
             Generate?.Invoke(this);
 
-        if (Upper != null ? Upper.Ball : null != null)
+        if (upper != null ? upper.Ball : null != null)
         {
-            Upper.Ball.SendTo(this);
-            Upper.Ball = null;
+            upper.Ball.SendTo(this);
+            upper.Ball = null;
         }
     }
 }

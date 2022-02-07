@@ -12,7 +12,7 @@ namespace Pattern.Managers
         private LinkedList<SlotPrefab> m_selected;
         private SlotAttribute m_fixedAttribute = SlotAttribute.none;
 
-        public Ray ray;
+        //public Ray ray;
         public static PatternHandler Instance => m_instance.Value;
 
         private static readonly Lazy<PatternHandler> m_instance = new Lazy<PatternHandler>(() => new PatternHandler());
@@ -35,7 +35,8 @@ namespace Pattern.Managers
         {
             if (m_selected.Count > 1)
             {
-                if (target.Equals(ray.Shot(m_selected.First.Next.Value.transform.position)))
+                //if (target.Equals(ray.Shot(m_selected.First.Next.Value.transform.position)))
+                if (target.Equals(Ray.Instance.Shot(m_selected.First.Next.Value.transform.position)))
                 {
                     m_selected.RemoveFirst();
                     return AddBall.remove;
@@ -56,8 +57,8 @@ namespace Pattern.Managers
         public SlotPrefab First()
             => m_selected.First.Value;
 
-        public (SlotPrefab begin, SlotPrefab end) LastLine()
-            => (m_selected.First.Value, m_selected.First.Next.Value);
+        //public (SlotPrefab begin, SlotPrefab end) LastLine()
+        //    => (m_selected.First.Value, m_selected.First.Next.Value);
 
         public void Clear()
         {
