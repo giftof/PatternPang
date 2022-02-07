@@ -13,16 +13,10 @@ public class Ray : MonoBehaviour
     {
         RaycastHit2D hit;
 
-Debug.Log($"position in ray = {position}");
-
         hit = Physics2D.Raycast(position, transform.forward);
 
         if (hit && hit.transform.TryGetComponent(out SlotPrefab slotPrefab))
-        {
-Debug.LogWarning($"hit in ray = {slotPrefab}");
             return slotPrefab;
-        }
-Debug.Log("hit is NULL!");
         return null;
     }
 }

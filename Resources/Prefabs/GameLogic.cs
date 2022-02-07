@@ -117,14 +117,12 @@ public class GameLogic : MonoBehaviour
     {
         Vector3 beginPosition = Vector3.left * (Size.Row - 1) * widthUnit * .5f;
         Vector3 currentPosition = beginPosition;
-        SlotPrefab lower;
 
         BaseLine = new SlotPrefab[Size.Row];
         slotArray = new SlotPrefab[Size.Row * Size.Column];
 
         for (uint w = 0; w < Size.Row; ++w)
         {
-            lower = null;
             if (IsFloating(w))
                 currentPosition += Vector3.up * slotSize.y * .5f;
             for (uint h = 0; h < Size.Column; ++h)
@@ -207,34 +205,39 @@ public class GameLogic : MonoBehaviour
 
     private void SearchSamePattern(Vector3[] shape)
     {
-        foreach (var item in slotArray)
-            if (item.transform.position.Equals(default))
-                Debug.LogError("FIND DEFAULT POSITION!");
+        List<SlotPrefab> list = new List<SlotPrefab>();
 
-
-Debug.Log("enter [SearchSamePattern]");
-        var result = slotArray
-            .Where(slot => {
+        slotArray
+            .Where(slot =>
+            {
                 if (slot.Slot.Color.Equals(SlotAttribute.generator))
                     return false;
 
                 Vector3 position = slot.transform.position;
-Debug.Log($"looping slotArray. curr = {slot}, {slot.transform.position}");
-
                 return shape.FirstOrDefault(offset => !slot.Slot.Color.Equals(ray.Shot(position -= offset)?.Slot.Color)) == default;
             })
-            .Select(slot => {
-Debug.LogError($"select slot = {slot}");
-                Vector3 position = slot.transform.position;
-                return shape.Select(offset => ray.Shot(position += offset));
+            .Select(slot => slot)
+            .Select(head =>
+            {
+                Vector3 position = head.transform.position;
+
+                list.Add(head);
+                list.AddRange(shape.Select(offset => ray.Shot(position -= offset)));
+                return list;
             }).ToArray();
 
-        Debug.Log($"cnt = {result.Count()}");
+        var group = list.GroupBy(e => e.Slot.Id);
 
-        foreach (var item in result)
-            foreach (var it in item)
-                Debug.Log($"it = {it}");
+        foreach (var g in group)
+            Debug.Log($"key = {g.Key}, cnt = {g.Count()}");
+        
 
+        /*        Debug.Log($"selected count = {selected.Count()}");
+                foreach (var item in selected)
+                    foreach (var it in item)
+                        *//*Debug.Log($"item = {item}");*//*
+                        Debug.Log($"it = {it}");
+        */
 
         //var array = slotArray
         //    .Where(slot => !slot.Slot.Color.Equals(SlotAttribute.generator))
