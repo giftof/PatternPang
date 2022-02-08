@@ -13,28 +13,36 @@ using Pattern.Managers;
 
 public class GameLogic : MonoBehaviour
 {
+    /* b */
     [SerializeField] ObjectPool slotPool;
     [SerializeField] ObjectPool ballPool;
-    [SerializeField] EventSystem eventSystem;
-    [SerializeField] Ray ray;
-
     public SlotPrefab[] BaseLine { get; set; } = null;
     public (uint Row, uint Column) Size { get; set; } = (0, 0);
     public uint BallVar { get; set; } = 0;
-
-    public int Score { get; private set; } = 0;
     private Vector2 m_slotSize;
     private float m_widthUnit;
     private SlotPrefab[] m_slotArray;
+    /* e */
+
+
+    [SerializeField] EventSystem eventSystem;
+    [SerializeField] Ray ray;
+
+    public int Score { get; private set; } = 0;
     private int m_matchCount;
     private int m_unitScore;
+
+    public static GameLogic Instance;
 
 
 
     private void Awake()
     {
+        Instance = this;
+        /* b */
         m_slotSize = slotPool.prefab.GetComponent<RectTransform>().sizeDelta;
         m_widthUnit = m_slotSize.x * 0.75f;
+        /* e */
     }
 
     public void Initialize()
@@ -74,6 +82,7 @@ public class GameLogic : MonoBehaviour
         StartCoroutine(WaitDrop(() => { Finish(); }));
     }
 
+    /* b */
     public void ClearBoard()
     {
         LineManager.Instance.Clear();
@@ -90,6 +99,7 @@ public class GameLogic : MonoBehaviour
         m_slotArray = null;
         BaseLine = null;
     }
+    /* e */
 
     private void Finish()
     {
@@ -126,6 +136,7 @@ public class GameLogic : MonoBehaviour
         StartCoroutine(CreateBall(destination));
     }
 
+    /* b */
     private void CreateBoard()
     {
         Vector3 beginPosition = Vector3.left * (Size.Row - 1) * m_widthUnit * .5f;
@@ -155,9 +166,12 @@ public class GameLogic : MonoBehaviour
             currentPosition = beginPosition + Vector3.right * (w + 1) * m_widthUnit;
         }
     }
+    /* e */
 
+    /* b */
     private bool IsFloating(uint row)
         => row % 2 == CONST.EVEN_COLUMN_UP;
+    /* e */
 
     IEnumerator FillBoard(Action action)
     {
@@ -203,7 +217,7 @@ public class GameLogic : MonoBehaviour
         action?.Invoke();
     }
 
-    private void AfterDraw()
+    public void AfterDraw()
     {
         eventSystem.enabled = false;
         Vector3[] shape = PatternHandler.Instance.ShapeOffset();
@@ -313,6 +327,7 @@ Debug.Log($"inc score = {m_matchCount} * {m_unitScore} = {m_matchCount * m_unitS
         }));
     }
 
+    /* b */
     /* at least 3 x 3 brard */
     private void PresetOffset()
     {
@@ -333,4 +348,5 @@ Debug.Log($"inc score = {m_matchCount} * {m_unitScore} = {m_matchCount * m_unitS
         CONST.DIRECTION_OFFSET[2] = CONST.DIRECTION_OFFSET[1] + Vector3.down * CONST.DIRECTION_OFFSET[1].y * 2;
         CONST.DIRECTION_OFFSET[5] = CONST.DIRECTION_OFFSET[2] * -1;
     }
+    /* e */
 }

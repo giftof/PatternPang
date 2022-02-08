@@ -22,6 +22,7 @@ using DG.Tweening;
 public class Game : MonoBehaviour
 {
     [SerializeField] GameLogic gameLogic;
+    [SerializeField] BoardManager boardManager;
     [SerializeField] Button generate;
     [SerializeField] Button clear;
     [SerializeField] Button re;
@@ -32,6 +33,9 @@ public class Game : MonoBehaviour
 
     void Start()
     {
+        boardManager.Size = CONST.SIZE1;
+        boardManager.BallVariation = CONST.LEVEL2;
+
         gameLogic.Size = CONST.SIZE1;
         gameLogic.BallVar = CONST.LEVEL2;
         SetButtonAction();
@@ -48,7 +52,8 @@ public class Game : MonoBehaviour
     private void BeginTimer()
     {
         progressBar.fillAmount = 1;
-        DOTween.To(() => progressBar.fillAmount, x => progressBar.fillAmount = x, 0, 60).SetId("timer")
+        DOTween.Kill("timer");
+        DOTween.To(() => progressBar.fillAmount, x => progressBar.fillAmount = x, 0, 30).SetId("timer")
             .OnComplete( ()=> {
                 StartCoroutine(FIN());
             });
@@ -59,7 +64,9 @@ public class Game : MonoBehaviour
         gameOverPannel.SetActive(true);
         eventSystem.enabled = false;
 
-        yield return new WaitForSecondsRealtime(5);
+        yield return new WaitForSecondsRealtime(0.5f);
+        gameLogic.ClearBall();
+        yield return new WaitForSecondsRealtime(4.5f);
 
         eventSystem.enabled = true;
         gameOverPannel.SetActive(false);
