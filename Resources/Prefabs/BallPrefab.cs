@@ -8,7 +8,7 @@ using Pattern.Configs;
 public class BallPrefab : MonoBehaviour
 {
     public SlotAttribute m_color { get; set; }
-    public static uint TweeningCount { get; set; } = 0;
+    public static uint TweeningCount { get; set; } = 0; /* remove */
     [SerializeField] Image image;
 
     public SlotAttribute Color
@@ -23,22 +23,22 @@ public class BallPrefab : MonoBehaviour
 
     public void SendTo(SlotPrefab destination)
     {
-        TweeningCount += 1;
+        //TweeningCount += 1;
         transform.DOMoveY(destination.transform.position.y, CONST.MOVE_DURATION).SetEase(Ease.Linear)
             .OnComplete(() => {
                 destination.Child = this;
                 destination.Slot.Color = Color;
-                TweeningCount -= 1;
+                //TweeningCount -= 1;
             });
     }
 
     public void Drop<T>(DELEGATE_T<T> finishAction, T obj)
     {
-        TweeningCount += 1;
+        //TweeningCount += 1;
         transform.DOMoveY(transform.position.y - CONST.TEMP_DROP_DISTANCE, CONST.MOVE_DURATION * CONST.TEMP_DROP_DISTANCE).SetEase(Ease.Linear)
             .OnComplete(() => {
                 finishAction?.Invoke(obj);
-                TweeningCount -= 1;
+                //TweeningCount -= 1;
             });
     }
 

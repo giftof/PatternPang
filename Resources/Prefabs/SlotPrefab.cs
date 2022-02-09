@@ -10,7 +10,7 @@ using Pattern.Configs;
 
 public delegate void DELEGATE_T<T>(T t);
 
-public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler, IPointerUpHandler, IParent<BallPrefab>
+public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler, IPointerUpHandler, IPointerClickHandler, IParent<BallPrefab>
 {
     public Slot Slot { get; set; } = null;
     public DELEGATE_T<SlotPrefab> Generate;
@@ -35,7 +35,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
 
     public void Initialize(Slot slot)
     {
-        name = slot.Id.ToString();
+        //name = slot.Id.ToString();
 
         Slot = slot;
         Generate = null;
@@ -47,7 +47,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
         if (!activate)
         {
             activate = true;
-            PatternHandler.Instance.Begin(this, Slot.Color);
+            PatternHandler.Instance.Begin(this);
             beginAction?.Invoke();
         }
     }
@@ -94,5 +94,11 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
             upper.Child.SendTo(this);
             upper.Child = null;
         }
+    }
+
+    /* not yet */
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        throw new NotImplementedException();
     }
 }

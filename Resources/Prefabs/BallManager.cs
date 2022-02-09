@@ -4,7 +4,6 @@ using Pattern.Configs;
 public class BallManager : ManagedPool<BallPrefab>
 {
     public uint BallVariation { get; set; } = 0;
-    private static readonly int beginVariation = 1;
 
     protected override void Awake()
         => base.Awake();
@@ -35,5 +34,5 @@ public class BallManager : ManagedPool<BallPrefab>
     }
 
     private SlotAttribute RandomColor
-        => (SlotAttribute)Random.Range(beginVariation, BallVariation + beginVariation);
+        => (SlotAttribute)Random.Range(0, BallVariation);
 }

@@ -25,6 +25,7 @@ namespace Pattern.Configs
         public static readonly (uint, uint) SIZE2 = (9, 11 + GENERATOR_LINE);
         public static readonly uint TEMP_DROP_DISTANCE = 9;
         public static readonly float LINE_WIDTH = .3f;
+        public static readonly float HEXAGON_WIDTH_RATIO = .75f;
 
         public static float MAX_DISTANCE;
         public static Vector3[] DIRECTION_OFFSET = new Vector3[6];
@@ -39,17 +40,17 @@ namespace Pattern.Configs
 
     public enum SlotAttribute
     {
-        none,
+        none = -1,
         red,
         green,
         blue,
         yellow,
         purple,
+        color_count,
         bomb1,
         bomb2,
         bomb3,
         generator,
-        count,
     }
 
     /*

@@ -247,7 +247,7 @@ public class GameLogic : MonoBehaviour
             ballPrefab.transform.SetParent(destination.transform.parent);
             ballPrefab.transform.localScale = Vector3.one;
             ballPrefab.transform.localPosition = destination.transform.localPosition;
-            ballPrefab.Color = (SlotAttribute)UnityEngine.Random.Range(1, (int)SlotAttribute.count - BallVar);
+            ballPrefab.Color = (SlotAttribute)UnityEngine.Random.Range(1, (int)SlotAttribute.color_count - BallVar);
             destination.Child = ballPrefab;
         }
         else
