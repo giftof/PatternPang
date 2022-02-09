@@ -39,6 +39,8 @@ public class GameLogic : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        PatternHandler.Instance.InputEnd = AfterDraw;
+
         /* b */
         m_slotSize = slotPool.prefab.GetComponent<RectTransform>().sizeDelta;
         m_widthUnit = m_slotSize.x * 0.75f;
@@ -64,6 +66,38 @@ public class GameLogic : MonoBehaviour
 
         yield return null;
         StartCoroutine(FillBoard(() => { Finish(); }));
+
+
+        Matrix4x4 mat0 = m_slotArray[0].transform.localToWorldMatrix;
+        Vector3 pos;
+        //Vector3 right = Vector3.right * mat0.m22 * m_slotSize.x;
+        Vector3 right = Vector3.right * mat0.m00 * m_widthUnit;
+        Vector3 up = Vector3.up * mat0.m00 * m_slotSize.y;
+
+        pos = m_slotArray[0].transform.position;
+        Debug.LogError($"expect = 0, rst = {ray.Shot(pos).name}");
+
+        pos = m_slotArray[0].transform.position + up;
+        Debug.LogError($"expect = 1, rst = {ray.Shot(pos).name}");
+
+        pos = m_slotArray[0].transform.position + up * 2;
+        Debug.LogError($"expect = 2, rst = {ray.Shot(pos).name}");
+
+        pos = m_slotArray[0].transform.position + right + up * .5f;
+        Debug.LogError($"expect = 9, rst = {ray.Shot(pos).name}");
+
+        pos = m_slotArray[0].transform.position + right * 5 + up * .5f;
+        Debug.LogError($"expect = 45, rst = {ray.Shot(pos).name}");
+
+        pos = m_slotArray[0].transform.position + right * 6;
+        Debug.LogError($"expect = 54, rst = {ray.Shot(pos).name}");
+
+        pos = m_slotArray[0].transform.position + right * 5 + up * 7.5f;
+        Debug.LogError($"expect = 52, rst = {ray.Shot(pos).name}");
+
+        pos = m_slotArray[0].transform.position + right * 6 + up * 7;
+        Debug.LogError($"expect = 61, rst = {ray.Shot(pos).name}");
+
     }
 
     public void ClearBall()
@@ -74,9 +108,9 @@ public class GameLogic : MonoBehaviour
         if (m_slotArray != null)
             foreach (var item in m_slotArray)
             {
-                if (item.Ball != null)
-                    item.Ball.Drop(ballPool.Release, item.Ball.gameObject);
-                item.Ball = null;
+                if (item.Child != null)
+                    item.Child.Drop(ballPool.Release, item.Child.gameObject);
+                item.Child = null;
             }
 
         StartCoroutine(WaitDrop(() => { Finish(); }));
@@ -90,9 +124,9 @@ public class GameLogic : MonoBehaviour
         if (m_slotArray != null)
             foreach (var item in m_slotArray)
             {
-                if (item.Ball != null)
-                    ballPool.Release(item.Ball.gameObject);
-                item.Ball = null;
+                if (item.Child != null)
+                    ballPool.Release(item.Child.gameObject);
+                item.Child = null;
                 slotPool.Release(item.gameObject);
             }
 
@@ -109,6 +143,7 @@ public class GameLogic : MonoBehaviour
         PatternHandler.Instance.Clear();
     }
 
+    /* b */
     private void SetBallGenerator()
     {
         BaseLine.Select(e => {
@@ -127,14 +162,17 @@ public class GameLogic : MonoBehaviour
             return e;
         }).ToArray();
     }
+    /* e */
 
+    /* b */
     private void GenerateBall(SlotPrefab destination)
     {
-        if (destination.Ball != null)
+        if (destination.Child != null)
             return;
 
         StartCoroutine(CreateBall(destination));
     }
+    /* e */
 
     /* b */
     private void CreateBoard()
@@ -151,9 +189,12 @@ public class GameLogic : MonoBehaviour
                 currentPosition += Vector3.up * m_slotSize.y * .5f;
             for (uint h = 0; h < Size.Column; ++h)
             {
-                if (slotPool.Request<SlotPrefab>(transform, currentPosition) is SlotPrefab slot)
+                if (slotPool.Request<SlotPrefab>() is SlotPrefab slot)
                 {
-                    slot.Initialize(new Slot(w * Size.Column + h), AfterDraw);
+                    slot.transform.SetParent(transform);
+                    slot.transform.localScale = Vector3.one;
+                    slot.transform.localPosition = currentPosition;
+                    slot.Initialize(new Slot(w * Size.Column + h));
 
                     m_slotArray[slot.Slot.Id] = slot;
                     currentPosition += Vector3.up * m_slotSize.y;
@@ -182,7 +223,7 @@ public class GameLogic : MonoBehaviour
 
         foreach (var item in m_slotArray)
         {
-            if (item.Ball == null)
+            if (item.Child == null)
             {
                 ++nullCount;
                 item.Dispose();
@@ -195,19 +236,24 @@ public class GameLogic : MonoBehaviour
             action?.Invoke();
     }
 
+    /* b */
     IEnumerator CreateBall(SlotPrefab destination)
     {
         while (BallPrefab.TweeningCount > 0)
             yield return null;
 
-        if (ballPool.Request<BallPrefab>(destination.transform.parent, destination.transform.localPosition) is BallPrefab ballPrefab)
+        if (ballPool.Request<BallPrefab>() is BallPrefab ballPrefab)
         {
+            ballPrefab.transform.SetParent(destination.transform.parent);
+            ballPrefab.transform.localScale = Vector3.one;
+            ballPrefab.transform.localPosition = destination.transform.localPosition;
             ballPrefab.Color = (SlotAttribute)UnityEngine.Random.Range(1, (int)SlotAttribute.count - BallVar);
-            destination.Ball = ballPrefab;
+            destination.Child = ballPrefab;
         }
         else
             throw new Exception("ballPool make Exception");
     }
+    /* e */
 
     IEnumerator WaitDrop(Action action)
     {
@@ -291,32 +337,32 @@ Debug.Log($"inc score = {m_matchCount} * {m_unitScore} = {m_matchCount * m_unitS
             {
                 case 1:
                     /*Debug.Log("case 1 normal remove");*/
-                    ballPool.Release(m_slotArray[g.Key].Ball.gameObject);
-                    m_slotArray[g.Key].Ball = null;
+                    ballPool.Release(m_slotArray[g.Key].Child.gameObject);
+                    m_slotArray[g.Key].Child = null;
                     m_slotArray[g.Key].Slot.Color = SlotAttribute.none;
                     break;
                 case 2:
                     /*Debug.Log("case 2 normal remove");*/
-                    ballPool.Release(m_slotArray[g.Key].Ball.gameObject);
-                    m_slotArray[g.Key].Ball = null;
+                    ballPool.Release(m_slotArray[g.Key].Child.gameObject);
+                    m_slotArray[g.Key].Child = null;
                     m_slotArray[g.Key].Slot.Color = SlotAttribute.none;
                     break;
                 case 3:     // bomb level 1
                     /*Debug.Log("case 3 bomb level 1");*/
-                    ballPool.Release(m_slotArray[g.Key].Ball.gameObject);
-                    m_slotArray[g.Key].Ball = null;
+                    ballPool.Release(m_slotArray[g.Key].Child.gameObject);
+                    m_slotArray[g.Key].Child = null;
                     m_slotArray[g.Key].Slot.Color = SlotAttribute.none;
                     break;
                 case 4:     // bomb level 2
                     /*Debug.Log("case 4 bomb level 2");*/
-                    ballPool.Release(m_slotArray[g.Key].Ball.gameObject);
-                    m_slotArray[g.Key].Ball = null;
+                    ballPool.Release(m_slotArray[g.Key].Child.gameObject);
+                    m_slotArray[g.Key].Child = null;
                     m_slotArray[g.Key].Slot.Color = SlotAttribute.none;
                     break;
                 default:    // bomb level 3
                     /*Debug.Log("case 5~ bomb level 3");*/
-                    ballPool.Release(m_slotArray[g.Key].Ball.gameObject);
-                    m_slotArray[g.Key].Ball = null;
+                    ballPool.Release(m_slotArray[g.Key].Child.gameObject);
+                    m_slotArray[g.Key].Child = null;
                     m_slotArray[g.Key].Slot.Color = SlotAttribute.none;
                     break;
             }
@@ -347,6 +393,36 @@ Debug.Log($"inc score = {m_matchCount} * {m_unitScore} = {m_matchCount * m_unitS
         CONST.DIRECTION_OFFSET[4] = CONST.DIRECTION_OFFSET[1] * -1;
         CONST.DIRECTION_OFFSET[2] = CONST.DIRECTION_OFFSET[1] + Vector3.down * CONST.DIRECTION_OFFSET[1].y * 2;
         CONST.DIRECTION_OFFSET[5] = CONST.DIRECTION_OFFSET[2] * -1;
+
+
+
+        
+        RaycastHit2D[] hit2D = Physics2D.CircleCastAll(m_slotArray[0].transform.position, m_widthUnit / 4, transform.forward);
+
+        float d0 = (m_slotArray[1].transform.localPosition - m_slotArray[0].transform.localPosition).y;
+        float d1 = (m_slotArray[1].transform.position - m_slotArray[0].transform.position).y;
+        Debug.Log(d0);
+        Debug.Log(d1);
+
+        Matrix4x4 mat0 = m_slotArray[0].transform.localToWorldMatrix;
+        Debug.Log(m_slotArray[0].transform.localToWorldMatrix);
+        Debug.Log(mat0.m00);
+        Debug.Log(mat0.m03);
+
+        Matrix4x4 mat1 = m_slotArray[1].transform.localToWorldMatrix;
+        Debug.Log(m_slotArray[1].transform.localToWorldMatrix);
+        Debug.Log(mat1.m00);
+        Debug.Log(mat1.m03);
+
+        //Debug.Log(m_slotArray[1].transform.localPosition - m_slotArray[0].transform.localPosition);
+        //Debug.Log(m_slotArray[1].transform.position - m_slotArray[0].transform.position);
+
+        //foreach (RaycastHit2D hit in hit2D)
+        //{
+        //    Debug.LogWarning($"hit = {hit.transform.GetComponent<SlotPrefab>().name}");
+        //}
+        Debug.Log($"m_widthUnit = {m_widthUnit}, cnt = {hit2D.Length}");
+
     }
     /* e */
 }

@@ -14,10 +14,14 @@ namespace Pattern.Objects
     public class Slot
     {
         public SlotAttribute Color { get; set; } = SlotAttribute.none;
-        public uint MatchCount { get; set; } = 0;
         public uint Id { get; set; } = 0;
 
         public Slot(uint id)
             => Id = id;
+    }
+
+    public sealed class BottomSlot
+    {
+        public bool IsWorking { get; set; }
     }
 }

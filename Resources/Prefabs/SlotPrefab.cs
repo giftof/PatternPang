@@ -10,17 +10,17 @@ using Pattern.Configs;
 
 public delegate void DELEGATE_T<T>(T t);
 
-public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler, IPointerUpHandler
+public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler, IPointerUpHandler, IParent<BallPrefab>
 {
     public Slot Slot { get; set; } = null;
     public DELEGATE_T<SlotPrefab> Generate;
-    public Action finishAction;
+    public Action FinishAction { get; set; } = null;
 
     private Action beginAction;
     private Action addAction;
     private Action removeAction;
 
-    public BallPrefab Ball { get; set; } = null;
+    public BallPrefab Child { get; set; } = null;
     
     private static bool activate = false;
 
@@ -33,15 +33,13 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
         removeAction = LineManager.Instance.Remove;
     }
 
-    public void Initialize(Slot slot, Action finishAction)
+    public void Initialize(Slot slot)
     {
         name = slot.Id.ToString();
 
         Slot = slot;
         Generate = null;
         GetComponent<Image>().raycastTarget = true;
-
-        this.finishAction = finishAction;
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -76,9 +74,10 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        if (activate && Input.touchCount == 0)
+        if (activate && Input.touchCount <= 1)
         {
-            finishAction?.Invoke();
+            PatternHandler.Instance?.InputEnd?.Invoke();
+            FinishAction?.Invoke();
             activate = false;
         }
     }
@@ -90,10 +89,10 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
         if (upper == null)
             Generate?.Invoke(this);
 
-        if (upper != null ? upper.Ball : null != null)
+        if (upper != null ? upper.Child : null != null)
         {
-            upper.Ball.SendTo(this);
-            upper.Ball = null;
+            upper.Child.SendTo(this);
+            upper.Child = null;
         }
     }
 }

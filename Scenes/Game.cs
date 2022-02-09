@@ -34,7 +34,7 @@ public class Game : MonoBehaviour
     void Start()
     {
         boardManager.Size = CONST.SIZE1;
-        boardManager.BallVariation = CONST.LEVEL2;
+        boardManager.ballManager.BallVariation = CONST.LEVEL2;
 
         gameLogic.Size = CONST.SIZE1;
         gameLogic.BallVar = CONST.LEVEL2;

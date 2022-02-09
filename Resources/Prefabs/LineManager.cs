@@ -23,7 +23,10 @@ public class LineManager : MonoBehaviour
         Clear();
 
         SlotPrefab slot = PatternHandler.Instance.First();
-        currentLine = linePool.Request<LinePrefab>(transform);
+        currentLine = linePool.Request<LinePrefab>();
+        currentLine.transform.SetParent(transform);
+        currentLine.transform.localScale = Vector3.one;
+        currentLine.transform.localPosition = default;
         jointCount = 0;
 
         currentLine.line.positionCount = ++jointCount;
@@ -56,7 +59,10 @@ public class LineManager : MonoBehaviour
     public void ToLine(List<SlotPrefab> list)
     {
         int joint = list.Count;
-        LinePrefab unit = linePool.Request<LinePrefab>(transform);
+        LinePrefab unit = linePool.Request<LinePrefab>();
+        unit.transform.SetParent(transform);
+        unit.transform.localScale = Vector3.one;
+        unit.transform.localPosition = default;
 
         unit.line.positionCount = joint;
         unit.line.SetPosition(0, list[0].transform.position);

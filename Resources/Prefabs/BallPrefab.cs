@@ -26,7 +26,7 @@ public class BallPrefab : MonoBehaviour
         TweeningCount += 1;
         transform.DOMoveY(destination.transform.position.y, CONST.MOVE_DURATION).SetEase(Ease.Linear)
             .OnComplete(() => {
-                destination.Ball = this;
+                destination.Child = this;
                 destination.Slot.Color = Color;
                 TweeningCount -= 1;
             });
@@ -54,7 +54,7 @@ public class BallPrefab : MonoBehaviour
             SlotAttribute.bomb1 => UnityEngine.Color.black,
             SlotAttribute.bomb2 => UnityEngine.Color.black,
             SlotAttribute.bomb3 => UnityEngine.Color.black,
-            _ => UnityEngine.Color.white,
+            _ => UnityEngine.Color.grey,
         };
     }
 }
