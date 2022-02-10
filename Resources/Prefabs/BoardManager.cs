@@ -1,23 +1,33 @@
 using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 using Pattern.Configs;
 
 public class BoardManager : ManagedPool<SlotPrefab>
 {
-    public BallManager ballManager;
+    public static BoardManager Instance = null;
+
     public (uint Row, uint Column) Size { get; set; } = (0, 0);
+    public BallManager ballManager;
     private Vector2 m_slotSize;
     private float m_widthUnit;
+    private List<SlotPrefab> m_bottomList;
 
     protected override void Awake()
     {
         base.Awake();
         m_slotSize = pool.prefab.GetComponent<RectTransform>().sizeDelta;
         m_widthUnit = m_slotSize.x * CONST.HEXAGON_WIDTH_RATIO;
+        m_bottomList = new List<SlotPrefab>();
+        Instance = this;
     }
 
     public override void Clear()
     {
+        foreach (var pair in dictionary)
+            pair.Value.Child = null;
+
+        m_bottomList.Clear();
         ballManager.Clear();
         base.Clear();
     }
@@ -25,11 +35,17 @@ public class BoardManager : ManagedPool<SlotPrefab>
     public void Create()
     {
         Clear();
-        PutSlots();
+        PublishBoard();
         UnitOffset();
     }
 
-    private void PutSlots()
+    public Dictionary<int, SlotPrefab> Data
+        => dictionary;
+
+    public IReadOnlyList<SlotPrefab> BottomLine
+        => m_bottomList;
+
+    private void PublishBoard()
     {
         Vector3 beginPosition = (Size.Row - 1) * .5f * m_widthUnit * Vector3.left;
         Vector3 currentPosition = beginPosition;
@@ -39,18 +55,27 @@ public class BoardManager : ManagedPool<SlotPrefab>
             currentPosition += IsFloating(w) ? .5f * m_slotSize.y * Vector3.up : Vector3.zero;
             for (uint h = 0; h < Size.Column; ++h)
             {
-                Request(transform, currentPosition);
+                SlotPrefab slot = Request(transform, currentPosition);
                 currentPosition += Vector3.up * m_slotSize.y;
+                slot.name = slot.GetInstanceID().ToString(); /* for test */
+
+                if (h.Equals(0))
+                    m_bottomList.Add(slot);
+                if (h.Equals(Size.Column - 1))
+                    slot.Generate = MakeChild;
             }
             currentPosition = beginPosition + (w + 1) * m_widthUnit * Vector3.right;
         }
     }
 
+    private void MakeChild(SlotPrefab slot)
+        => slot.Child = BallManager.Instance.Request(slot.transform.parent, slot.transform.localPosition);
+
     private void UnitOffset()
     {
-        Matrix4x4 matrix = dictionary.First().Value.transform.localToWorldMatrix;
-        Vector3 right = m_widthUnit * matrix.m00 * Vector3.right;
-        Vector3 up = m_slotSize.y * matrix.m00 * Vector3.up;
+        float ratio = dictionary.First().Value.transform.localToWorldMatrix.m00;
+        Vector3 right = m_widthUnit * ratio * Vector3.right;
+        Vector3 up = m_slotSize.y * ratio * Vector3.up;
 
         float min = Mathf.Min(up.y * 2, right.x * 2, Vector3.Distance(up * 1.5f + right, Vector3.zero));
         float max = Mathf.Max(up.y, up.y * .5f + right.x);

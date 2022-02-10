@@ -13,7 +13,7 @@ public class ObjectPool : MonoBehaviour
     {
         if (queue.Count > 0)
             return queue.Dequeue().GetComponent<T>();
-        return Object.Instantiate(prefab).GetComponent<T>();
+        return Instantiate(prefab).GetComponent<T>();
     }
 
     public void Release(GameObject obj)

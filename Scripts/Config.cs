@@ -50,7 +50,6 @@ namespace Pattern.Configs
         bomb1,
         bomb2,
         bomb3,
-        generator,
     }
 
     /*

@@ -1,10 +1,3 @@
-/*
- * Create: [Game.cs] on Thu Jan 27 2022 4:58:52 PM
- * Author: [cloudeven@gmail.com]
- *
- * Copyright (c) 2022 [noname]
- */
-
 using System;
 using System.Text;
 using System.Linq;
@@ -14,7 +7,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Pattern.Managers;
-using Pattern.Objects;
 using Pattern.Configs;
 using DG.Tweening;
 
@@ -33,27 +25,33 @@ public class Game : MonoBehaviour
 
     void Start()
     {
+        SetGameLevel();
+        SetButtonAction();
+    }
+
+    private void SetGameLevel()
+    {
         boardManager.Size = CONST.SIZE1;
         boardManager.ballManager.BallVariation = CONST.LEVEL2;
-
-        gameLogic.Size = CONST.SIZE1;
-        gameLogic.BallVar = CONST.LEVEL2;
-        SetButtonAction();
     }
 
     private void SetButtonAction()
     {
-        generate.onClick.AddListener(gameLogic.Initialize);
+        generate.onClick.AddListener(gameLogic.CreateGame);
         generate.onClick.AddListener(BeginTimer);
-        clear.onClick.AddListener(gameLogic.ClearBoard);
+        clear.onClick.AddListener(gameLogic.ClearGame);
+
+
+
+        //re.onClick.AddListener(gameLogic.ClearBall);
         re.onClick.AddListener(gameLogic.ClearBall);
     }
 
     private void BeginTimer()
     {
         progressBar.fillAmount = 1;
-        DOTween.Kill("timer");
-        DOTween.To(() => progressBar.fillAmount, x => progressBar.fillAmount = x, 0, 30).SetId("timer")
+        DOTween.Kill(progressBar.GetInstanceID());
+        DOTween.To(() => progressBar.fillAmount, x => progressBar.fillAmount = x, 0, 30).SetId(progressBar.GetInstanceID())
             .OnComplete( ()=> {
                 StartCoroutine(FIN());
             });

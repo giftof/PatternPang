@@ -7,13 +7,18 @@ using Pattern.Configs;
 
 public class BallPrefab : MonoBehaviour
 {
-    public SlotAttribute m_color { get; set; }
-    public static uint TweeningCount { get; set; } = 0; /* remove */
     [SerializeField] Image image;
+
+    private static Color[] palette = new Color[8] {UnityEngine.Color.red, UnityEngine.Color.green, UnityEngine.Color.blue,
+        UnityEngine.Color.yellow, UnityEngine.Color.cyan,
+        UnityEngine.Color.black, UnityEngine.Color.black, UnityEngine.Color.black};
+
+    private SlotAttribute m_color { get; set; }
+    public bool IsWorking { get; private set; }
 
     public SlotAttribute Color
     {
-        get { return m_color; }
+        get => m_color;
         set
         {
             m_color = value;
@@ -21,40 +26,40 @@ public class BallPrefab : MonoBehaviour
         }
     }
 
-    public void SendTo(SlotPrefab destination)
+    public void TransferTo(IParent<BallPrefab> destination)
     {
-        //TweeningCount += 1;
-        transform.DOMoveY(destination.transform.position.y, CONST.MOVE_DURATION).SetEase(Ease.Linear)
-            .OnComplete(() => {
-                destination.Child = this;
-                destination.Slot.Color = Color;
-                //TweeningCount -= 1;
-            });
+        if (IsWorking)
+            return;
+
+        IsWorking = true;
+
+        if (destination is MonoBehaviour monoObj)
+        {
+            destination.Child = this;
+
+            transform
+                .DOMoveY(monoObj.transform.position.y, CONST.MOVE_DURATION)
+                .SetEase(Ease.Linear)
+                .OnComplete(() => {
+                    IsWorking = false;
+                });
+        }
     }
 
     public void Drop<T>(DELEGATE_T<T> finishAction, T obj)
     {
-        //TweeningCount += 1;
-        transform.DOMoveY(transform.position.y - CONST.TEMP_DROP_DISTANCE, CONST.MOVE_DURATION * CONST.TEMP_DROP_DISTANCE).SetEase(Ease.Linear)
+        IsWorking = true;
+        transform.DOMoveY(transform.position.y - CONST.TEMP_DROP_DISTANCE, CONST.MOVE_DURATION * CONST.TEMP_DROP_DISTANCE)
             .OnComplete(() => {
                 finishAction?.Invoke(obj);
-                //TweeningCount -= 1;
+                IsWorking = false;
             });
     }
 
     private Color ConvertToColor()
     {
-        return m_color switch
-        {
-            SlotAttribute.red => UnityEngine.Color.red,
-            SlotAttribute.green => UnityEngine.Color.green,
-            SlotAttribute.blue => UnityEngine.Color.blue,
-            SlotAttribute.yellow => UnityEngine.Color.yellow,
-            SlotAttribute.purple => UnityEngine.Color.cyan,
-            SlotAttribute.bomb1 => UnityEngine.Color.black,
-            SlotAttribute.bomb2 => UnityEngine.Color.black,
-            SlotAttribute.bomb3 => UnityEngine.Color.black,
-            _ => UnityEngine.Color.grey,
-        };
+        if (m_color < 0)
+            return UnityEngine.Color.grey;
+        return palette[(int)m_color];
     }
 }

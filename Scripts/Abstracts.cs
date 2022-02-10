@@ -38,7 +38,10 @@ public abstract class ManagedPool<T> : MonoBehaviour where T : MonoBehaviour
     public virtual void Clear()
     {
         foreach (var pair in dictionary)
+        {
             pool.Release(pair.Value.gameObject);
+            pair.Value.gameObject.SetActive(false);
+        }
         dictionary.Clear();
     }
 }

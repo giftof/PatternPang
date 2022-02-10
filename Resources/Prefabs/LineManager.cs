@@ -1,75 +1,49 @@
 using System.Collections.Generic;
-using UnityEngine;
 using Pattern.Managers;
 
-
-public class LineManager : MonoBehaviour
+public class LineManager : ManagedPool<LinePrefab>
 {
-    [SerializeField] ObjectPool linePool;
-
     public static LineManager Instance = null;
-    private LinkedList<LinePrefab> lineArray;
-    LinePrefab currentLine;
-    int jointCount;
+    private LinePrefab m_currentLine;
+    private int m_jointCount;
 
-    private void Awake()
+    protected override void Awake()
     {
-        lineArray = new LinkedList<LinePrefab>();
+        base.Awake();
         Instance = this;
     }
 
     public void Begin()
     {
         Clear();
-
-        SlotPrefab slot = PatternHandler.Instance.First();
-        currentLine = linePool.Request<LinePrefab>();
-        currentLine.transform.SetParent(transform);
-        currentLine.transform.localScale = Vector3.one;
-        currentLine.transform.localPosition = default;
-        jointCount = 0;
-
-        currentLine.line.positionCount = ++jointCount;
-        currentLine.line.SetPosition(jointCount - 1, slot.transform.position);
-
-        lineArray.AddFirst(currentLine);
+        m_currentLine = Request(transform, default);
+        Append();
     }
 
     public void Append()
     {
-        currentLine.line.positionCount = ++jointCount;
-        currentLine.line.SetPosition(jointCount - 1, PatternHandler.Instance.First().transform.position);
+        m_currentLine.line.positionCount = ++m_jointCount;
+        m_currentLine.line.SetPosition(m_jointCount - 1, PatternHandler.Instance.First().transform.position);
     }
 
     public void Remove()
-    {
-        currentLine.line.positionCount = --jointCount;
-    }
+        => m_currentLine.line.positionCount = --m_jointCount;
 
-    public void Clear()
+    public override void Clear()
     {
-        if (lineArray == null)
-            return;
-
-        foreach (var item in lineArray)
-            linePool.Release(item.gameObject);
-        lineArray.Clear();
+        base.Clear();
+        m_jointCount = 0;
     }
 
     public void ToLine(List<SlotPrefab> list)
     {
         int joint = list.Count;
-        LinePrefab unit = linePool.Request<LinePrefab>();
-        unit.transform.SetParent(transform);
-        unit.transform.localScale = Vector3.one;
-        unit.transform.localPosition = default;
+        LinePrefab unit = Request(transform, default);
 
         unit.line.positionCount = joint;
         unit.line.SetPosition(0, list[0].transform.position);
 
         for (int i = 0; i < list.Count; ++i)
             unit.line.SetPosition(i, list[i].transform.position);
-
-        lineArray.AddFirst(unit);
     }
 }

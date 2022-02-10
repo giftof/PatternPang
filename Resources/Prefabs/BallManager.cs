@@ -1,12 +1,18 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Pattern.Configs;
 
 public class BallManager : ManagedPool<BallPrefab>
 {
+    public static BallManager Instance = null;
+
     public uint BallVariation { get; set; } = 0;
 
     protected override void Awake()
-        => base.Awake();
+    {
+        base.Awake();
+        Instance = this;
+    }
 
     public override BallPrefab Request()
     {
@@ -25,6 +31,15 @@ public class BallManager : ManagedPool<BallPrefab>
     {
         ball.Color = SlotAttribute.none;
         base.Release(ball);
+    }
+
+    public Dictionary<int, BallPrefab> Data
+        => dictionary;
+
+    public void DropAndClear()
+    {
+        foreach (var pair in dictionary)
+            Drop(pair.Value);
     }
 
     private BallPrefab SetColor(BallPrefab ball, SlotAttribute color = SlotAttribute.none)

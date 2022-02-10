@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Pattern.Configs;
 
-
-
 namespace Pattern.Managers
 {
     public class PatternHandler
@@ -26,6 +24,7 @@ namespace Pattern.Managers
         {
             if (slot == null || m_selected.Count > 0)
                 return AddBall.none;
+
             m_selected.AddFirst(slot);
             return AddBall.add;
         }
@@ -57,7 +56,7 @@ namespace Pattern.Managers
             }
 
             /* is NEW and SAME COLOR */
-            if (m_selected.Last.Value.Slot.Color.Equals(target.Slot.Color)
+            if (m_selected.Last.Value.Child.Color.Equals(target.Child.Color)
                 && !m_selected.Contains(target))
             {
                 m_selected.AddFirst(target);
@@ -67,6 +66,9 @@ namespace Pattern.Managers
             /* is near but duplicated slot or unmatch color */
             return AddBall.none;
         }
+
+        public IReadOnlyList<SlotPrefab> Selected()
+            => m_selected as IReadOnlyList<SlotPrefab>;
 
         public SlotPrefab First()
             => m_selected.First.Value;

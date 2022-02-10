@@ -1624,6 +1624,11 @@ PrefabInstance:
       propertyPath: eventSystem
       value: 
       objectReference: {fileID: 494440774}
+    - target: {fileID: -3294132035252067893, guid: 8893331dad9b34ec08e1171713b59bef,
+        type: 3}
+      propertyPath: boardManager
+      value: 
+      objectReference: {fileID: 5877332650875210710}
     - target: {fileID: 8839592098881883311, guid: 8893331dad9b34ec08e1171713b59bef,
         type: 3}
       propertyPath: m_Pivot.x
@@ -1856,7 +1861,7 @@ PrefabInstance:
     - target: {fileID: 2024938738358913613, guid: fbeee11f149e844878b697c72560d718,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -860.00006
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2024938738358913613, guid: fbeee11f149e844878b697c72560d718,
         type: 3}
@@ -1916,11 +1921,11 @@ RectTransform:
   m_Father: {fileID: 4027071}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 690}
-  m_SizeDelta: {x: 920, y: 270}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: -459.99997, y: 775}
+  m_SizeDelta: {x: 920, y: 120}
+  m_Pivot: {x: 0, y: 1}
 --- !u!114 &1567078703
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2472,6 +2477,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -9072639752585140127, guid: 03c694f93c2e44bbd8ab24e04a42d048,
         type: 3}
+      propertyPath: pool
+      value: 
+      objectReference: {fileID: 756207498}
+    - target: {fileID: -9072639752585140127, guid: 03c694f93c2e44bbd8ab24e04a42d048,
+        type: 3}
       propertyPath: ballPool
       value: 
       objectReference: {fileID: 1817034802}
@@ -2513,7 +2523,7 @@ PrefabInstance:
     - target: {fileID: 7862382989380753127, guid: 03c694f93c2e44bbd8ab24e04a42d048,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7862382989380753127, guid: 03c694f93c2e44bbd8ab24e04a42d048,
         type: 3}
@@ -2523,7 +2533,7 @@ PrefabInstance:
     - target: {fileID: 7862382989380753127, guid: 03c694f93c2e44bbd8ab24e04a42d048,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7862382989380753127, guid: 03c694f93c2e44bbd8ab24e04a42d048,
         type: 3}
@@ -2534,6 +2544,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_SizeDelta.y
       value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 7862382989380753127, guid: 03c694f93c2e44bbd8ab24e04a42d048,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7862382989380753127, guid: 03c694f93c2e44bbd8ab24e04a42d048,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7862382989380753127, guid: 03c694f93c2e44bbd8ab24e04a42d048,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7862382989380753127, guid: 03c694f93c2e44bbd8ab24e04a42d048,
         type: 3}
@@ -2578,7 +2603,7 @@ PrefabInstance:
     - target: {fileID: 7862382989380753127, guid: 03c694f93c2e44bbd8ab24e04a42d048,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 7862382989380753127, guid: 03c694f93c2e44bbd8ab24e04a42d048,
         type: 3}
@@ -2732,6 +2757,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8833802099804477855, guid: a1e7666b29bbd47a685cc9ddc3143bf2,
+        type: 3}
+      propertyPath: pool
+      value: 
+      objectReference: {fileID: 1817034802}
     - target: {fileID: 8833802099804477855, guid: a1e7666b29bbd47a685cc9ddc3143bf2,
         type: 3}
       propertyPath: ballPool
