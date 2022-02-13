@@ -5,13 +5,10 @@ using UnityEngine.EventSystems;
 using Pattern.Managers;
 using Pattern.Configs;
 
-public delegate void DELEGATE_T<T>(T t);
-
 public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler, IPointerUpHandler, IPointerClickHandler, IParent<BallPrefab>/*, IAttributedParent<BallPrefab>*/
 {
-    //public SlotAttribute Attribute { get; set; }
     public BallPrefab Child { get; set; } = null;
-    public DELEGATE_T<SlotPrefab> Generate;
+    public T_DELEGATE_T<bool, SlotPrefab> Generate;
 
     private Action beginAction;
     private Action addAction;
@@ -75,24 +72,18 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
             return true;
 
         if (upper == null)
+            return Generate?.Invoke(this) ?? false;
+        else
         {
             if (Child == null)
             {
-                Generate?.Invoke(this);
-                return true;
-            }
-            else
-                return false;
-        }
-        else if (Child == null)
-        {
-            if (upper.Child != null && !upper.Child.IsWorking)
-            {
-                upper.Child.TransferTo(this);
-                upper.Child = null;
+                if (upper.Child != null && !upper.Child.IsWorking)
+                {
+                    upper.Child.TransferTo(this);
+                    upper.Child = null;
+                }
                 return upper.Dispose();
             }
-            return upper.Dispose();
         }
         return upper.Dispose();
     }
@@ -100,6 +91,6 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
     /* not yet */
     public void OnPointerClick(PointerEventData eventData)
     {
-        throw new NotImplementedException();
+        Debug.Log("not implement yet");
     }
 }

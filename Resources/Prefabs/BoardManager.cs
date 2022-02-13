@@ -24,12 +24,16 @@ public class BoardManager : ManagedPool<SlotPrefab>
 
     public override void Clear()
     {
-        foreach (var pair in dictionary)
-            pair.Value.Child = null;
-
+        ClearChild();
         m_bottomList.Clear();
         ballManager.Clear();
         base.Clear();
+    }
+    
+    public void ClearChild()
+    {
+        foreach (var pair in dictionary)
+            pair.Value.Child = null;
     }
 
     public void Create()
@@ -68,8 +72,15 @@ public class BoardManager : ManagedPool<SlotPrefab>
         }
     }
 
-    private void MakeChild(SlotPrefab slot)
-        => slot.Child = BallManager.Instance.Request(slot.transform.parent, slot.transform.localPosition);
+    private bool MakeChild(SlotPrefab slot)
+    {
+        if (slot.Child == null)
+        {
+            slot.Child = BallManager.Instance.Request(slot.transform.parent, slot.transform.localPosition);
+            return true;
+        }
+        return false;
+    }
 
     private void UnitOffset()
     {

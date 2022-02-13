@@ -24,7 +24,7 @@ namespace Pattern.Configs
         public static readonly (uint, uint) SIZE1 = (7, 8 + GENERATOR_LINE);
         public static readonly (uint, uint) SIZE2 = (9, 11 + GENERATOR_LINE);
         public static readonly uint TEMP_DROP_DISTANCE = 9;
-        public static readonly float LINE_WIDTH = .3f;
+        public static readonly float LINE_WIDTH = .1f;
         public static readonly float HEXAGON_WIDTH_RATIO = .75f;
 
         public static float MAX_DISTANCE;

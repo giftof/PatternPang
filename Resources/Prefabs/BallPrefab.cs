@@ -3,13 +3,11 @@ using UnityEngine.UI;
 using DG.Tweening;
 using Pattern.Configs;
 
-
-
 public class BallPrefab : MonoBehaviour
 {
     [SerializeField] Image image;
 
-    private static Color[] palette = new Color[8] {UnityEngine.Color.red, UnityEngine.Color.green, UnityEngine.Color.blue,
+    private static Color[] m_palette = new Color[8] {UnityEngine.Color.red, UnityEngine.Color.green, UnityEngine.Color.blue,
         UnityEngine.Color.yellow, UnityEngine.Color.cyan,
         UnityEngine.Color.black, UnityEngine.Color.black, UnityEngine.Color.black};
 
@@ -60,6 +58,6 @@ public class BallPrefab : MonoBehaviour
     {
         if (m_color < 0)
             return UnityEngine.Color.grey;
-        return palette[(int)m_color];
+        return m_palette[(int)m_color];
     }
 }

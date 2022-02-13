@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public delegate void DELEGATE_T<T>(T t);
+public delegate T1 T_DELEGATE_T<T1, T2>(T2 t2);
+
 public abstract class ManagedPool<T> : MonoBehaviour where T : MonoBehaviour
 {
     public ObjectPool pool;

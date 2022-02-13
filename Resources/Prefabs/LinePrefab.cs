@@ -9,7 +9,7 @@ public class LinePrefab : MonoBehaviour
 
     private void Start()
     {
-        line.SetColors(Color.cyan, Color.cyan);
+        line.SetColors(Color.grey, Color.grey);
         line.SetWidth(CONST.LINE_WIDTH, CONST.LINE_WIDTH);
     }
 

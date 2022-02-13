@@ -73,9 +73,9 @@ public class Game : MonoBehaviour
     private void Update()
     {
         if (eventSystem.enabled)
-            DOTween.Play("timer");
+            DOTween.Play(progressBar.GetInstanceID());
         if (!eventSystem.enabled)
-            DOTween.Pause("timer");
+            DOTween.Pause(progressBar.GetInstanceID());
 
         score.text = gameLogic.Score.ToString();
     }

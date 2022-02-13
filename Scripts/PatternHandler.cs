@@ -22,7 +22,7 @@ namespace Pattern.Managers
 
         public AddBall Begin(SlotPrefab slot)
         {
-            if (slot == null || m_selected.Count > 0)
+            if (slot.Generate != null || slot == null || m_selected.Count > 0)
                 return AddBall.none;
 
             m_selected.AddFirst(slot);
@@ -44,7 +44,8 @@ namespace Pattern.Managers
                 return Begin(target);
 
             /* is near? */
-            if (Vector3.Distance(m_selected.First.Value.transform.position, target.transform.position) > CONST.MAX_DISTANCE)
+            if (target.Generate != null
+                || Vector3.Distance(m_selected.First.Value.transform.position, target.transform.position) > CONST.MAX_DISTANCE)
                 return AddBall.none;
 
             /* is roll-back? */
@@ -67,8 +68,8 @@ namespace Pattern.Managers
             return AddBall.none;
         }
 
-        public IReadOnlyList<SlotPrefab> Selected()
-            => m_selected as IReadOnlyList<SlotPrefab>;
+        public LinkedList<SlotPrefab> Selected()
+            => m_selected;
 
         public SlotPrefab First()
             => m_selected.First.Value;

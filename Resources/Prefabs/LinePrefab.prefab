@@ -127,8 +127,8 @@ LineRenderer:
       m_Mode: 1
       m_NumColorKeys: 3
       m_NumAlphaKeys: 2
-    numCornerVertices: 50
-    numCapVertices: 50
+    numCornerVertices: 30
+    numCapVertices: 30
     alignment: 0
     textureMode: 0
     shadowBias: 0.5
