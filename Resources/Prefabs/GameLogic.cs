@@ -136,14 +136,12 @@ public class GameLogic : MonoBehaviour
                 DisposeMatchBall(key.Key);
 
             yield return new WaitForSecondsRealtime(.1f);
-            StartCoroutine(RequestBall(() => { TEST(trace, unitScore); }));
+            StartCoroutine(RequestBall(() => { RecursiveMatch(trace, unitScore); }));
         }
     }
 
-    private void TEST(Vector3[] trace, int unitScore)
-    {
-        StartCoroutine(FindMatch(trace, unitScore));
-    }
+    private void RecursiveMatch(Vector3[] trace, int unitScore)
+        => StartCoroutine(FindMatch(trace, unitScore));
 
     private void DisposeMatchBall(int objectId)
     {
