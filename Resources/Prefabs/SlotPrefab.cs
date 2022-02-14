@@ -13,7 +13,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
     private Action beginAction;
     private Action addAction;
     private Action removeAction;
-    private static bool activate = false;
+    public static bool Activate = false;
 
     private void Awake() 
     {
@@ -26,19 +26,19 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (activate)
+        if (Activate)
             return;
 
         if (PatternHandler.Instance.Begin(this).Equals(AddBall.add))
         {
             beginAction?.Invoke();
-            activate = true;
+            Activate = true;
         }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (!activate)
+        if (!Activate)
             return;
 
         switch (PatternHandler.Instance.Append(this))
@@ -56,10 +56,10 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        if (activate && Input.touchCount <= 1)
+        if (Activate && Input.touchCount <= 1)
         {
             PatternHandler.Instance?.InputEnd?.Invoke();
-            activate = false;
+            Activate = false;
         }
     }
 

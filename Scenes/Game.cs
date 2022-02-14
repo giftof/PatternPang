@@ -40,10 +40,6 @@ public class Game : MonoBehaviour
         generate.onClick.AddListener(gameLogic.CreateGame);
         generate.onClick.AddListener(BeginTimer);
         clear.onClick.AddListener(gameLogic.ClearGame);
-
-
-
-        //re.onClick.AddListener(gameLogic.ClearBall);
         re.onClick.AddListener(gameLogic.ClearBall);
     }
 
@@ -51,7 +47,7 @@ public class Game : MonoBehaviour
     {
         progressBar.fillAmount = 1;
         DOTween.Kill(progressBar.GetInstanceID());
-        DOTween.To(() => progressBar.fillAmount, x => progressBar.fillAmount = x, 0, 30).SetId(progressBar.GetInstanceID())
+        DOTween.To(() => progressBar.fillAmount, x => progressBar.fillAmount = x, 0, CONST.PLAY_TIME).SetId(progressBar.GetInstanceID())
             .OnComplete( ()=> {
                 StartCoroutine(FIN());
             });

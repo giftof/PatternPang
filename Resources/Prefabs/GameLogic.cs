@@ -32,13 +32,16 @@ public class GameLogic : MonoBehaviour
     {
         LineManager.Instance.Clear();
         BoardManager.Instance.Clear();
+        PatternHandler.Instance.Clear();
+        SlotPrefab.Activate = false;
     }
 
     public void ClearBall()
     {
         LineManager.Instance.Clear();
         BallManager.Instance.DropAndClear();
-        BoardManager.Instance.ClearChild();
+        PatternHandler.Instance.Clear();
+        SlotPrefab.Activate = false;
     }
 
     IEnumerator RequestBall(Action action)
