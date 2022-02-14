@@ -26,7 +26,7 @@ namespace Pattern.Configs
         public static readonly uint TEMP_DROP_DISTANCE = 9;
         public static readonly float LINE_WIDTH = .1f;
         public static readonly float HEXAGON_WIDTH_RATIO = .75f;
-        public static readonly float PLAY_TIME = 5;
+        public static readonly float PLAY_TIME = 30;
 
         public static float MAX_DISTANCE;
         public static Vector3[] DIRECTION_OFFSET = new Vector3[6];
