@@ -4,6 +4,7 @@
  *
  * Copyright (c) 2022 [noname]
  */
+using UnityEngine;
 
 
 
@@ -11,23 +12,45 @@ namespace Pattern.Configs
 {
     public static class CONST
     {
-        public static readonly int MIN_SELECT = 3;
-        public static readonly int BOMB = 3;
+        public static readonly uint MIN_SELECT = 3;
+        public static readonly uint BOMB = 3;
+        public static readonly uint GENERATOR_LINE = 1;
+        public static readonly uint EVEN_COLUMN_UP = 1;
+        public static readonly float MOVE_DURATION = .1f;
+        public static readonly uint LEVEL1 = 3;
+        public static readonly uint LEVEL2 = 4;
+        public static readonly uint LEVEL3 = 5;
+        public static readonly (uint, uint) SIZE0 = (3, 3 + GENERATOR_LINE);
+        public static readonly (uint, uint) SIZE1 = (7, 8 + GENERATOR_LINE);
+        public static readonly (uint, uint) SIZE2 = (9, 11 + GENERATOR_LINE);
+        public static readonly uint TEMP_DROP_DISTANCE = 9;
+        public static readonly float LINE_WIDTH = .1f;
+        public static readonly float HEXAGON_WIDTH_RATIO = .75f;
+        public static readonly float PLAY_TIME = 5;
+
+        public static float MAX_DISTANCE;
+        public static Vector3[] DIRECTION_OFFSET = new Vector3[6];
     }
 
-    public enum PatternColor
+    public enum AddBall
     {
+        remove = -1,
         none,
+        add,
+    }
+
+    public enum SlotAttribute
+    {
+        none = -1,
         red,
         green,
         blue,
         yellow,
         purple,
+        color_count,
         bomb1,
         bomb2,
         bomb3,
-        generator,
-        count,
     }
 
     /*
@@ -44,5 +67,4 @@ namespace Pattern.Configs
         upLeft,
         count,
     }
-
 }
