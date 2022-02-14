@@ -5,11 +5,12 @@ using Pattern.Configs;
 
 public class BallPrefab : MonoBehaviour
 {
-    [SerializeField] Image image;
+    [SerializeField] Image m_image;
+    [SerializeField] Sprite[] m_spriteArray;
 
     private static Color[] m_palette = new Color[8] {UnityEngine.Color.red, UnityEngine.Color.green, UnityEngine.Color.blue,
         UnityEngine.Color.yellow, UnityEngine.Color.cyan,
-        UnityEngine.Color.black, UnityEngine.Color.black, UnityEngine.Color.black};
+        UnityEngine.Color.white, UnityEngine.Color.white, UnityEngine.Color.white};
 
     private SlotAttribute m_color { get; set; }
     public bool IsWorking { get; private set; }
@@ -20,7 +21,8 @@ public class BallPrefab : MonoBehaviour
         set
         {
             m_color = value;
-            image.color = ConvertToColor();
+            m_image.color = ConvertToColor();
+            m_image.sprite = ConvertImage();
         }
     }
 
@@ -36,9 +38,9 @@ public class BallPrefab : MonoBehaviour
             destination.Child = this;
 
             transform
-                .DOMoveY(monoObj.transform.position.y, CONST.MOVE_DURATION)
-                .SetEase(Ease.Linear)
+                .DOMoveY(monoObj.transform.position.y, CONST.DURATION_MOVE)
                 .OnComplete(() => {
+                    transform.DOShakeScale(CONST.DURATION_MOVE, CONST.DURATION_JELLY_ELASTICITY, 2);
                     IsWorking = false;
                 });
         }
@@ -47,7 +49,7 @@ public class BallPrefab : MonoBehaviour
     public void Drop<T>(DELEGATE_T<T> finishAction, T obj)
     {
         IsWorking = true;
-        transform.DOMoveY(transform.position.y - CONST.TEMP_DROP_DISTANCE, CONST.MOVE_DURATION * CONST.TEMP_DROP_DISTANCE)
+        transform.DOMoveY(transform.position.y - CONST.TEMP_DROP_DISTANCE, CONST.DURATION_MOVE * CONST.TEMP_DROP_DISTANCE)
             .OnComplete(() => {
                 finishAction?.Invoke(obj);
                 IsWorking = false;
@@ -59,5 +61,14 @@ public class BallPrefab : MonoBehaviour
         if (m_color < 0)
             return UnityEngine.Color.grey;
         return m_palette[(int)m_color];
+    }
+
+    private Sprite ConvertImage()
+    {
+        if (m_color < 0)
+            return m_spriteArray[0];
+        if (m_color > SlotAttribute.color_count)
+            return m_spriteArray[(int)m_color - 1];
+        return m_spriteArray[(int)m_color];
     }
 }

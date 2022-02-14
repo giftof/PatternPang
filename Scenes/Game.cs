@@ -47,7 +47,7 @@ public class Game : MonoBehaviour
     {
         progressBar.fillAmount = 1;
         DOTween.Kill(progressBar.GetInstanceID());
-        DOTween.To(() => progressBar.fillAmount, x => progressBar.fillAmount = x, 0, CONST.PLAY_TIME).SetId(progressBar.GetInstanceID())
+        DOTween.To(() => progressBar.fillAmount, x => progressBar.fillAmount = x, 0, CONST.DURATION_PLAY_TIME).SetId(progressBar.GetInstanceID())
             .OnComplete( ()=> {
                 StartCoroutine(FIN());
             });

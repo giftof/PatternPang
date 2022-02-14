@@ -13,6 +13,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
     private Action beginAction;
     private Action addAction;
     private Action removeAction;
+    private DELEGATE_T<SlotPrefab> bombAction;
     public static bool Activate = false;
 
     private void Awake() 
@@ -20,6 +21,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
         beginAction = LineManager.Instance.Begin;
         addAction = LineManager.Instance.Append;
         removeAction = LineManager.Instance.Remove;
+        bombAction = GameLogic.Instance.Bomb;
 
         GetComponent<Image>().raycastTarget = true;
     }
@@ -44,9 +46,11 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
         switch (PatternHandler.Instance.Append(this))
         {
             case AddBall.remove:
+                Vibrate.Do(CONST.DURATION_VIBRATE_REMOVE);
                 removeAction?.Invoke();
                 return;
             case AddBall.add:
+                Vibrate.Do(CONST.DURATION_VIBRATE_ADD);
                 addAction?.Invoke();
                 return;
             default:
@@ -63,34 +67,12 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
         }
     }
 
-    /* make simple */
-    public bool Dispose()
-    {
-        SlotPrefab upper = Ray.Instance.Shot(transform.position + CONST.DIRECTION_OFFSET[(int)ClockWise.up]);
-
-        if (Child?.IsWorking ?? false)
-            return true;
-
-        if (upper == null)
-            return Generate?.Invoke(this) ?? false;
-        else
-        {
-            if (Child == null)
-            {
-                if (upper.Child != null && !upper.Child.IsWorking)
-                {
-                    upper.Child.TransferTo(this);
-                    upper.Child = null;
-                }
-                return upper.Dispose();
-            }
-        }
-        return upper.Dispose();
-    }
-
-    /* not yet */
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log("not implement yet");
+        if (!Activate)
+        {
+            bombAction?.Invoke(this);
+            Debug.Log("not implement yet");
+        }
     }
 }

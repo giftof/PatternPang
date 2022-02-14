@@ -22,7 +22,7 @@ namespace Pattern.Managers
 
         public AddBall Begin(SlotPrefab slot)
         {
-            if (slot.Generate != null || slot == null || m_selected.Count > 0)
+            if (slot == null || slot.Child == null || slot.Generate != null || m_selected.Count > 0 || slot.Child.Color > SlotAttribute.color_count)
                 return AddBall.none;
 
             m_selected.AddFirst(slot);
