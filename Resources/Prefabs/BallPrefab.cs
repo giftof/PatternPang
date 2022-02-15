@@ -39,8 +39,9 @@ public class BallPrefab : MonoBehaviour
 
             transform
                 .DOMoveY(monoObj.transform.position.y, CONST.DURATION_MOVE)
+                .SetEase(Ease.Linear)
                 .OnComplete(() => {
-                    transform.DOShakeScale(CONST.DURATION_MOVE, CONST.DURATION_JELLY_ELASTICITY, 2);
+                    //transform.DOShakeScale(CONST.DURATION_MOVE, CONST.DURATION_JELLY_ELASTICITY, 2);
                     IsWorking = false;
                 });
         }
