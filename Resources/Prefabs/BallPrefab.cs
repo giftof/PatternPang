@@ -11,8 +11,8 @@ public class BallPrefab : MonoBehaviour
     private static Color[] m_palette = new Color[8] {UnityEngine.Color.red, UnityEngine.Color.green, UnityEngine.Color.blue,
         UnityEngine.Color.yellow, UnityEngine.Color.cyan,
         UnityEngine.Color.white, UnityEngine.Color.white, UnityEngine.Color.white};
-
     private SlotAttribute m_color { get; set; }
+
     public bool IsWorking { get; private set; }
 
     public SlotAttribute Color

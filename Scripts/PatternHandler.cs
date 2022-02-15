@@ -8,17 +8,15 @@ namespace Pattern.Managers
 {
     public class PatternHandler
     {
-        public Action InputEnd { get; set; } = null;
         private LinkedList<SlotPrefab> m_selected;
-
         private static readonly Lazy<PatternHandler> m_instance = new Lazy<PatternHandler>(()
             => new PatternHandler());
+        private PatternHandler()
+            => m_selected = new LinkedList<SlotPrefab>();
 
         public static PatternHandler Instance
             => m_instance.Value;
-
-        private PatternHandler()
-            => m_selected = new LinkedList<SlotPrefab>();
+        public Action InputEnd { get; set; } = null;
 
         public AddBall Begin(SlotPrefab slot)
         {
