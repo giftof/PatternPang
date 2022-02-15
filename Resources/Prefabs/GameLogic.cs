@@ -101,9 +101,11 @@ public class GameLogic : MonoBehaviour
                 slot.Child = null;
                 break;
             case 2:
+            //case 3:
                 slot.Child.Color = SlotAttribute.bomb1;
                 break;
             case 3:
+            //case 4:
                 slot.Child.Color = SlotAttribute.bomb2;
                 break;
             default:
