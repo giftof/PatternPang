@@ -259,15 +259,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 175879a10d829458d985012a476e8481, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameLogic: {fileID: 1886414948}
-  boardManager: {fileID: 5877332650875210710}
-  generate: {fileID: 684325898}
-  clear: {fileID: 837129676}
-  re: {fileID: 1594295681}
-  score: {fileID: 2011139312}
-  progressBar: {fileID: 1337508596}
-  eventSystem: {fileID: 494440774}
-  gameOverPannel: {fileID: 2050521270}
+  m_gameLogic: {fileID: 1886414948}
+  m_boardManager: {fileID: 5877332650875210710}
+  m_generate: {fileID: 684325898}
+  m_clear: {fileID: 837129676}
+  m_re: {fileID: 1594295681}
+  m_score: {fileID: 2011139312}
+  m_progressBar: {fileID: 1337508596}
+  m_eventSystem: {fileID: 494440774}
+  m_gameOverPannel: {fileID: 2050521270}
 --- !u!114 &282388096 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: -7687523659287740828, guid: d50796424e11f4b2794831820ab73a9d,
@@ -1752,7 +1752,7 @@ PrefabInstance:
     - target: {fileID: 9008355687297334982, guid: 8893331dad9b34ec08e1171713b59bef,
         type: 3}
       propertyPath: m_Name
-      value: GamePrefab
+      value: GameLogic
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8893331dad9b34ec08e1171713b59bef, type: 3}
@@ -2102,7 +2102,7 @@ GameObject:
   - component: {fileID: 1671637205}
   - component: {fileID: 1671637204}
   m_Layer: 5
-  m_Name: Score
+  m_Name: ScoreTitle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2211,7 +2211,7 @@ GameObject:
   - component: {fileID: 2011139313}
   - component: {fileID: 2011139312}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Score
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
