@@ -56,6 +56,11 @@ public class BallPrefab : MonoBehaviour
             });
     }
 
+    public bool IsBomb()
+    {
+        return Color > SlotAttribute.color_count;
+    }
+
     private Color ConvertToColor()
     {
         if (m_color < 0)

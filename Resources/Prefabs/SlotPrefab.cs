@@ -46,12 +46,12 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
         switch (PatternHandler.Instance.Append(this))
         {
             case AddBall.remove:
-                Vibrate.Do(CONST.DURATION_VIBRATE_REMOVE);
+                //Vibrate.Do(CONST.DURATION_VIBRATE_REMOVE);
                 removeAction?.Invoke();
                 return;
             case AddBall.add:
-                Vibrate.Do(CONST.DURATION_VIBRATE_ADD);
                 addAction?.Invoke();
+                Vibrate.Do(CONST.DURATION_VIBRATE_ADD);
                 return;
             default:
                 return;
@@ -72,7 +72,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
         if (!Activate)
         {
             bombAction?.Invoke(this);
-            Debug.Log("not implement yet");
+            Vibrate.Do(CONST.DURATION_VIBRATE_ADD);
         }
     }
 }

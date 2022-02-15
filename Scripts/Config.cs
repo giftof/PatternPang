@@ -27,7 +27,7 @@ namespace Pattern.Configs
         public static readonly long DURATION_VIBRATE_REMOVE = 1;
         public static readonly float DURATION_WAIT_REMOVE = 1;
         public static readonly float DURATION_WAIT_FILL_BALL = .1f;
-        public static readonly float DURATION_BOMB_STEP = .001f;
+        public static readonly float DURATION_BOMB_STEP = .1f;
 
         public static readonly int SCORE_BOMB = 5;
 

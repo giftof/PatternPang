@@ -58,10 +58,10 @@ public class GameLogic : MonoBehaviour
                 StartCoroutine(DisposeBomb1(slot));
                 break;
             case SlotAttribute.bomb2:
-                StartCoroutine(DisposeBomb2(slot));
+                StartCoroutine(DisposeBomb3(slot));
                 break;
             case SlotAttribute.bomb3:
-                StartCoroutine(DisposeBomb3(slot));
+                StartCoroutine(DisposeBomb4(slot));
                 break;
             default:
                 break;
@@ -77,17 +77,17 @@ public class GameLogic : MonoBehaviour
     private void FinishDrag()
     {
         int unitScore = UnitScore;
-        Vector3[] trace = PatternHandler.Instance.ShapeOffset();
+        Vector3[] offsetArray = PatternHandler.Instance.ShapeOffset();
         m_matchCount = 0;
 
-        if (trace != null)
-            StartCoroutine(FindMatch(trace, unitScore));
+        if (offsetArray != null)
+            StartCoroutine(FindMatch(offsetArray, unitScore));
         else
             LineManager.Instance.Clear();
     }
 
-    private void RecursiveMatch(Vector3[] trace, int unitScore)
-        => StartCoroutine(FindMatch(trace, unitScore));
+    private void RecursiveMatch(Vector3[] offsetArray, int unitScore)
+        => StartCoroutine(FindMatch(offsetArray, unitScore));
 
     private void DisposeMatchBall(IGrouping<int, SlotPrefab> key)
     {
@@ -97,7 +97,6 @@ public class GameLogic : MonoBehaviour
         switch (matchCount)
         {
             case 1:
-            //case 2:
                 BallManager.Instance.Release(slot.Child);
                 slot.Child = null;
                 break;
@@ -161,63 +160,92 @@ public class GameLogic : MonoBehaviour
     }
 
     /* complicated functions... can be simple? */
-    IEnumerator FindMatch(Vector3[] trace, int unitScore)
+    IEnumerator FindMatch(Vector3[] offsetArray, int unitScore)
     {
         eventSystem.enabled = false;
 
         yield return null;
-        List<SlotPrefab> list = new List<SlotPrefab>();
+        List<SlotPrefab> matchList = new List<SlotPrefab>();
 
-        if (trace == null)
-            yield break;
+        //if (offsetArray == null)
+        //    yield break;
 
+        /* make list of matchList */
         BoardManager.Instance.Data
             .Select(e =>
             {
+                /* set position of origin */
                 Vector3 position = e.Value.transform.position;
 
+                /* if ball generator, skip it */
                 if (e.Value.Generate != null)
                     return false;
 
-                List<SlotPrefab> shape = trace
+                /* make matched shape of pattern */
+                List<SlotPrefab> shape = offsetArray
+                    /* verify trace
+                     * 
+                     * rayTarget is not null
+                     * rayTarget is not generator
+                     * rayTarget is not bomb
+                     * rayTarget is same color of origin ball
+                     */
                     .Where(offset => {
                         SlotPrefab slot = Ray.Instance.Shot(position -= offset);
                         if (slot == null
                             || slot.Generate != null
+                            || slot.Child.IsBomb()
                             || !slot.Child.Color.Equals(e.Value.Child.Color))
                             return false;
                         return true;
                     })
+                    /* select rayTarget */
                     .Select(offset => Ray.Instance.Shot(position))
+                    /* to list */
                     .ToList();
+                /* insert origin to head to use params of ToLine (LineManager.Instance.ToLine) */
                 shape.Insert(0, e.Value);
 
-                if (shape.Select(obj => e.Value.Child.Color.Equals(obj?.Child.Color)).Count().Equals(trace.Count() + 1))
+
+                if (shape.Select(obj => e.Value.Child.Color.Equals(obj?.Child.Color)).Count().Equals(offsetArray.Count() + 1))
                 {
+                    /** enable to insert matched ball animation by shape **/
+                    /** if u want dispose step by step, exchange this to coroutine not linq **/
                     LineManager.Instance.ToLine(shape);
                     ++m_matchCount;
-                    list.AddRange(shape);
+                    matchList.AddRange(shape);
                     Score += unitScore * m_matchCount;
                     Debug.LogWarning($"inc score = {unitScore * m_matchCount} = {unitScore} * {m_matchCount}");
                     return true;
                 }
                 return false;
+            /* Count is just Executor of this query to make matchList */
             }).Count();
 
-        var group = list.GroupBy(e => e.GetInstanceID());
+        /* grouping to know that to be bomb or remove */
+        var group = matchList.GroupBy(e => e.GetInstanceID());
 
         if (group.Count().Equals(0))
             eventSystem.enabled = true;
         else
         {
+            /* 
+             * wait some time to display matched materials
+             * remove guide line
+             * dispose matched balls
+             * wait some time to display converted materials
+             * fill empty slots and check same patterns till cant find
+             */
             yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_REMOVE);
 
             LineManager.Instance.Clear();
+            /** enable to insert transform animation (remove, turn to bomb, etc..) **/
+            /** if u want dispose step by step, exchange this to coroutine not linq **/
             foreach (var key in group)
                 DisposeMatchBall(key);
 
             yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_FILL_BALL);
-            StartCoroutine(RequestBall(() => { RecursiveMatch(trace, unitScore); }));
+            StartCoroutine(RequestBall(() => { RecursiveMatch(offsetArray, unitScore); }));
         }
     }
 
@@ -226,7 +254,7 @@ public class GameLogic : MonoBehaviour
         eventSystem.enabled = false;
 
         ReleaseBombed(slot);
-        m_bombLineCount += 1;
+        IncrementBombAction();
         foreach (var offset in CONST.DIRECTION_OFFSET)
         {
             SlotPrefab target = Ray.Instance.Shot(slot.transform.position + offset);
@@ -238,7 +266,7 @@ public class GameLogic : MonoBehaviour
         }
         eventSystem.enabled = true;
 
-        if (--m_bombLineCount == 0)
+        if (DecrementBombAction() == 0)
             StartCoroutine(RequestBall(null));
     }
 
@@ -250,7 +278,6 @@ public class GameLogic : MonoBehaviour
         yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
 
         eventSystem.enabled = true;
-        m_bombLineCount += 1;
         StartCoroutine(RemoveLine(slot, ClockWise.up, ClockWise.down));
     }
 
@@ -262,14 +289,47 @@ public class GameLogic : MonoBehaviour
         yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
 
         eventSystem.enabled = true;
-        m_bombLineCount += 3;
         StartCoroutine(RemoveLine(slot, ClockWise.up, ClockWise.down));
         StartCoroutine(RemoveLine(slot, ClockWise.upLeft, ClockWise.downRight));
         StartCoroutine(RemoveLine(slot, ClockWise.upRight, ClockWise.downLeft));
     }
 
+    IEnumerator DisposeBomb4(params SlotPrefab[] slot)
+    {
+        yield return null;
+        eventSystem.enabled = false;
+
+        foreach (var e in slot)
+            ReleaseBombed(e);
+
+        List<SlotPrefab> list = new List<SlotPrefab>();
+
+        slot.Where(e => {
+            var around = CONST.DIRECTION_OFFSET
+                .Select(offset => Ray.Instance.Shot(e.transform.position + offset))
+                .GroupBy(a => a?.Child != null && a.Generate == null);
+
+            foreach (var a in around)
+                if (a.Key)
+                    list.AddRange(a.ToList());
+            return false;
+        }).Count();
+
+        if (list.Count > 0)
+        {
+            yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
+            StartCoroutine(DisposeBomb4(list.ToArray()));
+        }
+        else
+        {
+            eventSystem.enabled = true;
+            StartCoroutine(RequestBall(null));
+        }
+    }
+
     IEnumerator RemoveLine(SlotPrefab slot, ClockWise dir1, ClockWise dir2)
     {
+        IncrementBombAction();
         eventSystem.enabled = false;
         Vector3 pos1 = slot.transform.position;
         Vector3 pos2 = slot.transform.position;
@@ -296,7 +356,7 @@ public class GameLogic : MonoBehaviour
         }
         eventSystem.enabled = true;
 
-        if (--m_bombLineCount == 0)
+        if (DecrementBombAction() == 0)
             StartCoroutine(RequestBall(null));
     }
 
@@ -312,5 +372,11 @@ public class GameLogic : MonoBehaviour
             Score += CONST.SCORE_BOMB;
         }
     }
+
+    private int IncrementBombAction(int count = 1)
+        => m_bombLineCount += count;
+
+    private int DecrementBombAction(int count = 1)
+        => m_bombLineCount -= count;
 }
 
