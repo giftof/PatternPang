@@ -5,14 +5,14 @@ using Pattern.Configs;
 
 public class BoardManager : ManagedPool<SlotPrefab>
 {
-    public static BoardManager Instance = null;
-
-    public (uint Row, uint Column) Size { get; set; } = (0, 0);
-    public BallManager ballManager;
     private Vector2 m_slotSize;
     private float m_widthUnit;
     private List<SlotPrefab> m_bottomList;
     private float m_lineThick = 0.93f;
+
+    public static BoardManager Instance = null;
+    public (uint Row, uint Column) Size { get; set; } = (0, 0);
+    public BallManager ballManager;
 
     protected override void Awake()
     {

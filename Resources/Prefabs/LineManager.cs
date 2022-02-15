@@ -3,9 +3,10 @@ using Pattern.Managers;
 
 public class LineManager : ManagedPool<LinePrefab>
 {
-    public static LineManager Instance = null;
     private LinePrefab m_currentLine;
     private int m_jointCount;
+
+    public static LineManager Instance = null;
 
     protected override void Awake()
     {

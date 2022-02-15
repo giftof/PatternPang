@@ -3,20 +3,21 @@ using UnityEngine;
 
 public class ObjectPool : MonoBehaviour
 {
+    private Queue<GameObject> m_queue;
+
     public GameObject prefab;
-    private Queue<GameObject> queue;
 
     private void Awake()
-        => queue = new Queue<GameObject>();
+        => m_queue = new Queue<GameObject>();
 
     public T Request<T>() where T : class
     {
-        if (queue.Count > 0)
-            return queue.Dequeue().GetComponent<T>();
+        if (m_queue.Count > 0)
+            return m_queue.Dequeue().GetComponent<T>();
         return Instantiate(prefab).GetComponent<T>();
     }
 
     public void Release(GameObject obj)
-        => queue.Enqueue(obj);
+        => m_queue.Enqueue(obj);
 }
 

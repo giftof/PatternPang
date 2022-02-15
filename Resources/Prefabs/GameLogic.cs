@@ -9,12 +9,12 @@ using Pattern.Configs;
 
 public class GameLogic : MonoBehaviour
 {
-    [SerializeField] EventSystem eventSystem;
+    [SerializeField] EventSystem m_eventSystem;
+    private int m_matchCount;
+    private int m_bombLineCount;
 
     public static GameLogic Instance;
     public int Score { get; private set; } = 0;
-    private int m_matchCount;
-    private int m_bombLineCount;
 
     private void Awake()
     {
@@ -139,7 +139,7 @@ public class GameLogic : MonoBehaviour
     /* complicated functions... can be simple? */
     IEnumerator RequestBall(Action action)
     {
-        eventSystem.enabled = false;
+        m_eventSystem.enabled = false;
         yield return null;
         int count = 0;
 
@@ -153,7 +153,7 @@ public class GameLogic : MonoBehaviour
             StartCoroutine(RequestBall(action));
         else
         {
-            eventSystem.enabled = true;
+            m_eventSystem.enabled = true;
             action?.Invoke();
         }
     }
@@ -161,7 +161,7 @@ public class GameLogic : MonoBehaviour
     /* complicated functions... can be simple? */
     IEnumerator FindMatch(Vector3[] offsetArray, int unitScore)
     {
-        eventSystem.enabled = false;
+        m_eventSystem.enabled = false;
 
         yield return null;
         List<SlotPrefab> matchList = new List<SlotPrefab>();
@@ -225,7 +225,7 @@ public class GameLogic : MonoBehaviour
         var group = matchList.GroupBy(e => e.GetInstanceID());
 
         if (group.Count().Equals(0))
-            eventSystem.enabled = true;
+            m_eventSystem.enabled = true;
         else
         {
             /* 
@@ -250,7 +250,7 @@ public class GameLogic : MonoBehaviour
 
     IEnumerator DisposeBomb1(SlotPrefab slot)
     {
-        eventSystem.enabled = false;
+        m_eventSystem.enabled = false;
 
         ReleaseBombed(slot);
         IncrementBombAction();
@@ -266,30 +266,30 @@ public class GameLogic : MonoBehaviour
 
         if (DecrementBombAction() == 0)
         {
-            eventSystem.enabled = true;
+            m_eventSystem.enabled = true;
             StartCoroutine(RequestBall(null));
         }
     }
 
     IEnumerator DisposeBomb2(SlotPrefab slot)
     {
-        eventSystem.enabled = false;
+        m_eventSystem.enabled = false;
 
         ReleaseBombed(slot);
         yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
 
-        eventSystem.enabled = true;
+        m_eventSystem.enabled = true;
         StartCoroutine(RemoveLine(slot, ClockWise.up, ClockWise.down));
     }
 
     IEnumerator DisposeBomb3(SlotPrefab slot)
     {
-        eventSystem.enabled = false;
+        m_eventSystem.enabled = false;
 
         ReleaseBombed(slot);
         yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
 
-        eventSystem.enabled = true;
+        m_eventSystem.enabled = true;
         StartCoroutine(RemoveLine(slot, ClockWise.up, ClockWise.down));
         StartCoroutine(RemoveLine(slot, ClockWise.upLeft, ClockWise.downRight));
         StartCoroutine(RemoveLine(slot, ClockWise.upRight, ClockWise.downLeft));
@@ -298,7 +298,7 @@ public class GameLogic : MonoBehaviour
     IEnumerator DisposeBomb4(params SlotPrefab[] slot)
     {
         yield return null;
-        eventSystem.enabled = false;
+        m_eventSystem.enabled = false;
 
         foreach (var e in slot)
             ReleaseBombed(e);
@@ -323,7 +323,7 @@ public class GameLogic : MonoBehaviour
         }
         else
         {
-            eventSystem.enabled = true;
+            m_eventSystem.enabled = true;
             StartCoroutine(RequestBall(null));
         }
     }
@@ -331,7 +331,7 @@ public class GameLogic : MonoBehaviour
     IEnumerator RemoveLine(SlotPrefab slot, ClockWise dir1, ClockWise dir2)
     {
         IncrementBombAction();
-        eventSystem.enabled = false;
+        m_eventSystem.enabled = false;
         Vector3 pos1 = slot.transform.position;
         Vector3 pos2 = slot.transform.position;
 
@@ -355,7 +355,7 @@ public class GameLogic : MonoBehaviour
                 break;
             yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
         }
-        eventSystem.enabled = true;
+        m_eventSystem.enabled = true;
 
         if (DecrementBombAction() == 0)
             StartCoroutine(RequestBall(null));
