@@ -28,8 +28,7 @@ public class BallPrefab : MonoBehaviour
 
     public void TransferTo(IParent<BallPrefab> destination)
     {
-        if (IsWorking)
-            return;
+        if (IsWorking) { return; }
 
         IsWorking = true;
 
@@ -58,23 +57,18 @@ public class BallPrefab : MonoBehaviour
     }
 
     public bool IsBomb()
-    {
-        return Color > SlotAttribute.color_count;
-    }
+        => Color > SlotAttribute.color_count;
 
     private Color ConvertToColor()
     {
-        if (m_color < 0)
-            return UnityEngine.Color.grey;
+        if (m_color < 0) { return UnityEngine.Color.grey; }
         return m_palette[(int)m_color];
     }
 
     private Sprite ConvertImage()
     {
-        if (m_color < 0)
-            return m_spriteArray[0];
-        if (m_color > SlotAttribute.color_count)
-            return m_spriteArray[(int)m_color - 1];
+        if (m_color < 0) { return m_spriteArray[0]; }
+        if (m_color > SlotAttribute.color_count) { return m_spriteArray[(int)m_color - 1]; }
         return m_spriteArray[(int)m_color];
     }
 }

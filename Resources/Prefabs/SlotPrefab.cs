@@ -28,8 +28,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (Activate)
-            return;
+        if (Activate) { return; }
 
         if (PatternHandler.Instance.Begin(this).Equals(AddBall.add))
         {
@@ -40,8 +39,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (!Activate)
-            return;
+        if (!Activate) { return; }
 
         switch (PatternHandler.Instance.Append(this))
         {

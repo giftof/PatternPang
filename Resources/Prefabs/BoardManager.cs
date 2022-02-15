@@ -64,8 +64,7 @@ public class BoardManager : ManagedPool<SlotPrefab>
                 currentPosition += Vector3.up * m_slotSize.y;
                 slot.name = slot.GetInstanceID().ToString(); /* for test */
 
-                if (h.Equals(0))
-                    m_bottomList.Add(slot);
+                if (h.Equals(0)) { m_bottomList.Add(slot); }
                 if (h.Equals(Size.Column - 1))
                     slot.Generate = MakeChild;
                 else

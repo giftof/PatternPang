@@ -5,6 +5,7 @@ public class LinePrefab : MonoBehaviour
 {
     public LineRenderer line;
 
+    [System.Obsolete]
     private void Start()
     {
         line.SetColors(Color.grey, Color.grey);

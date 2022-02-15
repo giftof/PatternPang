@@ -49,8 +49,7 @@ public class GameLogic : MonoBehaviour
 
     public void Bomb(SlotPrefab slot)
     {
-        if (slot.Generate != null || slot.Child == null)
-            return;
+        if (slot.Generate != null || slot.Child == null) { return; }
 
         switch (slot.Child.Color)
         {
