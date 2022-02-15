@@ -47,5 +47,4 @@ public static class Vibrate
         AndroidVibrator.Call("cancel");
 #endif
     }
-
 }

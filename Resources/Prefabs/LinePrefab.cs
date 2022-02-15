@@ -1,8 +1,6 @@
 using UnityEngine;
 using Pattern.Configs;
 
-
-
 public class LinePrefab : MonoBehaviour
 {
     public LineRenderer line;

@@ -264,10 +264,12 @@ public class GameLogic : MonoBehaviour
                 ReleaseBombed(target, true);
             }
         }
-        eventSystem.enabled = true;
 
         if (DecrementBombAction() == 0)
+        {
+            eventSystem.enabled = true;
             StartCoroutine(RequestBall(null));
+        }
     }
 
     IEnumerator DisposeBomb2(SlotPrefab slot)

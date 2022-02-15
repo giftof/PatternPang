@@ -2366,6 +2366,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ray
       objectReference: {fileID: 0}
+    - target: {fileID: 2331180536518447854, guid: d50796424e11f4b2794831820ab73a9d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8148325383296325626, guid: d50796424e11f4b2794831820ab73a9d,
         type: 3}
       propertyPath: m_Pivot.x

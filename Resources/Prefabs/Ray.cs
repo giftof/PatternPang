@@ -1,7 +1,5 @@
 using UnityEngine;
 
-
-
 public class Ray : MonoBehaviour
 {
     public static Ray Instance;
