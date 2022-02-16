@@ -1634,6 +1634,11 @@ PrefabInstance:
       propertyPath: boardManager
       value: 
       objectReference: {fileID: 5877332650875210710}
+    - target: {fileID: -3294132035252067893, guid: 8893331dad9b34ec08e1171713b59bef,
+        type: 3}
+      propertyPath: m_eventSystem
+      value: 
+      objectReference: {fileID: 494440774}
     - target: {fileID: 8839592098881883311, guid: 8893331dad9b34ec08e1171713b59bef,
         type: 3}
       propertyPath: m_Pivot.x
