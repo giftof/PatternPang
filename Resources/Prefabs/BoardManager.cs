@@ -44,7 +44,8 @@ public class BoardManager : ManagedPool<SlotPrefab>
         UnitOffset();
     }
 
-    public Dictionary<int, SlotPrefab> Data
+    /*public Dictionary<int, SlotPrefab> Data*/
+    public IReadOnlyDictionary<int, SlotPrefab> Data
         => dictionary;
 
     public IReadOnlyList<SlotPrefab> BottomLine
