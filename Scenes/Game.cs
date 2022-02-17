@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Pattern.Configs;
+using Pattern.Tools;
 using DG.Tweening;
 
 
@@ -18,10 +19,52 @@ public class Game : MonoBehaviour
     [SerializeField] EventSystem m_eventSystem;
     [SerializeField] GameObject m_gameOverPannel;
 
+    //[SerializeField] Canvas m_canvas;
+    [SerializeField] GameObject m_fullBackground;
+    [SerializeField] GameObject m_safeBackground;
+
+    [SerializeField] Text m_screen;
+    [SerializeField] Text m_safeArea0;
+    [SerializeField] Text m_safeArea1;
+
+    [SerializeField] Text min;
+    [SerializeField] Text max;
+    [SerializeField] Text size;
+    //[SerializeField] GameObject m_backGround;
+
     void Start()
     {
         SetGameLevel();
         SetButtonAction();
+        SafeScreen();
+
+        TEST_SAFE_SCREEN();
+    }
+
+    private void TEST_SAFE_SCREEN()
+    {
+        RectTransform rect = m_safeBackground.GetComponent<RectTransform>();
+
+        m_screen.text = Screen.width.ToString() + "/" + Screen.height.ToString();
+        m_safeArea0.text = Screen.safeArea.min.ToString();
+        m_safeArea1.text = Screen.safeArea.max.ToString();
+
+        min.text = rect.offsetMin.ToString();
+        max.text = rect.offsetMax.ToString();
+        size.text = rect.rect.size.ToString();
+    }
+
+    private void SafeScreen()
+    {
+        (Vector2 min, Vector2 max) safeArea = new SafeScreen().RectOffset();
+        RectTransform rect = m_safeBackground.GetComponent<RectTransform>();
+        RectTransform fullRect = m_fullBackground.GetComponent<RectTransform>();
+
+        rect.offsetMin = safeArea.min;
+        rect.offsetMax = safeArea.max;
+
+        fullRect.offsetMin = Vector2.zero;
+        fullRect.offsetMax = Vector2.zero;
     }
 
     private void SetGameLevel()

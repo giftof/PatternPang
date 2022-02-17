@@ -4,13 +4,6 @@ namespace Pattern.Configs
 {
     public static class CONST
     {
-        public static readonly uint LEVEL1 = 3;
-        public static readonly uint LEVEL2 = 4;
-        public static readonly uint LEVEL3 = 5;
-        public static readonly (uint, uint) SIZE0 = (3, 3 + GENERATOR_LINE);
-        public static readonly (uint, uint) SIZE1 = (7, 8 + GENERATOR_LINE);
-        public static readonly (uint, uint) SIZE2 = (9, 11 + GENERATOR_LINE);
-
         public static readonly uint MIN_SELECT = 3;
         public static readonly uint BOMB = 3;
         public static readonly uint GENERATOR_LINE = 1;
@@ -33,6 +26,13 @@ namespace Pattern.Configs
 
         public static float MAX_DISTANCE;
         public static Vector3[] DIRECTION_OFFSET = new Vector3[6];
+
+        public static readonly uint LEVEL1 = 3;
+        public static readonly uint LEVEL2 = 4;
+        public static readonly uint LEVEL3 = 5;
+        public static readonly (uint, uint) SIZE0 = (3, 3 + GENERATOR_LINE);
+        public static readonly (uint, uint) SIZE1 = (7, 8 + GENERATOR_LINE);
+        public static readonly (uint, uint) SIZE2 = (9, 11 + GENERATOR_LINE);
     }
 
     public enum AddBall

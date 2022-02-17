@@ -89,7 +89,7 @@ public class BoardManager : ManagedPool<SlotPrefab>
 
         for (uint w = 0; w < Size.Row; ++w)
         {
-            currentPosition += IsFloating(w) ? .5f * m_slotSize.y * Vector3.up : Vector3.zero;
+            currentPosition += m_slotSize.y * Vector3.up * (IsFloating(w) ? 1 : .5f);
             for (uint h = 0; h < Size.Column; ++h)
             {
                 SlotPrefab slot = Request(transform, currentPosition);
