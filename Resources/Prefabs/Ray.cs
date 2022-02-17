@@ -16,5 +16,7 @@ public class Ray : MonoBehaviour
         if (hit && hit.transform.TryGetComponent(out SlotPrefab slotPrefab))
             return slotPrefab;
         return null;
+
+        
     }
 }

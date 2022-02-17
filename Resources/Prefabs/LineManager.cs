@@ -5,13 +5,14 @@ public class LineManager : ManagedPool<LinePrefab>
 {
     private LinePrefab m_currentLine;
     private int m_jointCount;
-
-    public static LineManager Instance = null;
+    private PatternHandler m_patternHandler;
 
     protected override void Awake()
+        => base.Awake();
+
+    public PatternHandler SetPatternHandler
     {
-        base.Awake();
-        Instance = this;
+        set => m_patternHandler = value;
     }
 
     public void Begin()
@@ -24,7 +25,7 @@ public class LineManager : ManagedPool<LinePrefab>
     public void Append()
     {
         m_currentLine.line.positionCount = ++m_jointCount;
-        m_currentLine.line.SetPosition(m_jointCount - 1, PatternHandler.Instance.First().transform.position);
+        m_currentLine.line.SetPosition(m_jointCount - 1, m_patternHandler.First().transform.position);
     }
 
     public void Remove()

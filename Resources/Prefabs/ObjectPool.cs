@@ -20,4 +20,3 @@ public class ObjectPool : MonoBehaviour
     public void Release(GameObject obj)
         => m_queue.Enqueue(obj);
 }
-

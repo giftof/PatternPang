@@ -4,15 +4,10 @@ using Pattern.Configs;
 
 public class BallManager : ManagedPool<BallPrefab>
 {
-    public static BallManager Instance = null;
-
     public uint BallVariation { get; set; } = 0;
 
     protected override void Awake()
-    {
-        base.Awake();
-        Instance = this;
-    }
+        => base.Awake();
 
     public override BallPrefab Request()
     {

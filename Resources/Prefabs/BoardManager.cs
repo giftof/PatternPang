@@ -1,16 +1,24 @@
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 using Pattern.Configs;
+using Pattern.Managers;
 
 public class BoardManager : ManagedPool<SlotPrefab>
 {
+    [SerializeField] BallManager m_ballHandler;
+    private PatternHandler m_patternHandler;
+    private Action m_beginAction;
+    private Action m_addAction;
+    private Action m_removeAction;
+    private DELEGATE_T<SlotPrefab> m_bombAction;
+
     private Vector2 m_slotSize;
     private float m_widthUnit;
     private List<SlotPrefab> m_bottomList;
     private float m_lineThick = 0.93f;
 
-    public static BoardManager Instance = null;
     public (uint Row, uint Column) Size { get; set; } = (0, 0);
     public BallManager ballManager;
 
@@ -20,7 +28,31 @@ public class BoardManager : ManagedPool<SlotPrefab>
         m_slotSize = pool.prefab.GetComponent<RectTransform>().sizeDelta * m_lineThick;
         m_widthUnit = m_slotSize.x * CONST.HEXAGON_WIDTH_RATIO;
         m_bottomList = new List<SlotPrefab>();
-        Instance = this;
+    }
+
+    public PatternHandler SetPatternHandler
+    {
+        set => m_patternHandler = value;
+    }
+
+    public DELEGATE_T<SlotPrefab> SetBombAction
+    {
+        set => m_bombAction = value;
+    }
+
+    public Action SetRemoveAction
+    {
+        set => m_removeAction = value;
+    }
+
+    public Action SetAddAction
+    {
+        set => m_addAction = value;
+    }
+
+    public Action SetBeginAction
+    {
+        set => m_beginAction = value;
     }
 
     public override void Clear()
@@ -44,7 +76,6 @@ public class BoardManager : ManagedPool<SlotPrefab>
         UnitOffset();
     }
 
-    /*public Dictionary<int, SlotPrefab> Data*/
     public IReadOnlyDictionary<int, SlotPrefab> Data
         => dictionary;
 
@@ -62,6 +93,11 @@ public class BoardManager : ManagedPool<SlotPrefab>
             for (uint h = 0; h < Size.Column; ++h)
             {
                 SlotPrefab slot = Request(transform, currentPosition);
+                slot.SetPatternHandler = m_patternHandler;
+                slot.SetBeginAction = m_beginAction;
+                slot.SetAddAction = m_addAction;
+                slot.SetRemoveAction = m_removeAction;
+                slot.SetBombAction = m_bombAction;
                 currentPosition += Vector3.up * m_slotSize.y;
                 slot.name = slot.GetInstanceID().ToString(); /* for test */
 
@@ -79,7 +115,7 @@ public class BoardManager : ManagedPool<SlotPrefab>
     {
         if (slot.Child == null)
         {
-            slot.Child = BallManager.Instance.Request(slot.transform.parent, slot.transform.localPosition);
+            slot.Child = m_ballHandler.Request(slot.transform.parent, slot.transform.localPosition);
             return true;
         }
         return false;

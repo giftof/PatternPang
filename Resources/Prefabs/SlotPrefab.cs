@@ -11,21 +11,40 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
     private Action m_addAction;
     private Action m_removeAction;
     private DELEGATE_T<SlotPrefab> m_bombAction;
-    private Vibrate m_vibrate = Vibrate.Instance;
-    private PatternHandler m_pattern = PatternHandler.Instance;
+    private PatternHandler m_pattern;
 
     public BallPrefab Child { get; set; } = null;
     public T_DELEGATE_T<bool, SlotPrefab> Generate;
     public static bool Activate = false;
 
-    private void Awake() 
+    private void Awake()
     {
-        m_beginAction = LineManager.Instance.Begin;
-        m_addAction = LineManager.Instance.Append;
-        m_removeAction = LineManager.Instance.Remove;
-        m_bombAction = GameLogic.Instance.Bomb;
-
         GetComponent<Image>().raycastTarget = true;
+    }
+
+    public PatternHandler SetPatternHandler
+    {
+        set => m_pattern = value;
+    }
+
+    public DELEGATE_T<SlotPrefab> SetBombAction
+    {
+        set => m_bombAction = value;
+    }
+
+    public Action SetRemoveAction
+    {
+        set => m_removeAction = value;
+    }
+
+    public Action SetAddAction
+    {
+        set => m_addAction = value;
+    }
+
+    public Action SetBeginAction
+    {
+        set => m_beginAction = value;
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -51,7 +70,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
                 return;
             case AddBall.add:
                 m_addAction?.Invoke();
-                m_vibrate.Do(CONST.DURATION_VIBRATE_ADD);
+                Vibrate.Do(CONST.DURATION_VIBRATE_ADD);
                 return;
             default:
                 return;
@@ -72,7 +91,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
         if (!Activate)
         {
             m_bombAction?.Invoke(this);
-            m_vibrate.Do(CONST.DURATION_VIBRATE_ADD);
+            Vibrate.Do(CONST.DURATION_VIBRATE_ADD);
         }
     }
 }

@@ -10,40 +10,51 @@ using Pattern.Configs;
 public class GameLogic : MonoBehaviour
 {
     [SerializeField] EventSystem m_eventSystem;
+    [SerializeField] BoardManager m_boardHandler;
+    [SerializeField] BallManager m_ballHandler;
+    [SerializeField] LineManager m_lineHandler;
+    private PatternHandler m_patternHandler;
     private int m_matchCount;
     private int m_bombLineCount;
 
-    public static GameLogic Instance;
     public int Score { get; private set; } = 0;
 
     private void Awake()
     {
-        Instance = this;
-        PatternHandler.Instance.InputEnd = FinishDrag;
+        m_patternHandler = new PatternHandler();
+        m_patternHandler.InputEnd = FinishDrag;
+
+        m_lineHandler.SetPatternHandler = m_patternHandler;
+
+        m_boardHandler.SetPatternHandler = m_patternHandler;
+        m_boardHandler.SetBombAction = Bomb;
+        m_boardHandler.SetBeginAction = m_lineHandler.Begin;
+        m_boardHandler.SetAddAction = m_lineHandler.Append;
+        m_boardHandler.SetRemoveAction = m_lineHandler.Remove;
     }
 
     public void CreateGame()
     {
         Score = 0;
-        LineManager.Instance.Clear();
-        BoardManager.Instance.Create();
+        m_lineHandler.Clear();
+        m_boardHandler.Create();
         StartCoroutine(RequestBall(null));
     }
 
     public void ClearGame()
     {
-        LineManager.Instance.Clear();
-        BoardManager.Instance.Clear();
-        PatternHandler.Instance.Clear();
+        m_lineHandler.Clear();
+        m_boardHandler.Clear();
+        m_patternHandler.Clear();
         SlotPrefab.Activate = false;
     }
 
     public void ClearBall()
     {
-        LineManager.Instance.Clear();
-        BallManager.Instance.DropAndClear();
-        BoardManager.Instance.ClearChild();
-        PatternHandler.Instance.Clear();
+        m_lineHandler.Clear();
+        m_ballHandler.DropAndClear();
+        m_boardHandler.ClearChild();
+        m_patternHandler.Clear();
         SlotPrefab.Activate = false;
     }
 
@@ -71,18 +82,18 @@ public class GameLogic : MonoBehaviour
      * privates... complicated functions...
      */
     private int UnitScore
-        => PatternHandler.Instance.Selected().Select((e, index) => (e, index)).Sum(p => p.index) + PatternHandler.Instance.Selected().Count();
+        => m_patternHandler.Selected().Select((e, index) => (e, index)).Sum(p => p.index) + m_patternHandler.Selected().Count();
 
     private void FinishDrag()
     {
         int unitScore = UnitScore;
-        Vector3[] offsetArray = PatternHandler.Instance.ShapeOffset();
+        Vector3[] offsetArray = m_patternHandler.ShapeOffset();
         m_matchCount = 0;
 
         if (offsetArray != null)
             StartCoroutine(FindMatch(offsetArray, unitScore));
         else
-            LineManager.Instance.Clear();
+            m_lineHandler.Clear();
     }
 
     private void RecursiveMatch(Vector3[] offsetArray, int unitScore)
@@ -90,13 +101,13 @@ public class GameLogic : MonoBehaviour
 
     private void DisposeMatchBall(IGrouping<int, SlotPrefab> key)
     {
-        SlotPrefab slot = BoardManager.Instance.Data[key.Key];
+        SlotPrefab slot = m_boardHandler.Data[key.Key];
         int matchCount = key.Count();
 
         switch (matchCount)
         {
             case 1:
-                BallManager.Instance.Release(slot.Child);
+                m_ballHandler.Release(slot.Child);
                 slot.Child = null;
                 break;
             case 2:
@@ -143,7 +154,7 @@ public class GameLogic : MonoBehaviour
         yield return null;
         int count = 0;
 
-        foreach (var element in BoardManager.Instance.BottomLine)
+        foreach (var element in m_boardHandler.BottomLine)
         {
             if (FillSlot(element))
                 count++;
@@ -166,11 +177,8 @@ public class GameLogic : MonoBehaviour
         yield return null;
         List<SlotPrefab> matchList = new List<SlotPrefab>();
 
-        //if (offsetArray == null)
-        //    yield break;
-
         /* make list of matchList */
-        BoardManager.Instance.Data
+        m_boardHandler.Data
             .Select(e =>
             {
                 /* set position of origin */
@@ -205,12 +213,11 @@ public class GameLogic : MonoBehaviour
                 /* insert origin to head to use params of ToLine (LineManager.Instance.ToLine) */
                 shape.Insert(0, e.Value);
 
-
                 if (shape.Select(obj => e.Value.Child.Color.Equals(obj?.Child.Color)).Count().Equals(offsetArray.Count() + 1))
                 {
                     /** enable to insert matched ball animation by shape **/
                     /** if u want dispose step by step, exchange this to coroutine not linq **/
-                    LineManager.Instance.ToLine(shape);
+                    m_lineHandler.ToLine(shape);
                     ++m_matchCount;
                     matchList.AddRange(shape);
                     Score += unitScore * m_matchCount;
@@ -237,7 +244,7 @@ public class GameLogic : MonoBehaviour
              */
             yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_REMOVE);
 
-            LineManager.Instance.Clear();
+            m_lineHandler.Clear();
             /** enable to insert transform animation (remove, turn to bomb, etc..) **/
             /** if u want dispose step by step, exchange this to coroutine not linq **/
             foreach (var key in group)
@@ -368,7 +375,7 @@ public class GameLogic : MonoBehaviour
 
         if (slot.Child)
         {
-            BallManager.Instance.Release(slot.Child);
+            m_ballHandler.Release(slot.Child);
             slot.Child = null;
             Score += CONST.SCORE_BOMB;
         }
