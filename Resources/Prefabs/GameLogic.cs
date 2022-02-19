@@ -13,6 +13,7 @@ public class GameLogic : MonoBehaviour
     [SerializeField] BoardManager m_boardHandler;
     [SerializeField] BallManager m_ballHandler;
     [SerializeField] LineManager m_lineHandler;
+    [SerializeField] CoverManager m_coverHandler;
     private PatternHandler m_patternHandler;
     private int m_matchCount;
     private int m_bombLineCount;
@@ -31,12 +32,14 @@ public class GameLogic : MonoBehaviour
         m_boardHandler.SetBeginAction = m_lineHandler.Begin;
         m_boardHandler.SetAddAction = m_lineHandler.Append;
         m_boardHandler.SetRemoveAction = m_lineHandler.Remove;
+        m_coverHandler.transform.localScale = m_boardHandler.transform.localScale;
     }
 
     public void CreateGame()
     {
         Score = 0;
         m_lineHandler.Clear();
+        m_coverHandler.Clear();
         m_boardHandler.Create();
         StartCoroutine(RequestBall(null));
     }
@@ -46,6 +49,7 @@ public class GameLogic : MonoBehaviour
         m_lineHandler.Clear();
         m_boardHandler.Clear();
         m_patternHandler.Clear();
+        m_coverHandler.Clear();
         SlotPrefab.Activate = false;
     }
 

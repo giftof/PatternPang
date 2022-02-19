@@ -8,6 +8,7 @@ using Pattern.Managers;
 public class BoardManager : ManagedPool<SlotPrefab>
 {
     [SerializeField] BallManager m_ballHandler;
+    [SerializeField] CoverManager m_coverHandler;
     private PatternHandler m_patternHandler;
     private Action m_beginAction;
     private Action m_addAction;
@@ -17,7 +18,9 @@ public class BoardManager : ManagedPool<SlotPrefab>
     private Vector2 m_slotSize;
     private float m_widthUnit;
     private List<SlotPrefab> m_bottomList;
+    private List<SlotPrefab> m_topList;
     private float m_lineThick = 0.93f;
+    /*private float m_lineThick = 1;*/
 
     public (uint Row, uint Column) Size { get; set; } = (0, 0);
     public BallManager ballManager;
@@ -28,6 +31,7 @@ public class BoardManager : ManagedPool<SlotPrefab>
         m_slotSize = pool.prefab.GetComponent<RectTransform>().sizeDelta * m_lineThick;
         m_widthUnit = m_slotSize.x * CONST.HEXAGON_WIDTH_RATIO;
         m_bottomList = new List<SlotPrefab>();
+        m_topList = new List<SlotPrefab>();
     }
 
     public PatternHandler SetPatternHandler
@@ -82,6 +86,9 @@ public class BoardManager : ManagedPool<SlotPrefab>
     public IReadOnlyList<SlotPrefab> BottomLine
         => m_bottomList;
 
+    public IReadOnlyList<SlotPrefab> TopLine
+        => m_topList;
+
     private void PublishBoard()
     {
         Vector3 beginPosition = (Size.Row - 1) * .5f * m_widthUnit * Vector3.left;
@@ -103,9 +110,23 @@ public class BoardManager : ManagedPool<SlotPrefab>
 
                 if (h.Equals(0)) { m_bottomList.Add(slot); }
                 if (h.Equals(Size.Column - 1))
+                {
                     slot.Generate = MakeChild;
+                    CoverPrefab cover = m_coverHandler.Request(m_coverHandler.transform);
+                    cover.transform.position = slot.transform.position;
+                }
                 else
                     slot.Generate = null;
+
+/*
+                if (h.Equals(Size.Column - 1))
+                {
+                    m_topList.Add(slot);
+                    slot.Generate = MakeChild;
+                }
+                else
+                    slot.Generate = null;
+*/
             }
             currentPosition = beginPosition + (w + 1) * m_widthUnit * Vector3.right;
         }
