@@ -19,6 +19,7 @@ public class GameLogic : MonoBehaviour
     private int m_bombLineCount;
 
     public int Score { get; private set; } = 0;
+    public bool Finish = false;
 
     private void Awake()
     {
@@ -38,6 +39,7 @@ public class GameLogic : MonoBehaviour
     public void CreateGame()
     {
         Score = 0;
+        Finish = false;
         m_lineHandler.Clear();
         m_coverHandler.Clear();
         m_boardHandler.Create();
@@ -66,7 +68,7 @@ public class GameLogic : MonoBehaviour
     {
         if (slot.Generate != null || slot.Child == null) { return; }
 
-        switch (slot.Child.Color)
+        switch (slot.Child.BallColor)
         {
             case SlotAttribute.bomb1:
                 StartCoroutine(DisposeBomb1(slot));
@@ -88,20 +90,24 @@ public class GameLogic : MonoBehaviour
     private int UnitScore
         => m_patternHandler.Selected().Select((e, index) => (e, index)).Sum(p => p.index) + m_patternHandler.Selected().Count();
 
+    private int ModeScore
+        => m_patternHandler.Selected().Count - (int)CONST.MIN_SELECT;
+
     private void FinishDrag()
     {
         int unitScore = UnitScore;
+        int scoreMode = ModeScore;
         Vector3[] offsetArray = m_patternHandler.ShapeOffset();
         m_matchCount = 0;
 
         if (offsetArray != null)
-            StartCoroutine(FindMatch(offsetArray, unitScore));
+            StartCoroutine(FindMatch(offsetArray, unitScore, scoreMode));
         else
             m_lineHandler.Clear();
     }
 
-    private void RecursiveMatch(Vector3[] offsetArray, int unitScore)
-        => StartCoroutine(FindMatch(offsetArray, unitScore));
+    private void RecursiveMatch(Vector3[] offsetArray, int unitScore, int scoreMode)
+        => StartCoroutine(FindMatch(offsetArray, unitScore, scoreMode));
 
     private void DisposeMatchBall(IGrouping<int, SlotPrefab> key)
     {
@@ -115,13 +121,13 @@ public class GameLogic : MonoBehaviour
                 slot.Child = null;
                 break;
             case 2:
-                slot.Child.Color = SlotAttribute.bomb1;
+                slot.Child.BallColor = SlotAttribute.bomb1;
                 break;
             case 3:
-                slot.Child.Color = SlotAttribute.bomb2;
+                slot.Child.BallColor = SlotAttribute.bomb2;
                 break;
             default:
-                slot.Child.Color = SlotAttribute.bomb3;
+                slot.Child.BallColor = SlotAttribute.bomb3;
                 break;
         }
     }
@@ -154,7 +160,13 @@ public class GameLogic : MonoBehaviour
     /* complicated functions... can be simple? */
     IEnumerator RequestBall(Action action)
     {
-        m_eventSystem.enabled = false;
+        if (Finish)
+        {
+            Debug.LogError("break!!!");
+            yield break;
+        }
+
+        //m_eventSystem.enabled = false; /**/
         yield return null;
         int count = 0;
 
@@ -174,7 +186,7 @@ public class GameLogic : MonoBehaviour
     }
 
     /* complicated functions... can be simple? */
-    IEnumerator FindMatch(Vector3[] offsetArray, int unitScore)
+    IEnumerator FindMatch(Vector3[] offsetArray, int unitScore, int scoreMode)
     {
         m_eventSystem.enabled = false;
 
@@ -206,7 +218,7 @@ public class GameLogic : MonoBehaviour
                         if (slot == null
                             || slot.Generate != null
                             || slot.Child.IsBomb()
-                            || !slot.Child.Color.Equals(e.Value.Child.Color))
+                            || !slot.Child.BallColor.Equals(e.Value.Child.BallColor))
                             return false;
                         return true;
                     })
@@ -217,15 +229,16 @@ public class GameLogic : MonoBehaviour
                 /* insert origin to head to use params of ToLine (LineManager.Instance.ToLine) */
                 shape.Insert(0, e.Value);
 
-                if (shape.Select(obj => e.Value.Child.Color.Equals(obj?.Child.Color)).Count().Equals(offsetArray.Count() + 1))
+                if (shape.Select(obj => e.Value.Child.BallColor.Equals(obj?.Child.BallColor)).Count().Equals(offsetArray.Count() + 1))
                 {
                     /** enable to insert matched ball animation by shape **/
                     /** if u want dispose step by step, exchange this to coroutine not linq **/
                     m_lineHandler.ToLine(shape);
                     ++m_matchCount;
                     matchList.AddRange(shape);
-                    Score += unitScore * m_matchCount;
-                    Debug.LogWarning($"inc score = {unitScore * m_matchCount} = {unitScore} * {m_matchCount}");
+                    //Score += unitScore * m_matchCount * scoreMode;
+                    Score += unitScore * Multi(m_matchCount, scoreMode);
+Debug.LogWarning($"inc score = {unitScore * Multi(m_matchCount, scoreMode)}");
                     return true;
                 }
                 return false;
@@ -236,7 +249,11 @@ public class GameLogic : MonoBehaviour
         var group = matchList.GroupBy(e => e.GetInstanceID());
 
         if (group.Count().Equals(0))
-            m_eventSystem.enabled = true;
+        {
+            //m_eventSystem.enabled = true;
+            if (!Finish)
+                m_eventSystem.enabled = true;
+        }
         else
         {
             /* 
@@ -255,13 +272,22 @@ public class GameLogic : MonoBehaviour
                 DisposeMatchBall(key);
 
             yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_FILL_BALL);
-            StartCoroutine(RequestBall(() => { RecursiveMatch(offsetArray, unitScore); }));
+            StartCoroutine(RequestBall(() => { RecursiveMatch(offsetArray, unitScore, scoreMode); }));
         }
     }
 
+    private int Multi(int count, int mode)
+    {
+        //int rst = count * (int)Math.Pow(10, mode);
+        int rst = count * (int)Math.Pow(count * 2, mode);
+        Debug.Log($"Multi = {rst}");
+        return rst;
+    }
+
+
     IEnumerator DisposeBomb1(SlotPrefab slot)
     {
-        m_eventSystem.enabled = false;
+        //m_eventSystem.enabled = false; /**/
 
         ReleaseBombed(slot);
         IncrementBombAction();
@@ -277,30 +303,30 @@ public class GameLogic : MonoBehaviour
 
         if (DecrementBombAction() == 0)
         {
-            m_eventSystem.enabled = true;
+            //m_eventSystem.enabled = true; /**/
             StartCoroutine(RequestBall(null));
         }
     }
 
     IEnumerator DisposeBomb2(SlotPrefab slot)
     {
-        m_eventSystem.enabled = false;
+        //m_eventSystem.enabled = false; /**/
 
         ReleaseBombed(slot);
         yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
 
-        m_eventSystem.enabled = true;
+        //m_eventSystem.enabled = true; /**/
         StartCoroutine(RemoveLine(slot, ClockWise.up, ClockWise.down));
     }
 
     IEnumerator DisposeBomb3(SlotPrefab slot)
     {
-        m_eventSystem.enabled = false;
+        //m_eventSystem.enabled = false; /**/
 
         ReleaseBombed(slot);
         yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
 
-        m_eventSystem.enabled = true;
+        //m_eventSystem.enabled = true; /**/
         StartCoroutine(RemoveLine(slot, ClockWise.up, ClockWise.down));
         StartCoroutine(RemoveLine(slot, ClockWise.upLeft, ClockWise.downRight));
         StartCoroutine(RemoveLine(slot, ClockWise.upRight, ClockWise.downLeft));
@@ -309,7 +335,7 @@ public class GameLogic : MonoBehaviour
     IEnumerator DisposeBomb4(params SlotPrefab[] slot)
     {
         yield return null;
-        m_eventSystem.enabled = false;
+        //m_eventSystem.enabled = false; /**/
 
         foreach (var e in slot)
             ReleaseBombed(e);
@@ -334,7 +360,7 @@ public class GameLogic : MonoBehaviour
         }
         else
         {
-            m_eventSystem.enabled = true;
+            //m_eventSystem.enabled = true; /**/
             StartCoroutine(RequestBall(null));
         }
     }
@@ -342,7 +368,7 @@ public class GameLogic : MonoBehaviour
     IEnumerator RemoveLine(SlotPrefab slot, ClockWise dir1, ClockWise dir2)
     {
         IncrementBombAction();
-        m_eventSystem.enabled = false;
+        //m_eventSystem.enabled = false; /**/
         Vector3 pos1 = slot.transform.position;
         Vector3 pos2 = slot.transform.position;
 
@@ -366,7 +392,7 @@ public class GameLogic : MonoBehaviour
                 break;
             yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
         }
-        m_eventSystem.enabled = true;
+        //m_eventSystem.enabled = true; /**/
 
         if (DecrementBombAction() == 0)
             StartCoroutine(RequestBall(null));

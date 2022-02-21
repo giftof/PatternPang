@@ -70,7 +70,7 @@ public class Game : MonoBehaviour
     private void SetGameLevel()
     {
         m_boardManager.Size = CONST.SIZE1;
-        m_boardManager.ballManager.BallVariation = CONST.LEVEL2;
+        m_boardManager.ballManager.BallVariation = CONST.LEVEL1; // prefer is 1, 2
     }
 
     private void SetButtonAction()
@@ -95,6 +95,8 @@ public class Game : MonoBehaviour
         m_gameOverPannel.SetActive(true);
 
         yield return new WaitForSecondsRealtime(0.5f);
+
+        m_gameLogic.Finish = true;
         m_gameLogic.ClearBall();
         yield return new WaitForSecondsRealtime(4.5f);
 
@@ -108,7 +110,6 @@ public class Game : MonoBehaviour
             DOTween.Play(m_progressBar.GetInstanceID());
         else
             DOTween.Pause(m_progressBar.GetInstanceID());
-
         m_score.text = m_gameLogic.Score.ToString();
     }
 }

@@ -16,7 +16,7 @@ namespace Pattern.Managers
 
         public AddBall Begin(SlotPrefab slot)
         {
-            if (slot == null || slot.Child == null || slot.Generate != null || m_selected.Count > 0 || slot.Child.Color > SlotAttribute.color_count)
+            if (slot == null || slot.Child == null || slot.Generate != null || m_selected.Count > 0 || slot.Child.BallColor > SlotAttribute.color_count)
                 return AddBall.none;
 
             m_selected.AddFirst(slot);
@@ -51,7 +51,7 @@ namespace Pattern.Managers
             }
 
             /* is NEW and SAME COLOR */
-            if (m_selected.Last.Value.Child.Color.Equals(target.Child.Color)
+            if (m_selected.Last.Value.Child.BallColor.Equals(target.Child.BallColor)
                 && !m_selected.Contains(target))
             {
                 m_selected.AddFirst(target);

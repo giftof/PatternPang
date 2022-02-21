@@ -18,13 +18,13 @@ public class BallManager : ManagedPool<BallPrefab>
 
     public void Drop(BallPrefab ball)
     {
-        ball.Color = SlotAttribute.none;
+        ball.BallColor = SlotAttribute.none;
         ball.Drop(base.Release, ball);
     }
 
     public override void Release(BallPrefab ball)
     {
-        ball.Color = SlotAttribute.none;
+        ball.BallColor = SlotAttribute.none;
         base.Release(ball);
     }
 
@@ -39,7 +39,7 @@ public class BallManager : ManagedPool<BallPrefab>
 
     private BallPrefab SetColor(BallPrefab ball, SlotAttribute color = SlotAttribute.none)
     {
-        ball.Color = color;
+        ball.BallColor = color;
         return ball;
     }
 

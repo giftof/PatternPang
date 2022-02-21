@@ -8,14 +8,14 @@ public class BallPrefab : MonoBehaviour
     [SerializeField] Image m_image;
     [SerializeField] Sprite[] m_spriteArray;
 
-    private static Color[] m_palette = new Color[8] {UnityEngine.Color.red, UnityEngine.Color.green, UnityEngine.Color.blue,
-        UnityEngine.Color.yellow, UnityEngine.Color.cyan,
-        UnityEngine.Color.white, UnityEngine.Color.white, UnityEngine.Color.white};
+    private static Color[] m_palette = new Color[8] {Color.red, Color.green, Color.blue,
+                                                    Color.yellow, Color.cyan,
+                                                    Color.white, Color.white, Color.white};
     private SlotAttribute m_color { get; set; }
 
     public bool IsWorking { get; private set; }
 
-    public SlotAttribute Color
+    public SlotAttribute BallColor
     {
         get => m_color;
         set
@@ -57,11 +57,13 @@ public class BallPrefab : MonoBehaviour
     }
 
     public bool IsBomb()
-        => Color > SlotAttribute.color_count;
+        => BallColor > SlotAttribute.color_count;
 
     private Color ConvertToColor()
     {
-        if (m_color < 0) { return UnityEngine.Color.grey; }
+        if (m_color < 0) { return Color.grey; }
+Debug.Log($"m_color = {(int)m_color}");
+        if (m_color > SlotAttribute.color_count) { return m_palette[(int)m_color - 1]; }
         return m_palette[(int)m_color];
     }
 

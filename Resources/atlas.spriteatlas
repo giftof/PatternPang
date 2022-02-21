@@ -49,6 +49,7 @@ SpriteAtlas:
     cachedData: {fileID: 0}
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
+  - {fileID: 21300000, guid: 3aef0400fd1f8a54ba53f3d9529c9ecf, type: 3}
   - {fileID: 21300000, guid: 49bde0a170657de43ae1575c802f4ce7, type: 3}
   - {fileID: 21300000, guid: ec8c0c220143b40f99b3d486f49c31cd, type: 3}
   - {fileID: 21300000, guid: e2de092389d204e0390f2a0b19c47691, type: 3}
@@ -56,6 +57,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: e0d98ba621b044f8db14425127950d75, type: 3}
   - {fileID: 21300000, guid: ec3bc1aefad2c421ebf92a431179f0b2, type: 3}
   m_PackedSpriteNamesToIndex:
+  - whexagon
   - Square-icon
   - bomb1
   - circle4

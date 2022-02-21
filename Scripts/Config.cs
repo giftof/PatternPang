@@ -27,6 +27,8 @@ namespace Pattern.Configs
         public static float MAX_DISTANCE;
         public static Vector3[] DIRECTION_OFFSET = new Vector3[6];
 
+        public static readonly uint LEVEL_ = 1;
+        public static readonly uint LEVEL0 = 2;
         public static readonly uint LEVEL1 = 3;
         public static readonly uint LEVEL2 = 4;
         public static readonly uint LEVEL3 = 5;
