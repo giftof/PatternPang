@@ -287,7 +287,7 @@ Debug.LogWarning($"inc score = {unitScore * Multi(m_matchCount, scoreMode)}");
 
     IEnumerator DisposeBomb1(SlotPrefab slot)
     {
-        //m_eventSystem.enabled = false; /**/
+        m_eventSystem.enabled = false; /**/
 
         ReleaseBombed(slot);
         IncrementBombAction();
@@ -310,7 +310,7 @@ Debug.LogWarning($"inc score = {unitScore * Multi(m_matchCount, scoreMode)}");
 
     IEnumerator DisposeBomb2(SlotPrefab slot)
     {
-        //m_eventSystem.enabled = false; /**/
+        m_eventSystem.enabled = false; /**/
 
         ReleaseBombed(slot);
         yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
@@ -321,7 +321,7 @@ Debug.LogWarning($"inc score = {unitScore * Multi(m_matchCount, scoreMode)}");
 
     IEnumerator DisposeBomb3(SlotPrefab slot)
     {
-        //m_eventSystem.enabled = false; /**/
+        m_eventSystem.enabled = false; /**/
 
         ReleaseBombed(slot);
         yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
@@ -335,7 +335,7 @@ Debug.LogWarning($"inc score = {unitScore * Multi(m_matchCount, scoreMode)}");
     IEnumerator DisposeBomb4(params SlotPrefab[] slot)
     {
         yield return null;
-        //m_eventSystem.enabled = false; /**/
+        m_eventSystem.enabled = false; /**/
 
         foreach (var e in slot)
             ReleaseBombed(e);
