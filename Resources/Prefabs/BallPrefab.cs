@@ -39,6 +39,7 @@ public class BallPrefab : MonoBehaviour
             transform
                 .DOMoveY(monoObj.transform.position.y, CONST.DURATION_MOVE)
                 .SetEase(Ease.Linear)
+                .SetUpdate(true)
                 .OnComplete(() => {
                     //transform.DOShakeScale(CONST.DURATION_MOVE, CONST.DURATION_JELLY_ELASTICITY, 2);
                     IsWorking = false;
@@ -50,6 +51,7 @@ public class BallPrefab : MonoBehaviour
     {
         IsWorking = true;
         transform.DOMoveY(transform.position.y - CONST.TEMP_DROP_DISTANCE, CONST.DURATION_MOVE * CONST.TEMP_DROP_DISTANCE)
+            .SetUpdate(true)
             .OnComplete(() => {
                 finishAction?.Invoke(obj);
                 IsWorking = false;
@@ -62,7 +64,6 @@ public class BallPrefab : MonoBehaviour
     private Color ConvertToColor()
     {
         if (m_color < 0) { return Color.grey; }
-Debug.Log($"m_color = {(int)m_color}");
         if (m_color > SlotAttribute.color_count) { return m_palette[(int)m_color - 1]; }
         return m_palette[(int)m_color];
     }
