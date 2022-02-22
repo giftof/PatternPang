@@ -23,6 +23,7 @@ namespace Pattern.Configs
         public static readonly float DURATION_BOMB_STEP = .1f;
 
         public static readonly int SCORE_BOMB = 5;
+        public static readonly int BONUS_TIMER_BEGIN_VALUE = 0;
 
         public static float MAX_DISTANCE;
         public static Vector3[] DIRECTION_OFFSET = new Vector3[6];

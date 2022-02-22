@@ -17,9 +17,12 @@ public class GameLogic : MonoBehaviour
     private PatternHandler m_patternHandler;
     private int m_matchCount;
     private int m_bombLineCount;
+    private int m_unitScore; // nameing is suck
+    private int m_modeScore; // nameing is suck
 
     public int Score { get; private set; } = 0;
     public bool Finish = false;
+    public int BonusTimeSecond;
 
     private void Awake()
     {
@@ -27,7 +30,6 @@ public class GameLogic : MonoBehaviour
         m_patternHandler.InputEnd = FinishDrag;
 
         m_lineHandler.SetPatternHandler = m_patternHandler;
-
         m_boardHandler.SetPatternHandler = m_patternHandler;
         m_boardHandler.SetBombAction = Bomb;
         m_boardHandler.SetBeginAction = m_lineHandler.Begin;
@@ -40,6 +42,8 @@ public class GameLogic : MonoBehaviour
     {
         Score = 0;
         Finish = false;
+        BonusTimeSecond = CONST.BONUS_TIMER_BEGIN_VALUE;
+
         m_lineHandler.Clear();
         m_coverHandler.Clear();
         m_boardHandler.Create();
@@ -95,19 +99,19 @@ public class GameLogic : MonoBehaviour
 
     private void FinishDrag()
     {
-        int unitScore = UnitScore;
-        int scoreMode = ModeScore;
+        m_unitScore = UnitScore;
+        m_modeScore = ModeScore;
         Vector3[] offsetArray = m_patternHandler.ShapeOffset();
         m_matchCount = 0;
 
         if (offsetArray != null)
-            StartCoroutine(FindMatch(offsetArray, unitScore, scoreMode));
+            StartCoroutine(DisposeMatch(offsetArray));
         else
             m_lineHandler.Clear();
     }
 
-    private void RecursiveMatch(Vector3[] offsetArray, int unitScore, int scoreMode)
-        => StartCoroutine(FindMatch(offsetArray, unitScore, scoreMode));
+    private void RecursiveMatch(Vector3[] offsetArray)
+        => StartCoroutine(DisposeMatch(offsetArray));
 
     private void DisposeMatchBall(IGrouping<int, SlotPrefab> key)
     {
@@ -161,12 +165,9 @@ public class GameLogic : MonoBehaviour
     IEnumerator RequestBall(Action action)
     {
         if (Finish)
-        {
-            Debug.LogError("break!!!");
             yield break;
-        }
 
-        //m_eventSystem.enabled = false; /**/
+        m_eventSystem.enabled = false;
         yield return null;
         int count = 0;
 
@@ -185,102 +186,87 @@ public class GameLogic : MonoBehaviour
         }
     }
 
-    /* complicated functions... can be simple? */
-    IEnumerator FindMatch(Vector3[] offsetArray, int unitScore, int scoreMode)
+    private List<SlotPrefab> Matched(Vector3[] offsetArray)
+    {
+        List<SlotPrefab> match = new List<SlotPrefab>();
+
+        foreach (var unit in from origin in m_boardHandler.Data
+                             let unit = DrawMatchedElement(origin.Value, offsetArray)
+                             where unit != null
+                             select unit)
+                             {
+                                ++m_matchCount;
+                                Score += m_unitScore * Multi(m_matchCount, m_modeScore);
+                                m_lineHandler.ToLine(unit);
+                                
+                                match.AddRange(unit);
+                             }
+        
+        return match;
+    }
+    
+    private List<SlotPrefab> DrawMatchedElement(SlotPrefab origin, Vector3[] offsetArray)
+    {
+        List<SlotPrefab> unit = new List<SlotPrefab>();
+        Vector3 position = origin.transform.position;
+
+        if (origin.Generate != null)
+            return null;
+
+        unit.Add(origin);
+        foreach (var match in from offset in offsetArray
+                              let hit = Ray.Instance.Shot(position -= offset)
+                              where hit != null && hit.Generate == null && !hit.Child.IsBomb() && hit.Child.BallColor.Equals(origin.Child.BallColor)
+                              select hit)
+            unit.Add(match);
+
+        if (unit.Count > offsetArray.Length)
+            return unit;
+
+        return null;
+    }
+
+    IEnumerator DisposeMatch(Vector3[] offsetArray)
     {
         m_eventSystem.enabled = false;
 
-        yield return null;
-        List<SlotPrefab> matchList = new List<SlotPrefab>();
+        List<SlotPrefab> matchedList = Matched(offsetArray);
 
-        /* make list of matchList */
-        m_boardHandler.Data
-            .Select(e =>
-            {
-                /* set position of origin */
-                Vector3 position = e.Value.transform.position;
-
-                /* if ball generator, skip it */
-                if (e.Value.Generate != null)
-                    return false;
-
-                /* make matched shape of pattern */
-                List<SlotPrefab> shape = offsetArray
-                    /* verify trace
-                     * 
-                     * rayTarget is not null
-                     * rayTarget is not generator
-                     * rayTarget is not bomb
-                     * rayTarget is same color of origin ball
-                     */
-                    .Where(offset => {
-                        SlotPrefab slot = Ray.Instance.Shot(position -= offset);
-                        if (slot == null
-                            || slot.Generate != null
-                            || slot.Child.IsBomb()
-                            || !slot.Child.BallColor.Equals(e.Value.Child.BallColor))
-                            return false;
-                        return true;
-                    })
-                    /* select rayTarget */
-                    .Select(offset => Ray.Instance.Shot(position))
-                    /* to list */
-                    .ToList();
-                /* insert origin to head to use params of ToLine (LineManager.Instance.ToLine) */
-                shape.Insert(0, e.Value);
-
-                if (shape.Select(obj => e.Value.Child.BallColor.Equals(obj?.Child.BallColor)).Count().Equals(offsetArray.Count() + 1))
-                {
-                    /** enable to insert matched ball animation by shape **/
-                    /** if u want dispose step by step, exchange this to coroutine not linq **/
-                    m_lineHandler.ToLine(shape);
-                    ++m_matchCount;
-                    matchList.AddRange(shape);
-                    //Score += unitScore * m_matchCount * scoreMode;
-                    Score += unitScore * Multi(m_matchCount, scoreMode);
-Debug.LogWarning($"inc score = {unitScore * Multi(m_matchCount, scoreMode)}");
-                    return true;
-                }
-                return false;
-            /* Count is just Executor of this query to make matchList */
-            }).Count();
-
-        /* grouping to know that to be bomb or remove */
-        var group = matchList.GroupBy(e => e.GetInstanceID());
+        var group = matchedList.GroupBy(e => e.GetInstanceID());
 
         if (group.Count().Equals(0))
         {
-            //m_eventSystem.enabled = true;
             if (!Finish)
                 m_eventSystem.enabled = true;
         }
         else
         {
-            /* 
-             * wait some time to display matched materials
-             * remove guide line
-             * dispose matched balls
-             * wait some time to display converted materials
-             * fill empty slots and check same patterns till cant find
-             */
             yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_REMOVE);
 
             m_lineHandler.Clear();
-            /** enable to insert transform animation (remove, turn to bomb, etc..) **/
-            /** if u want dispose step by step, exchange this to coroutine not linq **/
             foreach (var key in group)
                 DisposeMatchBall(key);
 
             yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_FILL_BALL);
-            StartCoroutine(RequestBall(() => { RecursiveMatch(offsetArray, unitScore, scoreMode); }));
+            StartCoroutine(RequestBall(() => { RecursiveMatch(offsetArray); }));
         }
     }
 
     private int Multi(int count, int mode)
     {
+
         //int rst = count * (int)Math.Pow(10, mode);
         int rst = count * (int)Math.Pow(count * 2, mode);
-        Debug.Log($"Multi = {rst}");
+        
+        if (1 < count)
+            BonusTimeSecond += mode;
+
+        // if (BonusTimeSecond < 0 && 0 < mode)
+        //     BonusTimeSecond += 1;
+        // else
+        //     BonusTimeSecond += mode;
+
+// Debug.Log($"Multi = {rst}");
         return rst;
     }
 

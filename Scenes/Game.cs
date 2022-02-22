@@ -32,8 +32,12 @@ public class Game : MonoBehaviour
     [SerializeField] Text size;
     //[SerializeField] GameObject m_backGround;
 
+    private float m_timerDuration;
+    private float m_fillAmount;
+
     void Start()
     {
+        SetDefaultTimer();
         SetGameLevel();
         SetButtonAction();
         SafeScreen();
@@ -76,17 +80,44 @@ public class Game : MonoBehaviour
     private void SetButtonAction()
     {
         m_generate.onClick.AddListener(m_gameLogic.CreateGame);
+        m_generate.onClick.AddListener(SetDefaultTimer);
         m_generate.onClick.AddListener(BeginTimer);
         m_clear.onClick.AddListener(m_gameLogic.ClearGame);
         m_re.onClick.AddListener(m_gameLogic.ClearBall);
     }
 
+    private void SetDefaultTimer()
+        => SetTimer(1, CONST.DURATION_PLAY_TIME);
+
+    private void SetTimer(float fillAmount, float duration)
+    {
+        m_timerDuration = duration;
+        m_fillAmount = fillAmount;
+    }
+
     private void BeginTimer()
     {
-        m_progressBar.fillAmount = 1;
+        m_progressBar.fillAmount = m_fillAmount;
+
         DOTween.Kill(m_progressBar.GetInstanceID());
-        DOTween.To(() => m_progressBar.fillAmount, x => m_progressBar.fillAmount = x, 0, CONST.DURATION_PLAY_TIME).SetId(m_progressBar.GetInstanceID())
+        DOTween.To(() => m_progressBar.fillAmount, x => m_progressBar.fillAmount = x, 0, m_timerDuration).SetId(m_progressBar.GetInstanceID())
+            .SetEase(Ease.Linear)
+            .SetUpdate(true)
             .OnComplete( ()=> { StartCoroutine(FIN()); });
+    }
+
+    private void UpdateTimer()
+    {
+        float increment = 1 / CONST.DURATION_PLAY_TIME;
+
+        m_fillAmount = m_progressBar.fillAmount;
+        m_fillAmount += increment * m_gameLogic.BonusTimeSecond;
+        m_fillAmount = Mathf.Min(m_fillAmount, 1);
+        m_timerDuration = CONST.DURATION_PLAY_TIME * m_fillAmount;
+Debug.Log($"increment time = {m_fillAmount - m_progressBar.fillAmount}, BonusValue = {m_gameLogic.BonusTimeSecond}");
+        m_gameLogic.BonusTimeSecond = CONST.BONUS_TIMER_BEGIN_VALUE;
+
+        BeginTimer();
     }
 
     IEnumerator FIN()
@@ -106,10 +137,14 @@ public class Game : MonoBehaviour
 
     private void Update()
     {
+        if (m_gameLogic.BonusTimeSecond > 0)
+            UpdateTimer();
+
         if (m_eventSystem.enabled)
             DOTween.Play(m_progressBar.GetInstanceID());
         else
             DOTween.Pause(m_progressBar.GetInstanceID());
+
         m_score.text = m_gameLogic.Score.ToString();
     }
 }
