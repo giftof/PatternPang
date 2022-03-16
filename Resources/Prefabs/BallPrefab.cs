@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
@@ -26,7 +27,7 @@ public class BallPrefab : MonoBehaviour
         }
     }
 
-    public void TransferTo(IParent<BallPrefab> destination)
+    public void TransferTo(IParent<BallPrefab> destination, Action callBack = null)
     {
         if (IsWorking) { return; }
 
@@ -37,12 +38,13 @@ public class BallPrefab : MonoBehaviour
             destination.Child = this;
 
             transform
+                // .DOMoveY(monoObj.transform.position.y, CONST.DURATION_MOVE * Step(monoObj.transform))
                 .DOMoveY(monoObj.transform.position.y, CONST.DURATION_MOVE)
                 .SetEase(Ease.Linear)
                 .SetUpdate(true)
                 .OnComplete(() => {
-                    //transform.DOShakeScale(CONST.DURATION_MOVE, CONST.DURATION_JELLY_ELASTICITY, 2);
                     IsWorking = false;
+                    callBack?.Invoke();
                 });
         }
     }

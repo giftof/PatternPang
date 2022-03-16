@@ -100,6 +100,7 @@ public class BoardManager : ManagedPool<SlotPrefab>
             for (uint h = 0; h < Size.Column; ++h)
             {
                 SlotPrefab slot = Request(transform, currentPosition);
+                slot.id = Size.Column * w + h;
                 slot.SetPatternHandler = m_patternHandler;
                 slot.SetBeginAction = m_beginAction;
                 slot.SetAddAction = m_addAction;
@@ -117,16 +118,6 @@ public class BoardManager : ManagedPool<SlotPrefab>
                 }
                 else
                     slot.Generate = null;
-
-/*
-                if (h.Equals(Size.Column - 1))
-                {
-                    m_topList.Add(slot);
-                    slot.Generate = MakeChild;
-                }
-                else
-                    slot.Generate = null;
-*/
             }
             currentPosition = beginPosition + (w + 1) * m_widthUnit * Vector3.right;
         }
@@ -151,6 +142,7 @@ public class BoardManager : ManagedPool<SlotPrefab>
         float min = Mathf.Min(up.y * 2, right.x * 2, Vector3.Distance(up * 1.5f + right, Vector3.zero));
         float max = Mathf.Max(up.y, up.y * .5f + right.x);
 
+        // CONST.OFFSET = up.y;
         CONST.MAX_DISTANCE = (min + max) * .5f;
         CONST.DIRECTION_OFFSET[0] = up;
         CONST.DIRECTION_OFFSET[1] = up * .5f + right;

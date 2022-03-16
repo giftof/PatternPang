@@ -11,18 +11,16 @@ public class Game : MonoBehaviour
 {
     [SerializeField] GameLogic m_gameLogic;
     [SerializeField] BoardManager m_boardManager;
+
+    /*
+     * TEMP Begin
+     */
     [SerializeField] Button m_generate;
-    [SerializeField] Button m_clear;
     [SerializeField] Button m_re;
     [SerializeField] Text m_score;
     [SerializeField] Image m_progressBar;
     [SerializeField] EventSystem m_eventSystem;
     [SerializeField] GameObject m_gameOverPannel;
-
-    //[SerializeField] Canvas m_canvas;
-    [SerializeField] GameObject m_fullBackground;
-    [SerializeField] GameObject m_safeBackground;
-
     [SerializeField] Text m_screen;
     [SerializeField] Text m_safeArea0;
     [SerializeField] Text m_safeArea1;
@@ -30,17 +28,23 @@ public class Game : MonoBehaviour
     [SerializeField] Text min;
     [SerializeField] Text max;
     [SerializeField] Text size;
-    //[SerializeField] GameObject m_backGround;
+    /*
+     * TEMP End
+     */
+
+    [SerializeField] GameObject m_fullBackground;
+    [SerializeField] GameObject m_safeBackground;
 
     private float m_timerDuration;
     private float m_fillAmount;
 
     void Start()
     {
-        SetDefaultTimer();
         SetGameLevel();
+        SetDefaultTimer();
         SetButtonAction();
         SafeScreen();
+        m_gameLogic.InitGame();
 
         TEST_SAFE_SCREEN();
     }
@@ -73,8 +77,10 @@ public class Game : MonoBehaviour
 
     private void SetGameLevel()
     {
-        m_boardManager.Size = CONST.SIZE1;
-        m_boardManager.ballManager.BallVariation = CONST.LEVEL1; // prefer is 1, 2
+        m_boardManager.Size = CONST.SIZE75;
+        m_boardManager.ballManager.BallVariation = CONST.LEVEL3; // prefer is 1, 2
+        // m_boardManager.Size = CONST.SIZE78;
+        // m_boardManager.ballManager.BallVariation = CONST.LEVEL4; // prefer is 1, 2
     }
 
     private void SetButtonAction()
@@ -82,7 +88,6 @@ public class Game : MonoBehaviour
         m_generate.onClick.AddListener(m_gameLogic.CreateGame);
         m_generate.onClick.AddListener(SetDefaultTimer);
         m_generate.onClick.AddListener(BeginTimer);
-        m_clear.onClick.AddListener(m_gameLogic.ClearGame);
         m_re.onClick.AddListener(m_gameLogic.ClearBall);
     }
 
@@ -114,7 +119,6 @@ public class Game : MonoBehaviour
         m_fillAmount += increment * m_gameLogic.BonusTimeSecond;
         m_fillAmount = Mathf.Min(m_fillAmount, 1);
         m_timerDuration = CONST.DURATION_PLAY_TIME * m_fillAmount;
-Debug.Log($"increment time = {m_fillAmount - m_progressBar.fillAmount}, BonusValue = {m_gameLogic.BonusTimeSecond}");
         m_gameLogic.BonusTimeSecond = CONST.BONUS_TIMER_BEGIN_VALUE;
 
         BeginTimer();
