@@ -38,7 +38,6 @@ public class BallPrefab : MonoBehaviour
             destination.Child = this;
 
             transform
-                // .DOMoveY(monoObj.transform.position.y, CONST.DURATION_MOVE * Step(monoObj.transform))
                 .DOMoveY(monoObj.transform.position.y, CONST.DURATION_MOVE)
                 .SetEase(Ease.Linear)
                 .SetUpdate(true)

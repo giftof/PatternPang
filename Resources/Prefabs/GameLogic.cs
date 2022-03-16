@@ -139,51 +139,67 @@
 //     }
 
 //     /* complicated functions... can be simple? */
-//     private bool FillSlot(SlotPrefab slot)
+//     private bool FillSlot(SlotPrefab slot, Action action = null)
 //     {
 //         bool flag = false;
 //         SlotPrefab current = slot;
 //         Sequence sequence = DOTween.Sequence().SetEase(Ease.Linear).OnComplete(() => {
-//             if (flag) 
+//             if (flag)
 //                 FillSlot(slot);
 //             else
-//                 m_eventSystem.enabled = true;
+//             {
+//                 if (action == null)
+//                     m_eventSystem.enabled = true;
+//                 else
+//                     action?.Invoke();
+//             }
+// /*
+//             action?.Invoke();
+//             m_eventSystem.enabled = true;
+// */
 //         });
 
 //         m_eventSystem.enabled = false;
 
+//         return flag = DisposeFillSlot(slot, sequence);
+//     }
+
+//     private bool DisposeFillSlot(SlotPrefab slot, Sequence sequence)
+//     {
+//         bool flag = false;
+
 //         while (true)
 //         {
-//             SlotPrefab above = Ray.Instance.Shot(current.transform.position + CONST.DIRECTION_OFFSET[(int)ClockWise.up]);
+//             SlotPrefab above = Ray.Instance.Shot(slot.transform.position + CONST.DIRECTION_OFFSET[(int)ClockWise.up]);
+            
 //             if (above == null)
 //             {
-//                 bool rst = current.Generate?.Invoke(current) ?? false;
-//                 if (rst) flag = true;
-
+//                 flag = slot.Generate?.Invoke(slot) ?? false;
 //                 sequence.Play();
-//                 return rst;
+//                 return flag;
 //             }
 
-//             if (current.Child == null && above.Child != null)
+//             if (slot.Child == null && above.Child != null)
 //             {
-//                 SlotPrefab temp = current;
-//                 current.Child = above.Child;
+//                 SlotPrefab temp = slot;
+//                 slot.Child = above.Child;
 //                 above.Child = null;
-//                 flag = true;
-//                 sequence.Join(DOTween.To(
-//                     () => temp.Child.transform.position, pos => temp.Child.transform.position = pos, temp.transform.position, CONST.DURATION_MOVE
-//                 ));
+//                 sequence.Join(DOTween.To(() => temp.Child.transform.position, pos => temp.Child.transform.position = pos, temp.transform.position, CONST.DURATION_MOVE));
 //             }
-//             current = above;
+
+//             slot = above;
 //         }
 //     }
 
 //     private void RequestBall(Action action)
 //     {
 //         if (Finish) return;
-        
+
+//         m_boardHandler.BottomLine.Where(e => FillSlot(e, action)).Count();
+// /*
 //         if (m_boardHandler.BottomLine.Where(e => FillSlot(e)).Count() == 0)
 //             action?.Invoke();
+// */
 //     }
 
 //     private List<SlotPrefab> Matched(Vector3[] offsetArray)
@@ -213,10 +229,17 @@
 //         if (origin.Generate != null)
 //             return null;
 
+// var h = Ray.Instance.Shot(position - offsetArray[0]);
+// Debug.Log($"h = {h}");
+
 //         unit.Add(origin);
 //         foreach (var match in from offset in offsetArray
 //                               let hit = Ray.Instance.Shot(position -= offset)
-//                               where hit != null && hit.Generate == null && !hit.Child.IsBomb() && hit.Child.BallColor.Equals(origin.Child.BallColor)
+//                               where 
+//                                     hit != null
+//                                     && hit.Generate == null 
+//                                     && !hit.Child.IsBomb() 
+//                                     && hit.Child.BallColor.Equals(origin.Child.BallColor)
 //                               select hit)
 //             unit.Add(match);
 
@@ -385,6 +408,28 @@
 //         => m_bombLineCount -= count;
 // }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 using System;
 using System.Linq;
 using System.Collections;
@@ -401,9 +446,9 @@ public class GameLogic : MonoBehaviour
     [SerializeField] BallManager m_ballHandler;
     [SerializeField] LineManager m_lineHandler;
     [SerializeField] CoverManager m_coverHandler;
+    [SerializeField] BombHandler m_bombHandler;
     private PatternHandler m_patternHandler;
     private int m_matchCount;
-    private int m_bombLineCount;
     private int m_unitScore; // nameing is suck
     private int m_modeScore; // nameing is suck
 
@@ -423,6 +468,10 @@ public class GameLogic : MonoBehaviour
         m_boardHandler.SetAddAction = m_lineHandler.Append;
         m_boardHandler.SetRemoveAction = m_lineHandler.Remove;
         m_coverHandler.transform.localScale = m_boardHandler.transform.localScale;
+
+        m_bombHandler.d_bomb = Bomb;
+        m_bombHandler.d_score = BombScore;
+        m_bombHandler.d_request = RequestBall;
     }
 
     public void InitGame()
@@ -456,29 +505,35 @@ public class GameLogic : MonoBehaviour
         SlotPrefab.Activate = false;
     }
 
-    public void Bomb(SlotPrefab slot)
+    /*
+     * privates... complicated functions...
+     */
+    private void Bomb(SlotPrefab slot)
     {
         if (slot.Generate != null || slot.Child == null) { return; }
 
         switch (slot.Child.BallColor)
         {
             case SlotAttribute.bomb1:
-                StartCoroutine(DisposeBomb1(slot));
+                m_eventSystem.enabled = false;
+                StartCoroutine(m_bombHandler.DisposeBomb1(slot));
                 break;
             case SlotAttribute.bomb2:
-                StartCoroutine(DisposeBomb3(slot));
+                m_eventSystem.enabled = false;
+                StartCoroutine(m_bombHandler.DisposeBomb3(slot));
                 break;
             case SlotAttribute.bomb3:
-                StartCoroutine(DisposeBomb4(slot));
+                m_eventSystem.enabled = false;
+                StartCoroutine(m_bombHandler.DisposeBomb4(slot));
                 break;
             default:
                 break;
         }
     }
 
-    /*
-     * privates... complicated functions...
-     */
+    private void BombScore()
+        => Score += CONST.SCORE_BOMB;
+
     private int UnitScore
         => m_patternHandler.Selected().Select((e, index) => (e, index)).Sum(p => p.index) + m_patternHandler.Selected().Count();
 
@@ -648,127 +703,4 @@ public class GameLogic : MonoBehaviour
             BonusTimeSecond += mode;
         return rst;
     }
-
-
-    IEnumerator DisposeBomb1(SlotPrefab slot)
-    {
-        m_eventSystem.enabled = false; /**/
-
-        ReleaseBombed(slot);
-        IncrementBombAction();
-        foreach (var offset in CONST.DIRECTION_OFFSET)
-        {
-            SlotPrefab target = Ray.Instance.Shot(slot.transform.position + offset);
-            if (target != null && target.Generate == null)
-            {
-                yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
-                ReleaseBombed(target, true);
-            }
-        }
-
-        if (DecrementBombAction() == 0)
-            StartCoroutine(RequestBall(null));
-    }
-
-    IEnumerator DisposeBomb2(SlotPrefab slot)
-    {
-        m_eventSystem.enabled = false; /**/
-
-        ReleaseBombed(slot);
-        yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
-
-        StartCoroutine(RemoveLine(slot, ClockWise.up, ClockWise.down));
-    }
-
-    IEnumerator DisposeBomb3(SlotPrefab slot)
-    {
-        m_eventSystem.enabled = false; /**/
-
-        ReleaseBombed(slot);
-        yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
-
-        StartCoroutine(RemoveLine(slot, ClockWise.up, ClockWise.down));
-        StartCoroutine(RemoveLine(slot, ClockWise.upLeft, ClockWise.downRight));
-        StartCoroutine(RemoveLine(slot, ClockWise.upRight, ClockWise.downLeft));
-    }
-
-    IEnumerator DisposeBomb4(params SlotPrefab[] slot)
-    {
-        yield return null;
-        m_eventSystem.enabled = false; /**/
-
-        foreach (var e in slot)
-            ReleaseBombed(e);
-
-        List<SlotPrefab> list = new List<SlotPrefab>();
-
-        slot.Where(e => {
-            var around = CONST.DIRECTION_OFFSET
-                .Select(offset => Ray.Instance.Shot(e.transform.position + offset))
-                .GroupBy(a => a?.Child != null && a.Generate == null);
-
-            foreach (var a in around)
-                if (a.Key)
-                    list.AddRange(a.ToList());
-            return false;
-        }).Count();
-
-        if (list.Count > 0)
-        {
-            yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
-            StartCoroutine(DisposeBomb4(list.ToArray()));
-        }
-        else
-            StartCoroutine(RequestBall(null));
-    }
-
-    IEnumerator RemoveLine(SlotPrefab slot, ClockWise dir1, ClockWise dir2)
-    {
-        IncrementBombAction();
-        Vector3 pos1 = slot.transform.position;
-        Vector3 pos2 = slot.transform.position;
-
-        while(true)
-        {
-            int failCount = 0;
-            SlotPrefab target1 = Ray.Instance.Shot(pos1 += CONST.DIRECTION_OFFSET[(int)dir1]);
-            SlotPrefab target2 = Ray.Instance.Shot(pos2 += CONST.DIRECTION_OFFSET[(int)dir2]);
-
-            if (target1 == null || target1.Generate != null)
-                ++failCount;
-            else
-                ReleaseBombed(target1, true);
-
-            if (target2 == null || target2.Generate != null)
-                ++failCount;
-            else
-                ReleaseBombed(target2, true);
-
-            if (failCount > 1)
-                break;
-            yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
-        }
-
-        if (DecrementBombAction() == 0)
-            StartCoroutine(RequestBall(null));
-    }
-
-    private void ReleaseBombed(SlotPrefab slot, bool recursive = false)
-    {
-        if (recursive)
-            Bomb(slot);
-
-        if (slot.Child)
-        {
-            m_ballHandler.Release(slot.Child);
-            slot.Child = null;
-            Score += CONST.SCORE_BOMB;
-        }
-    }
-
-    private int IncrementBombAction(int count = 1)
-        => m_bombLineCount += count;
-
-    private int DecrementBombAction(int count = 1)
-        => m_bombLineCount -= count;
 }
