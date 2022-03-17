@@ -17,8 +17,6 @@ public class BoardManager : ManagedPool<SlotPrefab>
 
     private Vector2 m_slotSize;
     private float m_widthUnit;
-    private List<SlotPrefab> m_bottomList;
-    private List<SlotPrefab> m_topList;
     private float m_lineThick = 0.93f;
     /*private float m_lineThick = 1;*/
 
@@ -30,8 +28,6 @@ public class BoardManager : ManagedPool<SlotPrefab>
         base.Awake();
         m_slotSize = pool.prefab.GetComponent<RectTransform>().sizeDelta * m_lineThick;
         m_widthUnit = m_slotSize.x * CONST.HEXAGON_WIDTH_RATIO;
-        m_bottomList = new List<SlotPrefab>();
-        m_topList = new List<SlotPrefab>();
     }
 
     public PatternHandler SetPatternHandler
@@ -62,7 +58,6 @@ public class BoardManager : ManagedPool<SlotPrefab>
     public override void Clear()
     {
         ClearChild();
-        m_bottomList.Clear();
         ballManager.Clear();
         base.Clear();
     }
@@ -83,12 +78,6 @@ public class BoardManager : ManagedPool<SlotPrefab>
     public IReadOnlyDictionary<int, SlotPrefab> Data
         => dictionary;
 
-    public IReadOnlyList<SlotPrefab> BottomLine
-        => m_bottomList;
-
-    public IReadOnlyList<SlotPrefab> TopLine
-        => m_topList;
-
     private void PublishBoard()
     {
         Vector3 beginPosition = (Size.Row - 1) * .5f * m_widthUnit * Vector3.left;
@@ -96,7 +85,7 @@ public class BoardManager : ManagedPool<SlotPrefab>
 
         for (uint w = 0; w < Size.Row; ++w)
         {
-            currentPosition += m_slotSize.y * Vector3.up * (IsFloating(w) ? 1 : .5f);
+            currentPosition += m_slotSize.y * Vector3.up * (IsHalfFloating(w) ? 1 : .5f);
             for (uint h = 0; h < Size.Column; ++h)
             {
                 SlotPrefab slot = Request(transform, currentPosition);
@@ -109,18 +98,19 @@ public class BoardManager : ManagedPool<SlotPrefab>
                 currentPosition += Vector3.up * m_slotSize.y;
                 slot.name = slot.GetInstanceID().ToString(); /* for test */
 
-                if (h.Equals(0)) { m_bottomList.Add(slot); }
                 if (h.Equals(Size.Column - 1))
-                {
-                    slot.Generate = MakeChild;
-                    CoverPrefab cover = m_coverHandler.Request(m_coverHandler.transform);
-                    cover.transform.position = slot.transform.position;
-                }
+                    GeneratorCap(slot);
                 else
                     slot.Generate = null;
             }
             currentPosition = beginPosition + (w + 1) * m_widthUnit * Vector3.right;
         }
+    }
+
+    private void GeneratorCap(SlotPrefab cap)
+    {
+        m_coverHandler.Request(m_coverHandler.transform).transform.position = cap.transform.position;
+        cap.Generate = MakeChild;
     }
 
     private bool MakeChild(SlotPrefab slot)
@@ -152,6 +142,6 @@ public class BoardManager : ManagedPool<SlotPrefab>
         CONST.DIRECTION_OFFSET[5] = up * .5f - right;
     }
 
-    private bool IsFloating(uint row)
+    private bool IsHalfFloating(uint row)
         => row % 2 == CONST.EVEN_COLUMN_UP;
 }

@@ -27,6 +27,11 @@ public class BallPrefab : MonoBehaviour
         }
     }
 
+    public Tweener TEST_Trans(IParent<BallPrefab> destination)
+    {
+        return DOTween.To(() => 0, x => _ = x, 0, 0);
+    }
+
     public void TransferTo(IParent<BallPrefab> destination, Action callBack = null)
     {
         if (IsWorking) { return; }

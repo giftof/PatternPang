@@ -283,129 +283,6 @@
 //             BonusTimeSecond += mode;
 //         return rst;
 //     }
-
-
-//     IEnumerator DisposeBomb1(SlotPrefab slot)
-//     {
-//         m_eventSystem.enabled = false; /**/
-
-//         ReleaseBombed(slot);
-//         IncrementBombAction();
-//         foreach (var offset in CONST.DIRECTION_OFFSET)
-//         {
-//             SlotPrefab target = Ray.Instance.Shot(slot.transform.position + offset);
-//             if (target != null && target.Generate == null)
-//             {
-//                 yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
-//                 ReleaseBombed(target, true);
-//             }
-//         }
-
-//         if (DecrementBombAction() == 0)
-//             RequestBall(null);
-//     }
-
-//     IEnumerator DisposeBomb2(SlotPrefab slot)
-//     {
-//         m_eventSystem.enabled = false; /**/
-
-//         ReleaseBombed(slot);
-//         yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
-
-//         StartCoroutine(RemoveLine(slot, ClockWise.up, ClockWise.down));
-//     }
-
-//     IEnumerator DisposeBomb3(SlotPrefab slot)
-//     {
-//         m_eventSystem.enabled = false; /**/
-
-//         ReleaseBombed(slot);
-//         yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
-
-//         StartCoroutine(RemoveLine(slot, ClockWise.up, ClockWise.down));
-//         StartCoroutine(RemoveLine(slot, ClockWise.upLeft, ClockWise.downRight));
-//         StartCoroutine(RemoveLine(slot, ClockWise.upRight, ClockWise.downLeft));
-//     }
-
-//     IEnumerator DisposeBomb4(params SlotPrefab[] slot)
-//     {
-//         yield return null;
-//         m_eventSystem.enabled = false; /**/
-
-//         foreach (var e in slot)
-//             ReleaseBombed(e);
-
-//         List<SlotPrefab> list = new List<SlotPrefab>();
-
-//         slot.Where(e => {
-//             var around = CONST.DIRECTION_OFFSET
-//                 .Select(offset => Ray.Instance.Shot(e.transform.position + offset))
-//                 .GroupBy(a => a?.Child != null && a.Generate == null);
-
-//             foreach (var a in around)
-//                 if (a.Key)
-//                     list.AddRange(a.ToList());
-//             return false;
-//         }).Count();
-
-//         if (list.Count > 0)
-//         {
-//             yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
-//             StartCoroutine(DisposeBomb4(list.ToArray()));
-//         }
-//         else
-//             RequestBall(null);
-//     }
-
-//     IEnumerator RemoveLine(SlotPrefab slot, ClockWise dir1, ClockWise dir2)
-//     {
-//         IncrementBombAction();
-//         Vector3 pos1 = slot.transform.position;
-//         Vector3 pos2 = slot.transform.position;
-
-//         while(true)
-//         {
-//             int failCount = 0;
-//             SlotPrefab target1 = Ray.Instance.Shot(pos1 += CONST.DIRECTION_OFFSET[(int)dir1]);
-//             SlotPrefab target2 = Ray.Instance.Shot(pos2 += CONST.DIRECTION_OFFSET[(int)dir2]);
-
-//             if (target1 == null || target1.Generate != null)
-//                 ++failCount;
-//             else
-//                 ReleaseBombed(target1, true);
-
-//             if (target2 == null || target2.Generate != null)
-//                 ++failCount;
-//             else
-//                 ReleaseBombed(target2, true);
-
-//             if (failCount > 1)
-//                 break;
-//             yield return new WaitForSecondsRealtime(CONST.DURATION_BOMB_STEP);
-//         }
-
-//         if (DecrementBombAction() == 0)
-//             RequestBall(null);
-//     }
-
-//     private void ReleaseBombed(SlotPrefab slot, bool recursive = false)
-//     {
-//         if (recursive)
-//             Bomb(slot);
-
-//         if (slot.Child)
-//         {
-//             m_ballHandler.Release(slot.Child);
-//             slot.Child = null;
-//             Score += CONST.SCORE_BOMB;
-//         }
-//     }
-
-//     private int IncrementBombAction(int count = 1)
-//         => m_bombLineCount += count;
-
-//     private int DecrementBombAction(int count = 1)
-//         => m_bombLineCount -= count;
 // }
 
 
@@ -438,6 +315,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using Pattern.Managers;
 using Pattern.Configs;
+using DG.Tweening;
 
 public class GameLogic : MonoBehaviour
 {
@@ -451,6 +329,7 @@ public class GameLogic : MonoBehaviour
     private int m_matchCount;
     private int m_unitScore; // nameing is suck
     private int m_modeScore; // nameing is suck
+    private SlotPrefab[] m_bottomArray;
 
     public int Score { get; private set; } = 0;
     public bool Finish = false;
@@ -475,7 +354,11 @@ public class GameLogic : MonoBehaviour
     }
 
     public void InitGame()
-        => m_boardHandler.Create();
+    {
+        uint height = m_boardHandler.Size.Column;
+        m_boardHandler.Create();
+        m_bottomArray = m_boardHandler.Data.Where(e => e.Value.id % height == 0).Select(e => e.Value).ToArray();
+    }
 
     public void CreateGame()
     {
@@ -485,6 +368,8 @@ public class GameLogic : MonoBehaviour
 
         m_lineHandler.Clear();
         StartCoroutine(RequestBall(null));
+
+        TEST_SlideBall();
     }
 
     public void ClearGame()
@@ -579,7 +464,37 @@ public class GameLogic : MonoBehaviour
         }
     }
 
-    /* complicated functions... can be simple? */
+    /*
+     * test begin
+     */
+    private void TEST_SlideBall()
+    {
+        uint height = m_boardHandler.Size.Column;
+        var group = m_boardHandler.Data.OrderBy(e => e.Value.id).GroupBy(e => e.Value.id / height);
+        // int actionCount = 0;
+
+        // foreach (var line in group)
+        //     SlideLine(line);
+    }
+
+    // private bool SlideLine(IGrouping<uint, KeyValuePair<int, SlotPrefab>> line)
+    // {
+    //     Sequence sequence = DOTween.Sequence();
+
+    //     foreach (var slot in line)
+    //         sequence.Join(slot.Value.Child.TEST_Trans(slot.Value).OnComplete(() => { Debug.Log("hello"); }));
+
+    //     sequence.OnComplete(() => {});
+    //     return false;
+    // }
+    /*
+     * test end
+     */
+
+
+    /*
+     * complicated functions... can be simple?
+     */
     private bool FillSlot(SlotPrefab slot)
     {
         SlotPrefab upper = Ray.Instance.Shot(slot.transform.position + CONST.DIRECTION_OFFSET[(int)ClockWise.up]);
@@ -614,11 +529,9 @@ public class GameLogic : MonoBehaviour
         yield return null;
         int count = 0;
 
-        foreach (var element in m_boardHandler.BottomLine)
-        {
+        foreach (var element in m_bottomArray)
             if (FillSlot(element))
                 count++;
-        }
 
         if (count > 0)
             StartCoroutine(RequestBall(action));
@@ -629,46 +542,7 @@ public class GameLogic : MonoBehaviour
         }
     }
 
-    private List<SlotPrefab> Matched(Vector3[] offsetArray)
-    {
-        List<SlotPrefab> match = new List<SlotPrefab>();
-
-        foreach (var unit in from origin in m_boardHandler.Data
-                             let unit = DrawMatchedElement(origin.Value, offsetArray)
-                             where unit != null
-                             select unit)
-                             {
-                                ++m_matchCount;
-                                Score += m_unitScore * Multi(m_matchCount, m_modeScore);
-                                m_lineHandler.ToLine(unit);
-                                
-                                match.AddRange(unit);
-                             }
-        
-        return match;
-    }
-    
-    private List<SlotPrefab> DrawMatchedElement(SlotPrefab origin, Vector3[] offsetArray)
-    {
-        List<SlotPrefab> unit = new List<SlotPrefab>();
-        Vector3 position = origin.transform.position;
-
-        if (origin.Generate != null)
-            return null;
-
-        unit.Add(origin);
-        foreach (var match in from offset in offsetArray
-                              let hit = Ray.Instance.Shot(position -= offset)
-                              where hit != null && hit.Generate == null && !hit.Child.IsBomb() && hit.Child.BallColor.Equals(origin.Child.BallColor)
-                              select hit)
-            unit.Add(match);
-
-        if (unit.Count > offsetArray.Length)
-            return unit;
-
-        return null;
-    }
-
+    /* complicated functions... can be simple? */
     IEnumerator DisposeMatch(Vector3[] offsetArray)
     {
         m_eventSystem.enabled = false;
@@ -693,6 +567,44 @@ public class GameLogic : MonoBehaviour
             yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_FILL_BALL);
             StartCoroutine(RequestBall(() => { RecursiveMatch(offsetArray); }));
         }
+    }
+
+    private List<SlotPrefab> Matched(Vector3[] offsetArray)
+    {
+        List<SlotPrefab> match = new List<SlotPrefab>();
+
+        foreach (var unit in from origin in m_boardHandler.Data
+                             let unit = DrawMatchedElement(origin.Value, offsetArray)
+                             where unit != null
+                             select unit)
+                             {
+                                ++m_matchCount;
+                                Score += m_unitScore * Multi(m_matchCount, m_modeScore);
+                                m_lineHandler.ToLine(unit);
+                                
+                                match.AddRange(unit);
+                             }
+        return match;
+    }
+    
+    private List<SlotPrefab> DrawMatchedElement(SlotPrefab origin, Vector3[] offsetArray)
+    {
+        List<SlotPrefab> unit = new List<SlotPrefab>();
+        Vector3 position = origin.transform.position;
+
+        if (origin.Generate != null)
+            return null;
+
+        unit.Add(origin);
+        foreach (var match in from offset in offsetArray
+                              let hit = Ray.Instance.Shot(position -= offset)
+                              where hit != null && hit.Generate == null && !hit.Child.IsBomb() && hit.Child.BallColor.Equals(origin.Child.BallColor)
+                              select hit)
+            unit.Add(match);
+
+        if (unit.Count > offsetArray.Length)
+            return unit;
+        return null;
     }
 
     private int Multi(int count, int mode)

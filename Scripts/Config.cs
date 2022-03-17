@@ -13,7 +13,7 @@ namespace Pattern.Configs
         public static readonly float LINE_WIDTH = .1f;
         public static readonly float HEXAGON_WIDTH_RATIO = .75f;
 
-        public static readonly float DURATION_MOVE = .1f;
+        public static readonly float DURATION_MOVE = .18f;
         public static readonly float DURATION_PLAY_TIME = 30;
         public static readonly float DURATION_JELLY_ELASTICITY = .6f;
         public static readonly long DURATION_VIBRATE_ADD = 8; // ms: vibe
