@@ -330,8 +330,9 @@ public class GameLogic : MonoBehaviour
     private int m_unitScore; // nameing is suck
     private int m_modeScore; // nameing is suck
     private SlotPrefab[] m_bottomArray;
-    private IEnumerable<IGrouping<uint, KeyValuePair<int, SlotPrefab>>> m_board;
+    // private IEnumerable<IGrouping<uint, KeyValuePair<int, SlotPrefab>>> m_board;
     private Vector3[] m_shape = null;
+    private bool[] m_isWorking;
 
     public int Score { get; private set; } = 0;
     public bool Finish = false;
@@ -359,8 +360,13 @@ public class GameLogic : MonoBehaviour
     {
         uint height = m_boardHandler.Size.Column;
         m_boardHandler.Create();
-        m_bottomArray = m_boardHandler.Data.Where(e => e.Value.id % height == 0).Select(e => e.Value).ToArray();
-        m_board = m_boardHandler.Data.OrderBy(e => e.Value.id).GroupBy(e => e.Value.id / height);
+        m_bottomArray = m_boardHandler.Data
+                        .OrderBy(e => e.Value.id)
+                        .Where(e => e.Value.id % height == 0)
+                        .Select(e => e.Value)
+                        .ToArray();
+        // m_board = m_boardHandler.Data.OrderBy(e => e.Value.id).GroupBy(e => e.Value.id / height);
+        m_isWorking = new bool[m_bottomArray.Length];
     }
 
     public void CreateGame()
@@ -437,10 +443,6 @@ public class GameLogic : MonoBehaviour
         m_lineHandler.Clear();
         
         StartCoroutine(DisposeMatch());
-        // if (m_shape != null)
-        //     StartCoroutine(DisposeMatch());
-        // else
-        //     m_lineHandler.Clear();
     }
 
     private void RecursiveMatch()
@@ -474,13 +476,20 @@ public class GameLogic : MonoBehaviour
      */
     private void TEST_SlideBall()
     {
-
-
-
         uint height = m_boardHandler.Size.Column;
-        var group = m_boardHandler.Data.OrderBy(e => e.Value.id).GroupBy(e => e.Value.id / height);
-        // int actionCount = 0;
+        var lineArray = m_bottomArray.Select(e => {
+            List<SlotPrefab> line = new List<SlotPrefab>();
+            for(int i = 0; i < height; ++i)
+                line.Add(e);
+            return line;
+        });
 
+
+        // uint height = m_boardHandler.Size.Column;
+        // var group = m_boardHandler.Data.OrderBy(e => e.Value.id).GroupBy(e => e.Value.id / height);
+        
+        
+        // int actionCount = 0;
         // foreach (var line in group)
         //     SlideLine(line);
     }
