@@ -6,6 +6,7 @@ using UnityEngine;
 using Pattern.Configs;
 
 public delegate IEnumerator IE_DELEGATE_T<T>(T arg);
+public delegate IEnumerator IE_DELEGATE();
 
 public class BombHandler : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class BombHandler : MonoBehaviour
 
     public DELEGATE_T<SlotPrefab> d_bomb;
     public Action d_score;
-    public IE_DELEGATE_T<Action> d_request;
+    public IE_DELEGATE d_request;
 
     public IEnumerator DisposeBomb1(SlotPrefab slot)
     {
@@ -31,7 +32,7 @@ public class BombHandler : MonoBehaviour
         }
 
         if (DecrementBombAction() == 0)
-            StartCoroutine(d_request(null));
+            StartCoroutine(d_request());
     }
 
     public IEnumerator DisposeBomb2(SlotPrefab slot)
@@ -78,7 +79,7 @@ public class BombHandler : MonoBehaviour
             StartCoroutine(DisposeBomb4(list.ToArray()));
         }
         else
-            StartCoroutine(d_request(null));
+            StartCoroutine(d_request());
     }
 
     IEnumerator RemoveLine(SlotPrefab slot, ClockWise dir1, ClockWise dir2)
@@ -109,7 +110,7 @@ public class BombHandler : MonoBehaviour
         }
 
         if (DecrementBombAction() == 0)
-            StartCoroutine(d_request(null));
+            StartCoroutine(d_request());
     }
 
     private void ReleaseBombed(SlotPrefab slot, bool recursive = false)

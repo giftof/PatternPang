@@ -330,6 +330,8 @@ public class GameLogic : MonoBehaviour
     private int m_unitScore; // nameing is suck
     private int m_modeScore; // nameing is suck
     private SlotPrefab[] m_bottomArray;
+    private IEnumerable<IGrouping<uint, KeyValuePair<int, SlotPrefab>>> m_board;
+    private Vector3[] m_shape = null;
 
     public int Score { get; private set; } = 0;
     public bool Finish = false;
@@ -358,6 +360,7 @@ public class GameLogic : MonoBehaviour
         uint height = m_boardHandler.Size.Column;
         m_boardHandler.Create();
         m_bottomArray = m_boardHandler.Data.Where(e => e.Value.id % height == 0).Select(e => e.Value).ToArray();
+        m_board = m_boardHandler.Data.OrderBy(e => e.Value.id).GroupBy(e => e.Value.id / height);
     }
 
     public void CreateGame()
@@ -367,7 +370,7 @@ public class GameLogic : MonoBehaviour
         BonusTimeSecond = CONST.BONUS_TIMER_BEGIN_VALUE;
 
         m_lineHandler.Clear();
-        StartCoroutine(RequestBall(null));
+        StartCoroutine(RequestBall());
 
         TEST_SlideBall();
     }
@@ -429,17 +432,19 @@ public class GameLogic : MonoBehaviour
     {
         m_unitScore = UnitScore;
         m_modeScore = ModeScore;
-        Vector3[] offsetArray = m_patternHandler.ShapeOffset();
+        m_shape = m_patternHandler.ShapeOffset();
         m_matchCount = 0;
-
-        if (offsetArray != null)
-            StartCoroutine(DisposeMatch(offsetArray));
-        else
-            m_lineHandler.Clear();
+        m_lineHandler.Clear();
+        
+        StartCoroutine(DisposeMatch());
+        // if (m_shape != null)
+        //     StartCoroutine(DisposeMatch());
+        // else
+        //     m_lineHandler.Clear();
     }
 
-    private void RecursiveMatch(Vector3[] offsetArray)
-        => StartCoroutine(DisposeMatch(offsetArray));
+    private void RecursiveMatch()
+        => StartCoroutine(DisposeMatch());
 
     private void DisposeMatchBall(IGrouping<int, SlotPrefab> key)
     {
@@ -469,6 +474,9 @@ public class GameLogic : MonoBehaviour
      */
     private void TEST_SlideBall()
     {
+
+
+
         uint height = m_boardHandler.Size.Column;
         var group = m_boardHandler.Data.OrderBy(e => e.Value.id).GroupBy(e => e.Value.id / height);
         // int actionCount = 0;
@@ -520,7 +528,7 @@ public class GameLogic : MonoBehaviour
     }
 
     /* complicated functions... can be simple? */
-    IEnumerator RequestBall(Action action)
+    IEnumerator RequestBall()
     {
         if (Finish)
             yield break;
@@ -534,27 +542,32 @@ public class GameLogic : MonoBehaviour
                 count++;
 
         if (count > 0)
-            StartCoroutine(RequestBall(action));
+            StartCoroutine(RequestBall());
         else
         {
             m_eventSystem.enabled = true;
-            action?.Invoke();
+            RecursiveMatch();
         }
     }
 
     /* complicated functions... can be simple? */
-    IEnumerator DisposeMatch(Vector3[] offsetArray)
+    IEnumerator DisposeMatch()
     {
+        if (m_shape == null)
+            yield break;
+
         m_eventSystem.enabled = false;
 
-        List<SlotPrefab> matchedList = Matched(offsetArray);
-
+        List<SlotPrefab> matchedList = Matched();
         var group = matchedList.GroupBy(e => e.GetInstanceID());
 
         if (group.Count().Equals(0))
         {
             if (!Finish)
+            {
+                m_shape = null;
                 m_eventSystem.enabled = true;
+            }
         }
         else
         {
@@ -565,45 +578,39 @@ public class GameLogic : MonoBehaviour
                 DisposeMatchBall(key);
 
             yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_FILL_BALL);
-            StartCoroutine(RequestBall(() => { RecursiveMatch(offsetArray); }));
+            StartCoroutine(RequestBall());
         }
     }
 
-    private List<SlotPrefab> Matched(Vector3[] offsetArray)
+    private List<SlotPrefab> Matched()
     {
-        List<SlotPrefab> match = new List<SlotPrefab>();
-
-        foreach (var unit in from origin in m_boardHandler.Data
-                             let unit = DrawMatchedElement(origin.Value, offsetArray)
-                             where unit != null
-                             select unit)
-                             {
-                                ++m_matchCount;
-                                Score += m_unitScore * Multi(m_matchCount, m_modeScore);
-                                m_lineHandler.ToLine(unit);
-                                
-                                match.AddRange(unit);
-                             }
-        return match;
+        return m_boardHandler.Data
+            .Select(e => DrawMatchedElement(e.Value, m_shape))
+            .Where(list => list != null)
+            .SelectMany(list => {
+                Score += m_unitScore * Multi(++m_matchCount, m_modeScore);
+                m_lineHandler.ToLine(list);
+                return list.Select(e => e);
+            })
+            .ToList();
     }
     
     private List<SlotPrefab> DrawMatchedElement(SlotPrefab origin, Vector3[] offsetArray)
     {
-        List<SlotPrefab> unit = new List<SlotPrefab>();
         Vector3 position = origin.transform.position;
 
         if (origin.Generate != null)
             return null;
 
-        unit.Add(origin);
-        foreach (var match in from offset in offsetArray
-                              let hit = Ray.Instance.Shot(position -= offset)
-                              where hit != null && hit.Generate == null && !hit.Child.IsBomb() && hit.Child.BallColor.Equals(origin.Child.BallColor)
-                              select hit)
-            unit.Add(match);
+        var list = (from offset in offsetArray
+                    let hit = Ray.Instance.Shot(position -= offset)
+                    where hit != null && hit.Generate == null && !hit.Child.IsBomb() && hit.Child.BallColor.Equals(origin.Child.BallColor)
+                    select hit)
+                    .Reverse().ToList();
+        list.Add(origin);                        
 
-        if (unit.Count > offsetArray.Length)
-            return unit;
+        if (list.Count > offsetArray.Length)
+            return list;
         return null;
     }
 
