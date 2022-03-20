@@ -4,7 +4,7 @@ namespace Pattern.Configs
 {
     public static class CONST
     {
-        // public static float OFFSET = 0;
+        public static float OFFSET = 0;
         public static readonly uint MIN_SELECT = 3;
         public static readonly uint BOMB = 3;
         public static readonly uint GENERATOR_LINE = 1;

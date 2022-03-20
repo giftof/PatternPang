@@ -132,7 +132,7 @@ public class BoardManager : ManagedPool<SlotPrefab>
         float min = Mathf.Min(up.y * 2, right.x * 2, Vector3.Distance(up * 1.5f + right, Vector3.zero));
         float max = Mathf.Max(up.y, up.y * .5f + right.x);
 
-        // CONST.OFFSET = up.y;
+        CONST.OFFSET = up.y;
         CONST.MAX_DISTANCE = (min + max) * .5f;
         CONST.DIRECTION_OFFSET[0] = up;
         CONST.DIRECTION_OFFSET[1] = up * .5f + right;

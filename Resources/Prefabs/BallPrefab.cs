@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
@@ -27,30 +26,14 @@ public class BallPrefab : MonoBehaviour
         }
     }
 
-    public Tweener TEST_Trans(IParent<BallPrefab> destination)
+    public Tweener MoveTo(IParent<BallPrefab> destination)
     {
-        return DOTween.To(() => 0, x => _ = x, 0, 0);
-    }
+        DOTween.Kill(GetInstanceID());
+        MonoBehaviour dest = destination as MonoBehaviour;
+        float duration = (transform.position.y - dest.transform.position.y) / CONST.OFFSET * CONST.DURATION_MOVE;
+        destination.Child = this;
 
-    public void TransferTo(IParent<BallPrefab> destination, Action callBack = null)
-    {
-        if (IsWorking) { return; }
-
-        IsWorking = true;
-
-        if (destination is MonoBehaviour monoObj)
-        {
-            destination.Child = this;
-
-            transform
-                .DOMoveY(monoObj.transform.position.y, CONST.DURATION_MOVE)
-                .SetEase(Ease.Linear)
-                .SetUpdate(true)
-                .OnComplete(() => {
-                    IsWorking = false;
-                    callBack?.Invoke();
-                });
-        }
+        return transform.DOMoveY(dest.transform.position.y, duration).SetEase(Ease.Linear);
     }
 
     public void Drop<T>(DELEGATE_T<T> finishAction, T obj)
