@@ -33,7 +33,6 @@ public class BombHandler : MonoBehaviour
 
         if (DecrementBombAction() == 0)
             d_request?.Invoke();
-            // StartCoroutine(d_request());
     }
 
     public IEnumerator DisposeBomb2(SlotPrefab slot)
@@ -81,7 +80,6 @@ public class BombHandler : MonoBehaviour
         }
         else
             d_request?.Invoke();
-            // StartCoroutine(d_request());
     }
 
     IEnumerator RemoveLine(SlotPrefab slot, ClockWise dir1, ClockWise dir2)
@@ -113,7 +111,6 @@ public class BombHandler : MonoBehaviour
 
         if (DecrementBombAction() == 0)
             d_request?.Invoke();
-            // StartCoroutine(d_request());
     }
 
     private void ReleaseBombed(SlotPrefab slot, bool recursive = false)
