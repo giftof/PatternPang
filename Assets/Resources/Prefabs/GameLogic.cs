@@ -49,8 +49,7 @@ public class GameLogic : MonoBehaviour
         m_bombHandler.d_score = BombScore;
         m_bombHandler.d_request = RequestBall;
 
-        CharactorPrefab charactor = m_charactorHandler.Request(m_charactorHandler.transform);
-        // charactor.transform.position = Vector3.zero;
+        // CharactorPrefab charactor = m_charactorHandler.Request(m_charactorHandler.transform);
     }
 
     public void InitGame()
@@ -154,25 +153,25 @@ public class GameLogic : MonoBehaviour
         SlotPrefab slot = m_boardHandler.Data[key.Key];
         int matchCount = key.Count();
 
-        m_ballHandler.Release(slot.Child);
-        slot.Child = null;
+        // m_ballHandler.Release(slot.Child);
+        // slot.Child = null;
 
-        // switch (matchCount)
-        // {
-        //     case 1:
-        //         m_ballHandler.Release(slot.Child);
-        //         slot.Child = null;
-        //         break;
-        //     case 2:
-        //         slot.Child.BallColor = SlotAttribute.bomb1;
-        //         break;
-        //     case 3:
-        //         slot.Child.BallColor = SlotAttribute.bomb2;
-        //         break;
-        //     default:
-        //         slot.Child.BallColor = SlotAttribute.bomb3;
-        //         break;
-        // }
+        switch (matchCount)
+        {
+            case 1:
+                m_ballHandler.Release(slot.Child);
+                slot.Child = null;
+                break;
+            case 2:
+                slot.Child.BallColor = SlotAttribute.bomb1;
+                break;
+            case 3:
+                slot.Child.BallColor = SlotAttribute.bomb2;
+                break;
+            default:
+                slot.Child.BallColor = SlotAttribute.bomb3;
+                break;
+        }
     }
 
     /* complicated functions... can be simple? */
@@ -240,7 +239,7 @@ public class GameLogic : MonoBehaviour
             m_lineHandler.Clear();
             foreach (var key in group)
             {
-                ShootBullet(key);
+                // ShootBullet(key);
                 DisposeMatchBall(key);
             }
 

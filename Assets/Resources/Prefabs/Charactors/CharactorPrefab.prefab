@@ -670,6 +670,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: ProgressBar
       objectReference: {fileID: 0}
+    - target: {fileID: 7473904508253990966, guid: 4775485fe361745588ba4e5c08fe9c24,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4775485fe361745588ba4e5c08fe9c24, type: 3}
 --- !u!224 &8870238681992683228 stripped
