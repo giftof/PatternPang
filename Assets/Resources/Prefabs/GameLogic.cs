@@ -16,6 +16,9 @@ public class GameLogic : MonoBehaviour
     [SerializeField] LineManager m_lineHandler;
     [SerializeField] CoverManager m_coverHandler;
     [SerializeField] BombHandler m_bombHandler;
+    [SerializeField] BulletManager m_bulletHandler;
+    [SerializeField] CharactorManager m_charactorHandler;
+
     private PatternHandler m_patternHandler;
     private int m_matchCount;
     private int m_unitScore; // nameing is suck
@@ -45,6 +48,9 @@ public class GameLogic : MonoBehaviour
         m_bombHandler.d_bomb = Bomb;
         m_bombHandler.d_score = BombScore;
         m_bombHandler.d_request = RequestBall;
+
+        CharactorPrefab charactor = m_charactorHandler.Request(m_charactorHandler.transform);
+        // charactor.transform.position = Vector3.zero;
     }
 
     public void InitGame()
@@ -134,27 +140,39 @@ public class GameLogic : MonoBehaviour
         StartCoroutine(DisposeMatch());
     }
 
+    private void ShootBullet(IGrouping<int, SlotPrefab> key)
+    {
+        SlotPrefab slot = m_boardHandler.Data[key.Key];
+
+        BulletPrefab bullet = m_bulletHandler.Request();
+        bullet.transform.position = slot.transform.position;
+        m_bulletHandler.Move(bullet, m_charactorHandler.First());
+    }
+
     private void DisposeMatchBall(IGrouping<int, SlotPrefab> key)
     {
         SlotPrefab slot = m_boardHandler.Data[key.Key];
         int matchCount = key.Count();
 
-        switch (matchCount)
-        {
-            case 1:
-                m_ballHandler.Release(slot.Child);
-                slot.Child = null;
-                break;
-            case 2:
-                slot.Child.BallColor = SlotAttribute.bomb1;
-                break;
-            case 3:
-                slot.Child.BallColor = SlotAttribute.bomb2;
-                break;
-            default:
-                slot.Child.BallColor = SlotAttribute.bomb3;
-                break;
-        }
+        m_ballHandler.Release(slot.Child);
+        slot.Child = null;
+
+        // switch (matchCount)
+        // {
+        //     case 1:
+        //         m_ballHandler.Release(slot.Child);
+        //         slot.Child = null;
+        //         break;
+        //     case 2:
+        //         slot.Child.BallColor = SlotAttribute.bomb1;
+        //         break;
+        //     case 3:
+        //         slot.Child.BallColor = SlotAttribute.bomb2;
+        //         break;
+        //     default:
+        //         slot.Child.BallColor = SlotAttribute.bomb3;
+        //         break;
+        // }
     }
 
     /* complicated functions... can be simple? */
@@ -221,7 +239,10 @@ public class GameLogic : MonoBehaviour
 
             m_lineHandler.Clear();
             foreach (var key in group)
+            {
+                ShootBullet(key);
                 DisposeMatchBall(key);
+            }
 
             yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_FILL_BALL);
             RequestBall();
