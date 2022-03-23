@@ -19,7 +19,6 @@ public class BoardManager : ManagedPool<SlotPrefab>
     private float m_widthUnit;
     private float m_lineThick = 1f;
     // private float m_lineThick = 0.93f;
-    /*private float m_lineThick = 1;*/
 
     public (uint Row, uint Column) Size { get; set; } = (0, 0);
     public BallManager ballManager;
@@ -27,7 +26,8 @@ public class BoardManager : ManagedPool<SlotPrefab>
     protected override void Awake()
     {
         base.Awake();
-        m_slotSize = pool.prefab.GetComponent<RectTransform>().sizeDelta * m_lineThick;
+        // m_slotSize = pool.prefab.GetComponent<RectTransform>().sizeDelta * m_lineThick;
+        m_slotSize = pool.prefab.GetComponent<RectTransform>().sizeDelta;
         m_widthUnit = m_slotSize.x * CONST.HEXAGON_WIDTH_RATIO;
     }
 
