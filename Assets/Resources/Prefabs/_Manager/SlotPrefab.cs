@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Pattern.Managers;
 using Pattern.Configs;
+using DG.Tweening;
 
 public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler, IPointerUpHandler, IPointerClickHandler, IParent<BallPrefab>/*, IAttributedParent<BallPrefab>*/
 {
@@ -22,6 +23,9 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
     {
         GetComponent<Image>().raycastTarget = true;
     }
+
+    public void PunchScale()
+        => Child.transform.DOPunchScale(Vector3.one * .2f, CONST.DURATION_WAIT_MATCH_BALL, 1, 1);
 
     public PatternHandler SetPatternHandler
     {
@@ -54,6 +58,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
 
         if (m_pattern.Begin(this).Equals(AddBall.add))
         {
+            PunchScale();
             m_beginAction?.Invoke();
             Activate = true;
         }
@@ -70,6 +75,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
                 m_removeAction?.Invoke();
                 return;
             case AddBall.add:
+                PunchScale();
                 m_addAction?.Invoke();
                 Vibrate.Do(CONST.DURATION_VIBRATE_ADD);
                 return;

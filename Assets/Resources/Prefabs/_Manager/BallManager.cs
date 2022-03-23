@@ -31,6 +31,12 @@ public class BallManager : ManagedPool<BallPrefab>
     public Dictionary<int, BallPrefab> Data
         => dictionary;
 
+    public void ToPunch(List<SlotPrefab> list)
+    {
+        foreach (var e in list)
+            e.PunchScale();
+    }
+
     public void DropAndClear()
     {
         foreach (var pair in dictionary)

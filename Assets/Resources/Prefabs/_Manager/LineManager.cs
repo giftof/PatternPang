@@ -1,9 +1,6 @@
 using System.Linq;
 using System.Collections.Generic;
-using UnityEngine;
 using Pattern.Managers;
-using Pattern.Configs;
-using DG.Tweening;
 
 public class LineManager : ManagedPool<LinePrefab>
 {
@@ -50,13 +47,7 @@ public class LineManager : ManagedPool<LinePrefab>
 
         list.Select((e, index) => (e, index)).Where(pair => {
             unit.line.SetPosition(pair.index, pair.e.transform.position);
-            // pair.e.Child.transform.DOScale(Vector3.one * 1.2f, CONST.DURATION_WAIT_MATCH_BALL);
-            pair.e.Child.transform.DOPunchScale(Vector3.one * .5f, CONST.DURATION_WAIT_MATCH_BALL, 1, 1);
             return false;
         }).ToArray();
-        // for (int i = 0; i < list.Count; ++i)
-        // {
-        //     unit.line.SetPosition(i, list[i].transform.position);
-        // }
     }
 }

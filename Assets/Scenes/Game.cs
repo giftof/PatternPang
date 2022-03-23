@@ -16,7 +16,6 @@ public class Game : MonoBehaviour
      * TEMP Begin
      */
     [SerializeField] Button m_generate;
-    [SerializeField] Button m_re;
     [SerializeField] Text m_score;
     [SerializeField] Image m_progressBar;
     [SerializeField] EventSystem m_eventSystem;
@@ -44,7 +43,6 @@ public class Game : MonoBehaviour
         SetDefaultTimer();
         SetButtonAction();
         SafeScreen();
-        m_gameLogic.InitGame();
 
         TEST_SAFE_SCREEN();
     }
@@ -85,10 +83,14 @@ public class Game : MonoBehaviour
 
     private void SetButtonAction()
     {
-        m_generate.onClick.AddListener(m_gameLogic.CreateGame);
-        m_generate.onClick.AddListener(SetDefaultTimer);
-        m_generate.onClick.AddListener(BeginTimer);
-        m_re.onClick.AddListener(m_gameLogic.ClearBall);
+        m_generate.onClick.AddListener( () => {
+            if (m_gameLogic.Finish)
+            {
+                m_gameLogic.CreateGame();
+                SetDefaultTimer();
+                BeginTimer();
+            }
+        } );
     }
 
     private void SetDefaultTimer()

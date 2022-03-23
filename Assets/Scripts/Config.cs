@@ -23,7 +23,9 @@ namespace Pattern.Configs
         public static readonly float DURATION_WAIT_FILL_BALL = .1f;
         public static readonly float DURATION_WAIT_MATCH_BALL = .4f;
         public static readonly float DURATION_BOMB_STEP = .1f;
+        public static readonly float DURATION_COMBO = 3f;
 
+        public static readonly float COMBOBOX_FLOATING_DISTANCE = 30f;
         public static readonly int SCORE_BOMB = 5;
         public static readonly int BONUS_TIMER_BEGIN_VALUE = 0;
 

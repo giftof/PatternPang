@@ -17,6 +17,7 @@ public class GameLogic : MonoBehaviour
     [SerializeField] CoverManager m_coverHandler;
     [SerializeField] BulletManager m_bulletHandler;
     [SerializeField] CharactorManager m_charactorHandler;
+    [SerializeField] ComboManager m_comboHandler;
 
     private PatternHandler m_patternHandler;
     private int m_matchCount;
@@ -29,10 +30,11 @@ public class GameLogic : MonoBehaviour
     private bool[] m_isWorking;
 
     public int Score { get; private set; } = 0;
-    public bool Finish = false;
+    public bool Finish { get; set; } = true;
     public int BonusTimeSecond;
 
-    private void Awake()
+    // private void Awake()
+    private void Start()
     {
         m_patternHandler = new PatternHandler();
         m_patternHandler.InputEnd = FinishDrag;
@@ -44,20 +46,10 @@ public class GameLogic : MonoBehaviour
         m_boardHandler.SetRemoveAction = m_lineHandler.Remove;
         m_coverHandler.transform.localScale = m_boardHandler.transform.localScale;
 
-        m_charactorHandler.Request(m_charactorHandler.transform);
-    }
+        CharactorPrefab c = m_charactorHandler.Request(m_charactorHandler.transform);
+Debug.LogWarning($"c = {c?.name}");
 
-    public void InitGame()
-    {
-        int height = m_boardHandler.Size.Column;
-        m_boardHandler.Create();
-        m_bottomArray = m_boardHandler.Data
-                        .OrderBy(e => e.Value.id)
-                        .Where(e => e.Value.id % height == 0)
-                        .Select(e => e.Value)
-                        .ToArray();
-        m_board = m_boardHandler.Data.OrderBy(e => e.Value.id).Select(e => e.Value).ToArray();
-        m_isWorking = new bool[m_bottomArray.Length];
+        InitGame();
     }
 
     public void CreateGame()
@@ -134,6 +126,19 @@ public class GameLogic : MonoBehaviour
     }
 
     /* complicated functions... can be simple? */
+    private void InitGame()
+    {
+        int height = m_boardHandler.Size.Column;
+        m_boardHandler.Create();
+        m_bottomArray = m_boardHandler.Data
+                        .OrderBy(e => e.Value.id)
+                        .Where(e => e.Value.id % height == 0)
+                        .Select(e => e.Value)
+                        .ToArray();
+        m_board = m_boardHandler.Data.OrderBy(e => e.Value.id).Select(e => e.Value).ToArray();
+        m_isWorking = new bool[m_bottomArray.Length];
+    }
+
     private void RequestBall()
     {
         if (Finish)
@@ -182,14 +187,15 @@ public class GameLogic : MonoBehaviour
         {
             foreach (var e in m)
             {
-                e.Reverse();
                 if (e.First().id.Equals(m_first?.id))
                     m_first = null;
                 else
                 {
                     yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_MATCH_BALL);
                     UpdateScore();
+                    m_comboHandler.Display(e.First().transform, m_matchCount);
                     m_lineHandler.ToLine(e);
+                    m_ballHandler.ToPunch(e);
                 }
             }
             yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_REMOVE);
@@ -203,8 +209,6 @@ public class GameLogic : MonoBehaviour
 
     private void ShootAndDispose(List<List<SlotPrefab>> l)
     {
-        // var g = l.SelectMany(e1 => e1.Select(e2 => e2)).GroupBy(e => e.id).ToList();
-
         foreach (var e in l.SelectMany(e1 => e1.Select(e2 => e2)).GroupBy(e => e.id))
         {
             ShootBullet(e);
@@ -230,7 +234,8 @@ public class GameLogic : MonoBehaviour
                     where hit != null && hit.Generate == null && hit.Child.BallColor.Equals(origin.Child.BallColor)
                     select hit)
                     .Reverse().ToList();
-        list.Add(origin);                        
+        list.Add(origin);
+        list.Reverse();
 
         if (list.Count > m_shape.Length)
             return list;
