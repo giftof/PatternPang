@@ -17,7 +17,8 @@ public class BoardManager : ManagedPool<SlotPrefab>
 
     private Vector2 m_slotSize;
     private float m_widthUnit;
-    private float m_lineThick = 0.93f;
+    private float m_lineThick = 1f;
+    // private float m_lineThick = 0.93f;
     /*private float m_lineThick = 1;*/
 
     public (uint Row, uint Column) Size { get; set; } = (0, 0);
@@ -95,6 +96,7 @@ public class BoardManager : ManagedPool<SlotPrefab>
                 slot.SetAddAction = m_addAction;
                 slot.SetRemoveAction = m_removeAction;
                 slot.SetBombAction = m_bombAction;
+// Debug.Log($"height = {m_slotSize.y}");
                 currentPosition += Vector3.up * m_slotSize.y;
                 slot.name = slot.GetInstanceID().ToString(); /* for test */
 
