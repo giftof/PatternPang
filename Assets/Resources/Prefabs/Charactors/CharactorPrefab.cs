@@ -12,7 +12,7 @@ public class CharactorPrefab : MonoBehaviour
     {
         baseRect = GetComponent<RectTransform>();
         jumpSize = Vector2.one * 30;
-        duration = .5f;
+        duration = .3f;
     }
 
     public Vector3 Position

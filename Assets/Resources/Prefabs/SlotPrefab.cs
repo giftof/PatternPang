@@ -13,7 +13,7 @@ public class SlotPrefab : MonoBehaviour, IPointerDownHandler, IPointerEnterHandl
     private DELEGATE_T<SlotPrefab> m_bombAction;
     private PatternHandler m_pattern;
 
-    public uint id;
+    public int id;
     public BallPrefab Child { get; set; } = null;
     public T_DELEGATE_T<bool, SlotPrefab> Generate;
     public static bool Activate = false;

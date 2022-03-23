@@ -15,7 +15,6 @@ public class GameLogic : MonoBehaviour
     [SerializeField] BallManager m_ballHandler;
     [SerializeField] LineManager m_lineHandler;
     [SerializeField] CoverManager m_coverHandler;
-    [SerializeField] BombHandler m_bombHandler;
     [SerializeField] BulletManager m_bulletHandler;
     [SerializeField] CharactorManager m_charactorHandler;
 
@@ -25,6 +24,7 @@ public class GameLogic : MonoBehaviour
     private int m_modeScore; // nameing is suck
     private SlotPrefab[] m_bottomArray;
     private SlotPrefab[] m_board;
+    private SlotPrefab m_first = null;
     private Vector3[] m_shape = null;
     private bool[] m_isWorking;
 
@@ -39,22 +39,17 @@ public class GameLogic : MonoBehaviour
 
         m_lineHandler.SetPatternHandler = m_patternHandler;
         m_boardHandler.SetPatternHandler = m_patternHandler;
-        m_boardHandler.SetBombAction = Bomb;
         m_boardHandler.SetBeginAction = m_lineHandler.Begin;
         m_boardHandler.SetAddAction = m_lineHandler.Append;
         m_boardHandler.SetRemoveAction = m_lineHandler.Remove;
         m_coverHandler.transform.localScale = m_boardHandler.transform.localScale;
 
-        m_bombHandler.d_bomb = Bomb;
-        m_bombHandler.d_score = BombScore;
-        m_bombHandler.d_request = RequestBall;
-
-        CharactorPrefab charactor = m_charactorHandler.Request(m_charactorHandler.transform);
+        m_charactorHandler.Request(m_charactorHandler.transform);
     }
 
     public void InitGame()
     {
-        uint height = m_boardHandler.Size.Column;
+        int height = m_boardHandler.Size.Column;
         m_boardHandler.Create();
         m_bottomArray = m_boardHandler.Data
                         .OrderBy(e => e.Value.id)
@@ -75,15 +70,6 @@ public class GameLogic : MonoBehaviour
         RequestBall();
     }
 
-    public void ClearGame()
-    {
-        m_lineHandler.Clear();
-        m_boardHandler.Clear();
-        m_patternHandler.Clear();
-        m_coverHandler.Clear();
-        SlotPrefab.Activate = false;
-    }
-
     public void ClearBall()
     {
         m_lineHandler.Clear();
@@ -96,82 +82,55 @@ public class GameLogic : MonoBehaviour
     /*
      * privates... complicated functions...
      */
-    private void Bomb(SlotPrefab slot)
-    {
-        if (slot.Generate != null || slot.Child == null) { return; }
-
-        switch (slot.Child.BallColor)
-        {
-            case SlotAttribute.bomb1:
-                m_eventSystem.enabled = false;
-                StartCoroutine(m_bombHandler.DisposeBomb1(slot));
-                break;
-            case SlotAttribute.bomb2:
-                m_eventSystem.enabled = false;
-                StartCoroutine(m_bombHandler.DisposeBomb3(slot));
-                break;
-            case SlotAttribute.bomb3:
-                m_eventSystem.enabled = false;
-                StartCoroutine(m_bombHandler.DisposeBomb4(slot));
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void BombScore()
-        => Score += CONST.SCORE_BOMB;
-
     private int UnitScore
         => m_patternHandler.Selected().Select((e, index) => (e, index)).Sum(p => p.index) + m_patternHandler.Selected().Count();
 
     private int ModeScore
         => m_patternHandler.Selected().Count - (int)CONST.MIN_SELECT;
 
+    private void UpdateScore()
+        => Score += m_unitScore * Multi(++m_matchCount, m_modeScore);
+
     private void FinishDrag()
     {
         m_unitScore = UnitScore;
         m_modeScore = ModeScore;
+        m_first = m_patternHandler.First();
         m_shape = m_patternHandler.ShapeOffset();
         m_matchCount = 0;
-        m_lineHandler.Clear();
-        
-        StartCoroutine(DisposeMatch());
+
+        if (m_shape == null)
+            m_lineHandler.Clear();
+        else
+        {
+            m_eventSystem.enabled = false;
+            UpdateScore();
+            StartCoroutine(DisposeSequenceMatch());
+        }
     }
 
-    private void ShootBullet(IGrouping<int, SlotPrefab> key)
+    private void ReleaseEventsystem()
     {
-        SlotPrefab slot = m_boardHandler.Data[key.Key];
+        m_eventSystem.enabled = true;
+        m_first = null;
+        m_shape = null;
+    }
+
+    private void ShootBullet(IGrouping<int, SlotPrefab> group)
+    {
+        SlotPrefab slot = group.First();
 
         BulletPrefab bullet = m_bulletHandler.Request();
         bullet.transform.position = slot.transform.position;
         m_bulletHandler.Move(bullet, m_charactorHandler.First());
     }
 
-    private void DisposeMatchBall(IGrouping<int, SlotPrefab> key)
+    private void DisposeShootingBall(IGrouping<int, SlotPrefab> group)
     {
-        SlotPrefab slot = m_boardHandler.Data[key.Key];
-        int matchCount = key.Count();
+        SlotPrefab slot = group.First();
 
         m_ballHandler.Release(slot.Child);
         slot.Child = null;
-
-        // switch (matchCount)
-        // {
-        //     case 1:
-        //         m_ballHandler.Release(slot.Child);
-        //         slot.Child = null;
-        //         break;
-        //     case 2:
-        //         slot.Child.BallColor = SlotAttribute.bomb1;
-        //         break;
-        //     case 3:
-        //         slot.Child.BallColor = SlotAttribute.bomb2;
-        //         break;
-        //     default:
-        //         slot.Child.BallColor = SlotAttribute.bomb3;
-        //         break;
-        // }
     }
 
     /* complicated functions... can be simple? */
@@ -206,76 +165,74 @@ public class GameLogic : MonoBehaviour
             if (count > 0)
                 RequestBall();
             else
-                StartCoroutine(DisposeMatch());
+                StartCoroutine(DisposeSequenceMatch());
         }).Play();
     }
 
-    /* complicated functions... can be simple? */
-    IEnumerator DisposeMatch()
+    IEnumerator DisposeSequenceMatch()
     {
         if (m_shape == null)
         {
-            m_eventSystem.enabled = true;
+            ReleaseEventsystem();
             yield break;
         }
 
-        m_eventSystem.enabled = false;
-
-        List<SlotPrefab> matchedList = Matched();
-        var group = matchedList.GroupBy(e => e.GetInstanceID());
-
-        if (group.Count().Equals(0))
+        List<List<SlotPrefab>> m = Match();
+        if (m.Count > 0)
         {
-            if (!Finish)
+            foreach (var e in m)
             {
-                m_shape = null;
-                m_eventSystem.enabled = true;
+                e.Reverse();
+                if (e.First().id.Equals(m_first?.id))
+                    m_first = null;
+                else
+                {
+                    yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_MATCH_BALL);
+                    UpdateScore();
+                    m_lineHandler.ToLine(e);
+                }
             }
-        }
-        else
-        {
             yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_REMOVE);
-
             m_lineHandler.Clear();
-            foreach (var key in group)
-            {
-                ShootBullet(key);
-                DisposeMatchBall(key);
-            }
-
-            yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_FILL_BALL);
+            ShootAndDispose(m);
             RequestBall();
         }
+        else
+            ReleaseEventsystem();
     }
 
-    private List<SlotPrefab> Matched()
+    private void ShootAndDispose(List<List<SlotPrefab>> l)
     {
-        return m_boardHandler.Data
-            .Select(e => DrawMatchedElement(e.Value, m_shape))
-            .Where(list => list != null)
-            .SelectMany(list => {
-                Score += m_unitScore * Multi(++m_matchCount, m_modeScore);
-                m_lineHandler.ToLine(list);
-                return list.Select(e => e);
-            })
-            .ToList();
+        // var g = l.SelectMany(e1 => e1.Select(e2 => e2)).GroupBy(e => e.id).ToList();
+
+        foreach (var e in l.SelectMany(e1 => e1.Select(e2 => e2)).GroupBy(e => e.id))
+        {
+            ShootBullet(e);
+            DisposeShootingBall(e);
+        }
     }
-    
-    private List<SlotPrefab> DrawMatchedElement(SlotPrefab origin, Vector3[] offsetArray)
+
+    private List<List<SlotPrefab>> Match()
+        => (from e in m_boardHandler.Data
+            let line = DrawMatchedElement(e.Value)
+            where line != null
+            select line).ToList();
+
+    private List<SlotPrefab> DrawMatchedElement(SlotPrefab origin)
     {
         Vector3 position = origin.transform.position;
 
         if (origin.Generate != null)
             return null;
 
-        var list = (from offset in offsetArray
+        var list = (from offset in m_shape
                     let hit = Ray.Instance.Shot(position -= offset)
-                    where hit != null && hit.Generate == null && !hit.Child.IsBomb() && hit.Child.BallColor.Equals(origin.Child.BallColor)
+                    where hit != null && hit.Generate == null && hit.Child.BallColor.Equals(origin.Child.BallColor)
                     select hit)
                     .Reverse().ToList();
         list.Add(origin);                        
 
-        if (list.Count > offsetArray.Length)
+        if (list.Count > m_shape.Length)
             return list;
         return null;
     }

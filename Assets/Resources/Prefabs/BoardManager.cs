@@ -13,14 +13,14 @@ public class BoardManager : ManagedPool<SlotPrefab>
     private Action m_beginAction;
     private Action m_addAction;
     private Action m_removeAction;
-    private DELEGATE_T<SlotPrefab> m_bombAction;
+    // private DELEGATE_T<SlotPrefab> m_bombAction;
 
     private Vector2 m_slotSize;
     private float m_widthUnit;
-    private float m_lineThick = 1f;
+    // private float m_lineThick = 1f;
     // private float m_lineThick = 0.93f;
 
-    public (uint Row, uint Column) Size { get; set; } = (0, 0);
+    public (int Row, int Column) Size { get; set; } = (0, 0);
     public BallManager ballManager;
 
     protected override void Awake()
@@ -36,10 +36,10 @@ public class BoardManager : ManagedPool<SlotPrefab>
         set => m_patternHandler = value;
     }
 
-    public DELEGATE_T<SlotPrefab> SetBombAction
-    {
-        set => m_bombAction = value;
-    }
+    // public DELEGATE_T<SlotPrefab> SetBombAction
+    // {
+    //     set => m_bombAction = value;
+    // }
 
     public Action SetRemoveAction
     {
@@ -84,10 +84,10 @@ public class BoardManager : ManagedPool<SlotPrefab>
         Vector3 beginPosition = (Size.Row - 1) * .5f * m_widthUnit * Vector3.left;
         Vector3 currentPosition = beginPosition;
 
-        for (uint w = 0; w < Size.Row; ++w)
+        for (int w = 0; w < Size.Row; ++w)
         {
             currentPosition += m_slotSize.y * Vector3.up * (IsHalfFloating(w) ? 1 : .5f);
-            for (uint h = 0; h < Size.Column; ++h)
+            for (int h = 0; h < Size.Column; ++h)
             {
                 SlotPrefab slot = Request(transform, currentPosition);
                 slot.id = Size.Column * w + h;
@@ -95,7 +95,7 @@ public class BoardManager : ManagedPool<SlotPrefab>
                 slot.SetBeginAction = m_beginAction;
                 slot.SetAddAction = m_addAction;
                 slot.SetRemoveAction = m_removeAction;
-                slot.SetBombAction = m_bombAction;
+                // slot.SetBombAction = m_bombAction;
 // Debug.Log($"height = {m_slotSize.y}");
                 currentPosition += Vector3.up * m_slotSize.y;
                 slot.name = slot.GetInstanceID().ToString(); /* for test */
@@ -144,6 +144,6 @@ public class BoardManager : ManagedPool<SlotPrefab>
         CONST.DIRECTION_OFFSET[5] = up * .5f - right;
     }
 
-    private bool IsHalfFloating(uint row)
+    private bool IsHalfFloating(int row)
         => row % 2 == CONST.EVEN_COLUMN_UP;
 }

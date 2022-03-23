@@ -4,7 +4,7 @@ using Pattern.Configs;
 
 public class BallManager : ManagedPool<BallPrefab>
 {
-    public uint BallVariation { get; set; } = 0;
+    public int BallVariation { get; set; } = 0;
 
     protected override void Awake()
         => base.Awake();
