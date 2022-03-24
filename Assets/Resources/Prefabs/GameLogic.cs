@@ -23,31 +23,29 @@ public class GameLogic : MonoBehaviour
     private int m_matchCount;
     private int m_unitScore; // nameing is suck
     private int m_modeScore; // nameing is suck
-    private SlotPrefab[] m_bottomArray;
     private SlotPrefab[] m_board;
     private SlotPrefab m_first = null;
     private Vector3[] m_shape = null;
-    private bool[] m_isWorking;
 
     public int Score { get; private set; } = 0;
     public bool Finish { get; set; } = true;
     public int BonusTimeSecond;
 
-    // private void Awake()
     private void Start()
     {
         m_patternHandler = new PatternHandler();
         m_patternHandler.InputEnd = FinishDrag;
 
         m_lineHandler.SetPatternHandler = m_patternHandler;
+
         m_boardHandler.SetPatternHandler = m_patternHandler;
         m_boardHandler.SetBeginAction = m_lineHandler.Begin;
         m_boardHandler.SetAddAction = m_lineHandler.Append;
         m_boardHandler.SetRemoveAction = m_lineHandler.Remove;
+
         m_coverHandler.transform.localScale = m_boardHandler.transform.localScale;
 
-        CharactorPrefab c = m_charactorHandler.Request(m_charactorHandler.transform);
-Debug.LogWarning($"c = {c?.name}");
+        m_charactorHandler.Request(m_charactorHandler.transform);
 
         InitGame();
     }
@@ -89,6 +87,7 @@ Debug.LogWarning($"c = {c?.name}");
         m_modeScore = ModeScore;
         m_first = m_patternHandler.First();
         m_shape = m_patternHandler.ShapeOffset();
+        m_patternHandler.Clear();
         m_matchCount = 0;
 
         if (m_shape == null)
@@ -97,7 +96,8 @@ Debug.LogWarning($"c = {c?.name}");
         {
             m_eventSystem.enabled = false;
             UpdateScore();
-            StartCoroutine(DisposeSequenceMatch());
+            m_comboHandler.Display(m_first.transform, m_matchCount);
+            StartCoroutine(DisposeSequentialPattern());
         }
     }
 
@@ -110,14 +110,12 @@ Debug.LogWarning($"c = {c?.name}");
 
     private void ShootBullet(IGrouping<int, SlotPrefab> group)
     {
-        SlotPrefab slot = group.First();
-
         BulletPrefab bullet = m_bulletHandler.Request();
-        bullet.transform.position = slot.transform.position;
+        bullet.transform.position = group.First().transform.position;
         m_bulletHandler.Move(bullet, m_charactorHandler.First());
     }
 
-    private void DisposeShootingBall(IGrouping<int, SlotPrefab> group)
+    private void DisposePatternedBall(IGrouping<int, SlotPrefab> group)
     {
         SlotPrefab slot = group.First();
 
@@ -130,13 +128,7 @@ Debug.LogWarning($"c = {c?.name}");
     {
         int height = m_boardHandler.Size.Column;
         m_boardHandler.Create();
-        m_bottomArray = m_boardHandler.Data
-                        .OrderBy(e => e.Value.id)
-                        .Where(e => e.Value.id % height == 0)
-                        .Select(e => e.Value)
-                        .ToArray();
         m_board = m_boardHandler.Data.OrderBy(e => e.Value.id).Select(e => e.Value).ToArray();
-        m_isWorking = new bool[m_bottomArray.Length];
     }
 
     private void RequestBall()
@@ -170,11 +162,11 @@ Debug.LogWarning($"c = {c?.name}");
             if (count > 0)
                 RequestBall();
             else
-                StartCoroutine(DisposeSequenceMatch());
+                StartCoroutine(DisposeSequentialPattern());
         }).Play();
     }
 
-    IEnumerator DisposeSequenceMatch()
+    IEnumerator DisposeSequentialPattern()
     {
         if (m_shape == null)
         {
@@ -182,7 +174,7 @@ Debug.LogWarning($"c = {c?.name}");
             yield break;
         }
 
-        List<List<SlotPrefab>> m = Match();
+        List<List<SlotPrefab>> m = Pattern();
         if (m.Count > 0)
         {
             foreach (var e in m)
@@ -194,11 +186,12 @@ Debug.LogWarning($"c = {c?.name}");
                     yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_MATCH_BALL);
                     UpdateScore();
                     m_comboHandler.Display(e.First().transform, m_matchCount);
+                    m_lineHandler.Clear();
                     m_lineHandler.ToLine(e);
                     m_ballHandler.ToPunch(e);
                 }
             }
-            yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_REMOVE);
+            yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_MATCH_BALL);
             m_lineHandler.Clear();
             ShootAndDispose(m);
             RequestBall();
@@ -212,17 +205,17 @@ Debug.LogWarning($"c = {c?.name}");
         foreach (var e in l.SelectMany(e1 => e1.Select(e2 => e2)).GroupBy(e => e.id))
         {
             ShootBullet(e);
-            DisposeShootingBall(e);
+            DisposePatternedBall(e);
         }
     }
 
-    private List<List<SlotPrefab>> Match()
+    private List<List<SlotPrefab>> Pattern()
         => (from e in m_boardHandler.Data
-            let line = DrawMatchedElement(e.Value)
+            let line = DrawPatternedElement(e.Value)
             where line != null
             select line).ToList();
 
-    private List<SlotPrefab> DrawMatchedElement(SlotPrefab origin)
+    private List<SlotPrefab> DrawPatternedElement(SlotPrefab origin)
     {
         Vector3 position = origin.transform.position;
 
@@ -233,12 +226,14 @@ Debug.LogWarning($"c = {c?.name}");
                     let hit = Ray.Instance.Shot(position -= offset)
                     where hit != null && hit.Generate == null && hit.Child.BallColor.Equals(origin.Child.BallColor)
                     select hit)
-                    .Reverse().ToList();
-        list.Add(origin);
-        list.Reverse();
+                    .ToList();
 
-        if (list.Count > m_shape.Length)
+        if (list.Count.Equals(m_shape.Length))
+        {
+            list.Insert(0, origin);
             return list;
+        }
+
         return null;
     }
 

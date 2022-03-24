@@ -13,8 +13,6 @@ public class BallPrefab : MonoBehaviour
                                                     Color.white, Color.white, Color.white};
     private SlotAttribute m_color { get; set; }
 
-    public bool IsWorking { get; private set; }
-
     public SlotAttribute BallColor
     {
         get => m_color;
@@ -38,13 +36,10 @@ public class BallPrefab : MonoBehaviour
 
     public void Drop<T>(DELEGATE_T<T> finishAction, T obj)
     {
-        IsWorking = true;
-        transform.DOMoveY(transform.position.y - CONST.TEMP_DROP_DISTANCE, CONST.DURATION_MOVE * CONST.TEMP_DROP_DISTANCE)
+        transform
+            .DOMoveY(transform.position.y - CONST.TEMP_DROP_DISTANCE, CONST.DURATION_MOVE * CONST.TEMP_DROP_DISTANCE)
             .SetUpdate(true)
-            .OnComplete(() => {
-                finishAction?.Invoke(obj);
-                IsWorking = false;
-            });
+            .OnComplete(() => { finishAction?.Invoke(obj); });
     }
 
     public bool IsBomb()

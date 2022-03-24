@@ -10,7 +10,8 @@ namespace Pattern.Configs
         public static readonly int GENERATOR_LINE = 1;
         public static readonly int EVEN_COLUMN_UP = 1;
         public static readonly int TEMP_DROP_DISTANCE = 9;
-        public static readonly float LINE_WIDTH = .1f;
+        // public static readonly float LINE_WIDTH = .1f;
+        public static readonly float LINE_WIDTH = .8f;
         public static readonly float HEXAGON_WIDTH_RATIO = .75f;
 
         public static readonly float DURATION_MOVE = .18f;
