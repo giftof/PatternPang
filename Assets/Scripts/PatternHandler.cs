@@ -38,7 +38,7 @@ public class PatternHandler {
             return AddBall.none;
         
         /* is roll-back? */
-        if (m_selected.Count > 1 && slot.Equals(Ray.Instance.Shot(m_selected.First.Next.Value.transform.position))) {
+        if (m_selected.Count > 1 && slot.Equals(Ray.Instance.Shoot(m_selected.First.Next.Value.transform.position))) {
             m_selected.RemoveFirst();
             return AddBall.remove;
         }

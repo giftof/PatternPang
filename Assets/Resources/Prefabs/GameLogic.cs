@@ -173,7 +173,7 @@ public class GameLogic: MonoBehaviour {
         foreach(var e in m_board) {
             SlotPrefab upper = Ray
                 .Instance
-                .Shot(e.transform.position + CONST.DIRECTION_OFFSET[(int)ClockWise.up]);
+                .Shoot(e.transform.position + CONST.DIRECTION_OFFSET[(int)ClockWise.up]);
             if (upper == null) {
                 if (e.Generate(e)) 
                     flag = true;
@@ -243,7 +243,7 @@ public class GameLogic: MonoBehaviour {
             return null;
         
         var list = (
-            from offset in m_shape let hit = Ray.Instance.Shot(position -= offset)where hit != null && hit.Generate == null && hit.Child.BallColor.Equals(origin.Child.BallColor)select hit
+            from offset in m_shape let hit = Ray.Instance.Shoot(position -= offset)where hit != null && hit.Generate == null && hit.Child.BallColor.Equals(origin.Child.BallColor)select hit
         ).ToList();
 
         if (list.Count.Equals(m_shape.Length)) {

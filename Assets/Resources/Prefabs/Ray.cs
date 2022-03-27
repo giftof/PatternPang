@@ -7,7 +7,7 @@ public class Ray : MonoBehaviour
     private void Awake()
         => Instance = this;
 
-    public SlotPrefab Shot(Vector3 position)
+    public SlotPrefab Shoot(Vector3 position)
     {
         RaycastHit2D hit;
 
