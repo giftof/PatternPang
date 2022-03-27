@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Pattern.Configs;
 
 public class BallManager : ManagedPool<BallPrefab>
 {
