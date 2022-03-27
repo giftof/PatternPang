@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class LineManager: ManagedPool<LinePrefab> {
     private LinePrefab m_currentLine;

@@ -9,8 +9,7 @@ IPointerDownHandler,
 IPointerEnterHandler,
 IPointerUpHandler,
 IPointerClickHandler,
-IParent<BallPrefab>
-{
+IParent<BallPrefab> {
     private Action m_beginAction;
     private Action m_addAction;
     private Action m_removeAction;
@@ -67,9 +66,9 @@ IParent<BallPrefab>
     }
 
     public void OnPointerEnter(PointerEventData eventData) {
-        if (!Activate)
+        if (!Activate) 
             return;
-
+        
         switch (m_pattern.Append(this)) {
             case AddBall.remove:
                 m_removeAction
@@ -87,10 +86,8 @@ IParent<BallPrefab>
     public void OnPointerUp(PointerEventData eventData) {
         if (Activate && Input.touchCount <= 1) {
             m_pattern
-                ?
-                        .InputEnd
-                        ?
-                        .Invoke();
+                ?.InputEnd
+                ?.Invoke();
             Activate = false;
         }
     }
