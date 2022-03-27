@@ -5,10 +5,10 @@ using UnityEngine.EventSystems;
 using DG.Tweening;
 
 public class Game: MonoBehaviour {
+    private Canvas m_canvas;
     [SerializeField] GameLogic m_gameLogic;
     [SerializeField] Button m_generate;
-    [SerializeField] Text m_score;
-    [SerializeField] Image m_progressBar;
+    [SerializeField] ScoreBar m_progressBar;
     [SerializeField] EventSystem m_eventSystem;
     [SerializeField] GameObject m_gameOverPannel;
     [SerializeField] GameObject m_fullBackground;
@@ -18,12 +18,22 @@ public class Game: MonoBehaviour {
     private float m_fillAmount;
 
     void Awake() {
-        Ray ray = Instantiate(Resources.Load<Ray>("Prefabs/Ray"), m_safeBackground.transform);
+        m_canvas = Instantiate(Resources.Load<Canvas>("Prefabs/Canvas"));
+        m_canvas.worldCamera = Camera.main;
+
+        m_fullBackground = Instantiate(Resources.Load<GameObject>("Prefabs/Background"), m_canvas.transform);
+        m_safeBackground = Instantiate(Resources.Load<GameObject>("Prefabs/Background"), m_canvas.transform);
 
         m_eventSystem = (new GameObject()).AddComponent<EventSystem>();
         m_eventSystem.gameObject.AddComponent<StandaloneInputModule>();
 
+        m_gameLogic = Instantiate(Resources.Load<GameLogic>("Prefabs/GameLogic"), m_safeBackground.transform);
         m_gameLogic.EventSystem = m_eventSystem;
+
+        m_progressBar = Instantiate(Resources.Load<ScoreBar>("Prefabs/ScoreBar"), m_safeBackground.transform);
+        m_generate = Instantiate(Resources.Load<Button>("Prefabs/Button"), m_safeBackground.transform);
+
+        Instantiate(Resources.Load<Ray>("Prefabs/Ray"), m_safeBackground.transform);
     }
 
     void Start() {
@@ -70,13 +80,13 @@ public class Game: MonoBehaviour {
     }
 
     private void BeginTimer() {
-        m_progressBar.fillAmount = m_fillAmount;
+        m_progressBar.FillAmount = m_fillAmount;
 
         DOTween.Kill(m_progressBar.GetInstanceID());
         DOTween
             .To(
-                () => m_progressBar.fillAmount,
-                x => m_progressBar.fillAmount = x,
+                () => m_progressBar.FillAmount,
+                x => m_progressBar.FillAmount = x,
                 0,
                 m_timerDuration
             )
@@ -91,7 +101,7 @@ public class Game: MonoBehaviour {
     private void UpdateTimer() {
         float increment = 1 / CONST.DURATION_PLAY_TIME;
 
-        m_fillAmount = m_progressBar.fillAmount;
+        m_fillAmount = m_progressBar.FillAmount;
         m_fillAmount += increment * m_gameLogic.BonusTimeSecond;
         m_fillAmount = Mathf.Min(m_fillAmount, 1);
         m_timerDuration = CONST.DURATION_PLAY_TIME * m_fillAmount;
@@ -124,7 +134,7 @@ public class Game: MonoBehaviour {
         else 
             DOTween.Pause(m_progressBar.GetInstanceID());
         
-        m_score.text = m_gameLogic
+        m_progressBar.Score = m_gameLogic
             .Score
             .ToString();
     }

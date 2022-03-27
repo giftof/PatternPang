@@ -23,10 +23,7 @@ public class BoardManager: ManagedPool<SlotPrefab> {
     protected override void Awake() {
         base.Awake();
         pool.prefab = Resources.Load<GameObject>("Prefabs/_Manager/SlotPrefab");
-        m_slotSize = pool
-            .prefab
-            .GetComponent<RectTransform>()
-            .sizeDelta;
+        m_slotSize = pool.prefab.GetComponent<RectTransform>().sizeDelta;
         m_widthUnit = m_slotSize.x * CONST.HEXAGON_WIDTH_RATIO;
     }
 
@@ -54,7 +51,7 @@ public class BoardManager: ManagedPool<SlotPrefab> {
 
     public void ClearChild() {
         foreach(var pair in dictionary)
-        pair.Value.Child = null;
+            pair.Value.Child = null;
     }
 
     public void Create() {
@@ -97,39 +94,24 @@ public class BoardManager: ManagedPool<SlotPrefab> {
     }
 
     private void GeneratorCap(SlotPrefab cap) {
-        coverManager
-            .Request(coverManager.transform)
-            .transform
-            .position = cap.transform.position;
+        coverManager.Request(coverManager.transform).transform.position = cap.transform.position;
         cap.Generate = MakeChild;
     }
 
     private bool MakeChild(SlotPrefab slot) {
         if (slot.Child == null) {
-            slot.Child = ballManager.Request(
-                slot.transform.parent,
-                slot.transform.localPosition
-            );
+            slot.Child = ballManager.Request(slot.transform.parent, slot.transform.localPosition);
             return true;
         }
         return false;
     }
 
     private void UnitOffset() {
-        float ratio = dictionary
-            .First()
-            .Value
-            .transform
-            .localToWorldMatrix
-            .m00;
+        float ratio = dictionary.First().Value.transform.localToWorldMatrix.m00;
         Vector3 right = m_widthUnit * ratio * Vector3.right;
         Vector3 up = m_slotSize.y * ratio * Vector3.up;
 
-        float min = Mathf.Min(
-            up.y * 2,
-            right.x * 2,
-            Vector3.Distance(up * 1.5f + right, Vector3.zero)
-        );
+        float min = Mathf.Min(up.y * 2, right.x * 2, Vector3.Distance(up * 1.5f + right, Vector3.zero));
         float max = Mathf.Max(up.y, up.y * .5f + right.x);
 
         CONST.OFFSET = up.y;

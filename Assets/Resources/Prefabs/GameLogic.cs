@@ -126,7 +126,7 @@ public class GameLogic: MonoBehaviour {
             m_eventSystem.enabled = false;
             UpdateScore();
             m_comboHandler.Display(m_first.transform, m_matchCount);
-            StartCoroutine(DisposeSequentialPattern());
+            StartCoroutine(DisposePatternSequentially());
         }
     }
 
@@ -136,7 +136,7 @@ public class GameLogic: MonoBehaviour {
         m_shape = null;
     }
 
-    private void ShootBullet(IGrouping<int, SlotPrefab> group) {
+    private void FireBullet(IGrouping<int, SlotPrefab> group) {
         BulletPrefab bullet = m_bulletHandler.Request();
         bullet.transform.position = group
             .First()
@@ -152,7 +152,6 @@ public class GameLogic: MonoBehaviour {
         slot.Child = null;
     }
 
-    /* complicated functions... can be simple? */
     private void InitGame() {
         int height = m_boardHandler.Size.Column;
         m_boardHandler.Create();
@@ -168,7 +167,7 @@ public class GameLogic: MonoBehaviour {
             return;
         
         m_eventSystem.enabled = false;
-        int count = 0;
+        bool flag = false;
         Sequence sequence = DOTween.Sequence();
 
         foreach(var e in m_board) {
@@ -177,7 +176,7 @@ public class GameLogic: MonoBehaviour {
                 .Shot(e.transform.position + CONST.DIRECTION_OFFSET[(int)ClockWise.up]);
             if (upper == null) {
                 if (e.Generate(e)) 
-                    ++count;
+                    flag = true;
                 }
             else {
                 if (e.Child == null && upper.Child != null) {
@@ -189,16 +188,16 @@ public class GameLogic: MonoBehaviour {
 
         sequence
             .OnComplete(() => {
-                if (count > 0) 
+                if (flag)
                     RequestBall();
                 else 
-                    StartCoroutine(DisposeSequentialPattern());
+                    StartCoroutine(DisposePatternSequentially());
                 }
             )
             .Play();
     }
 
-    IEnumerator DisposeSequentialPattern() {
+    IEnumerator DisposePatternSequentially() {
         if (m_shape == null) {
             ReleaseEventsystem();
             yield break;
@@ -207,10 +206,7 @@ public class GameLogic: MonoBehaviour {
         List<List<SlotPrefab>> m = Pattern();
         if (m.Count > 0) {
             foreach(var e in m) {
-                if (e.First().id.Equals(
-                    m_first
-                        ?.id
-                )) 
+                if (e.First().id.Equals(m_first?.id)) 
                     m_first = null;
                 else {
                     yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_MATCH_BALL);
@@ -227,11 +223,11 @@ public class GameLogic: MonoBehaviour {
             RequestBall();
         } else 
             ReleaseEventsystem();
-        }
+    }
     
     private void ShootAndDispose(List<List<SlotPrefab>> l) {
         foreach(var e in l.SelectMany(e1 => e1.Select(e2 => e2)).GroupBy(e => e.id)) {
-            ShootBullet(e);
+            FireBullet(e);
             DisposePatternedBall(e);
         }
     }
@@ -261,7 +257,7 @@ public class GameLogic: MonoBehaviour {
     private int Multi(int count, int mode) {
         int rst = count * (int)Math.Pow(count * 2, mode);
 
-        if (1 < count) 
+        if (1 < count)
             BonusTimeSecond += mode;
         return rst;
     }
