@@ -5,6 +5,11 @@ using DG.Tweening;
 
 public class BulletManager : ManagedPool<BulletPrefab>
 {
+    protected override void Awake() {
+        base.Awake();
+        pool.prefab = Resources.Load<GameObject>("Prefabs/_Bullet/BulletPrefab");
+    }
+
     public void Move(BulletPrefab bullet, CharactorPrefab to)
     {
         float distance = Vector3.Distance(bullet.transform.position, to.transform.position) * .7f;

@@ -2,93 +2,52 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using Pattern.Tools;
 using DG.Tweening;
 
 public class Game: MonoBehaviour {
     [SerializeField] GameLogic m_gameLogic;
-    [SerializeField] BoardManager m_boardManager;
-
-    /*
-     * TEMP Begin
-     */
     [SerializeField] Button m_generate;
     [SerializeField] Text m_score;
     [SerializeField] Image m_progressBar;
     [SerializeField] EventSystem m_eventSystem;
     [SerializeField] GameObject m_gameOverPannel;
-    [SerializeField] Text m_screen;
-    [SerializeField] Text m_safeArea0;
-    [SerializeField] Text m_safeArea1;
-
-    [SerializeField] Text min;
-    [SerializeField] Text max;
-    [SerializeField] Text size;
-    /*
-     * TEMP End
-     */
-
     [SerializeField] GameObject m_fullBackground;
     [SerializeField] GameObject m_safeBackground;
 
     private float m_timerDuration;
     private float m_fillAmount;
 
+    void Awake() {
+        Ray ray = Instantiate(Resources.Load<Ray>("Prefabs/Ray"), m_safeBackground.transform);
+
+        m_eventSystem = (new GameObject()).AddComponent<EventSystem>();
+        m_eventSystem.gameObject.AddComponent<StandaloneInputModule>();
+
+        m_gameLogic.EventSystem = m_eventSystem;
+    }
+
     void Start() {
         SetGameLevel();
         SetDefaultTimer();
         SetButtonAction();
         SafeScreen();
-
-        TEST_SAFE_SCREEN();
     }
 
-    private void TEST_SAFE_SCREEN() {
-        RectTransform rect = m_safeBackground.GetComponent<RectTransform>();
-
-        m_screen.text = Screen
-            .width
-            .ToString() + "/" + Screen
-            .height
-            .ToString();
-        m_safeArea0.text = Screen
-            .safeArea
-            .min
-            .ToString();
-        m_safeArea1.text = Screen
-            .safeArea
-            .max
-            .ToString();
-
-        min.text = rect
-            .offsetMin
-            .ToString();
-        max.text = rect
-            .offsetMax
-            .ToString();
-        size.text = rect
-            .rect
-            .size
-            .ToString();
+    private void SetGameLevel() {
+        m_gameLogic.Size = CONST.SIZE75;
+        m_gameLogic.BallVariation = CONST.LEVEL3; // prefer is 1, 2
     }
 
     private void SafeScreen() {
         (Vector2 min, Vector2 max)safeArea = new SafeScreen().RectOffset();
-        RectTransform rect = m_safeBackground.GetComponent<RectTransform>();
+        RectTransform safeRect = m_safeBackground.GetComponent<RectTransform>();
         RectTransform fullRect = m_fullBackground.GetComponent<RectTransform>();
 
-        rect.offsetMin = safeArea.min;
-        rect.offsetMax = safeArea.max;
+        safeRect.offsetMin = safeArea.min;
+        safeRect.offsetMax = safeArea.max;
 
         fullRect.offsetMin = Vector2.zero;
         fullRect.offsetMax = Vector2.zero;
-    }
-
-    private void SetGameLevel() {
-        m_boardManager.Size = CONST.SIZE75;
-        m_boardManager.ballManager.BallVariation = CONST.LEVEL3; // prefer is 1, 2
-        // m_boardManager.Size = CONST.SIZE78; m_boardManager.ballManager.BallVariation
-        // = CONST.LEVEL4;  prefer is 1, 2
     }
 
     private void SetButtonAction() {
@@ -144,6 +103,7 @@ public class Game: MonoBehaviour {
     IEnumerator FIN() {
         m_eventSystem.enabled = false;
         m_gameOverPannel.SetActive(true);
+        m_gameOverPannel.transform.SetAsLastSibling();
 
         yield return new WaitForSecondsRealtime(.5f);
 

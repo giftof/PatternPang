@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BoardManager: ManagedPool<SlotPrefab> {
-    [SerializeField] BallManager m_ballHandler;
-    [SerializeField] CoverManager m_coverHandler;
     private PatternHandler m_patternHandler;
     private Action m_beginAction;
     private Action m_addAction;
@@ -13,15 +11,18 @@ public class BoardManager: ManagedPool<SlotPrefab> {
 
     private Vector2 m_slotSize;
     private float m_widthUnit;
+    public float ScaleRatio = 1.8f;
 
     public(int Row, int Column)Size {
         get;
         set;
     } = (0, 0);
     public BallManager ballManager;
+    public CoverManager coverManager;
 
     protected override void Awake() {
         base.Awake();
+        pool.prefab = Resources.Load<GameObject>("Prefabs/_Manager/SlotPrefab");
         m_slotSize = pool
             .prefab
             .GetComponent<RectTransform>()
@@ -81,7 +82,6 @@ public class BoardManager: ManagedPool<SlotPrefab> {
                 slot.SetBeginAction = m_beginAction;
                 slot.SetAddAction = m_addAction;
                 slot.SetRemoveAction = m_removeAction;
-                // slot.SetBombAction = m_bombAction; Debug.Log($"height = {m_slotSize.y}");
                 currentPosition += Vector3.up * m_slotSize.y;
                 slot.name = slot
                     .GetInstanceID()
@@ -97,8 +97,8 @@ public class BoardManager: ManagedPool<SlotPrefab> {
     }
 
     private void GeneratorCap(SlotPrefab cap) {
-        m_coverHandler
-            .Request(m_coverHandler.transform)
+        coverManager
+            .Request(coverManager.transform)
             .transform
             .position = cap.transform.position;
         cap.Generate = MakeChild;
@@ -106,7 +106,7 @@ public class BoardManager: ManagedPool<SlotPrefab> {
 
     private bool MakeChild(SlotPrefab slot) {
         if (slot.Child == null) {
-            slot.Child = m_ballHandler.Request(
+            slot.Child = ballManager.Request(
                 slot.transform.parent,
                 slot.transform.localPosition
             );

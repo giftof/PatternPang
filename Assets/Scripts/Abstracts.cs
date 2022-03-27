@@ -8,7 +8,11 @@ public abstract class ManagedPool<T> : MonoBehaviour where T : MonoBehaviour {
     public ObjectPool pool;
     protected Dictionary<int, T> dictionary;
 
-    protected virtual void Awake() => dictionary = new Dictionary<int, T>();
+    protected virtual void Awake() {
+        dictionary = new Dictionary<int, T>();
+        pool = (new GameObject("objectPool")).AddComponent<ObjectPool>();
+        pool.transform.SetParent(transform);
+    }
 
     public virtual void Release(T target) {
         dictionary.Remove(target.GetInstanceID());

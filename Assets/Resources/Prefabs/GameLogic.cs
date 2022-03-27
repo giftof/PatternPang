@@ -7,14 +7,14 @@ using UnityEngine.EventSystems;
 using DG.Tweening;
 
 public class GameLogic: MonoBehaviour {
-    [SerializeField] EventSystem m_eventSystem;
-    [SerializeField] BoardManager m_boardHandler;
-    [SerializeField] BallManager m_ballHandler;
-    [SerializeField] LineManager m_lineHandler;
-    [SerializeField] CoverManager m_coverHandler;
-    [SerializeField] BulletManager m_bulletHandler;
-    [SerializeField] CharactorManager m_charactorHandler;
-    [SerializeField] ComboManager m_comboHandler;
+    private EventSystem m_eventSystem;
+    private BoardManager m_boardHandler;
+    private BallManager m_ballHandler;
+    private LineManager m_lineHandler;
+    private CoverManager m_coverHandler;
+    private BulletManager m_bulletHandler;
+    private CharactorManager m_charactorHandler;
+    private ComboManager m_comboHandler;
 
     private PatternHandler m_patternHandler;
     private int m_matchCount;
@@ -34,6 +34,18 @@ public class GameLogic: MonoBehaviour {
     } = true;
     public int BonusTimeSecond;
 
+    private void Awake() {
+        m_ballHandler = Instantiate(Resources.Load<BallManager>("Prefabs/_Manager/BallManager"), transform.parent);
+        m_boardHandler = Instantiate(Resources.Load<BoardManager>("Prefabs/_Manager/BoardManager"), transform.parent);
+        m_lineHandler = Instantiate(Resources.Load<LineManager>("Prefabs/_Manager/LineManager"), transform.parent);
+        m_coverHandler = Instantiate(Resources.Load<CoverManager>("Prefabs/_Manager/CoverManager"), transform.parent);
+        m_bulletHandler = Instantiate(Resources.Load<BulletManager>("Prefabs/_Bullet/BulletManager"), transform.parent);
+        m_charactorHandler = Instantiate(Resources.Load<CharactorManager>("Prefabs/_Charactor/CharactorManager"), transform.parent);
+        m_comboHandler = Instantiate(Resources.Load<ComboManager>("Prefabs/_Manager/ComboManager"), transform.parent);
+        m_boardHandler.ballManager = m_ballHandler;
+        m_boardHandler.coverManager = m_coverHandler;
+    }
+
     private void Start() {
         m_patternHandler = new PatternHandler();
         m_patternHandler.InputEnd = FinishDrag;
@@ -50,6 +62,18 @@ public class GameLogic: MonoBehaviour {
         m_charactorHandler.Request(m_charactorHandler.transform);
 
         InitGame();
+    }
+
+    public EventSystem EventSystem {
+        set => m_eventSystem = value;
+    }
+
+    public (int Row, int Column)Size {
+        set => m_boardHandler.Size = value;
+    }
+
+    public int BallVariation {
+        set => m_ballHandler.BallVariation = value;
     }
 
     public void CreateGame() {

@@ -6,7 +6,10 @@ public class LineManager: ManagedPool<LinePrefab> {
     private LinePrefab m_currentLine;
     private PatternHandler m_patternHandler;
 
-    protected override void Awake() => base.Awake();
+    protected override void Awake() {
+        base.Awake();
+        pool.prefab = Resources.Load<GameObject>("Prefabs/_Manager/LinePrefab");
+    }
 
     public PatternHandler SetPatternHandler {
         set => m_patternHandler = value;

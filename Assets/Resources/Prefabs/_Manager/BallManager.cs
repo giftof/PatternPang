@@ -5,8 +5,10 @@ public class BallManager : ManagedPool<BallPrefab>
 {
     public int BallVariation { get; set; } = 0;
 
-    protected override void Awake()
-        => base.Awake();
+    protected override void Awake() {
+        base.Awake();
+        pool.prefab = Resources.Load<GameObject>("Prefabs/_Manager/BallPrefab");
+    }
 
     public override BallPrefab Request()
     {
