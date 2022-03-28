@@ -24,15 +24,10 @@ public class GameLogic: MonoBehaviour {
     private SlotPrefab m_first = null;
     private Vector3[] m_shape = null;
 
-    public int Score {
-        get;
-        private set;
-    } = 0;
-    public bool Finish {
-        get;
-        set;
-    } = true;
+    public int Score { get; private set; } = 0;
+    public bool Finish { get; set; } = true;
     public int BonusTimeSecond;
+    public BoardManager BoardManager => m_boardHandler;
 
     private void Awake() {
         m_ballHandler = Instantiate(Resources.Load<BallManager>("Prefabs/_Manager/BallManager"), transform.parent);

@@ -8,7 +8,6 @@ public class SlotPrefab: MonoBehaviour,
 IPointerDownHandler,
 IPointerEnterHandler,
 IPointerUpHandler,
-// IPointerClickHandler,
 IParent<BallPrefab> {
     private Action m_beginAction;
     private Action m_addAction;
@@ -36,10 +35,6 @@ IParent<BallPrefab> {
         set => m_pattern = value;
     }
 
-    // public DELEGATE_T<SlotPrefab> SetBombAction {
-    //     set => m_bombAction = value;
-    // }
-
     public Action SetRemoveAction {
         set => m_removeAction = value;
     }
@@ -66,7 +61,7 @@ IParent<BallPrefab> {
     }
 
     public void OnPointerEnter(PointerEventData eventData) {
-        if (!Activate) 
+        if (!Activate)
             return;
         
         switch (m_pattern.Append(this)) {
@@ -91,12 +86,4 @@ IParent<BallPrefab> {
             Activate = false;
         }
     }
-
-    // public void OnPointerClick(PointerEventData eventData) {
-    //     if (!Activate) {
-    //         m_bombAction
-    //             ?.Invoke(this);
-    //         Vibrate.Do(CONST.DURATION_VIBRATE_ADD);
-    //     }
-    // }
 }
