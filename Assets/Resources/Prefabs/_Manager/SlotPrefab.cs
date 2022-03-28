@@ -16,10 +16,7 @@ IParent<BallPrefab> {
     private PatternHandler m_pattern;
 
     public int id;
-    public BallPrefab Child {
-        get;
-        set;
-    } = null;
+    public BallPrefab Child { get; set; } = null;
     public T_DELEGATE_T<bool, SlotPrefab> Generate;
     public static bool Activate = false;
 
@@ -27,9 +24,8 @@ IParent<BallPrefab> {
         GetComponent<Image>().raycastTarget = true;
     }
 
-    public void PunchScale() => Child
-        .transform
-        .DOPunchScale(Vector3.one * .2f, CONST.DURATION_WAIT_MATCH_BALL, 1, 1);
+    public void PunchScale()
+        => Child.transform.DOPunchScale(Vector3.one * .2f, CONST.DURATION_WAIT_MATCH_BALL, 1, 1);
 
     public PatternHandler SetPatternHandler {
         set => m_pattern = value;
@@ -48,14 +44,12 @@ IParent<BallPrefab> {
     }
 
     public void OnPointerDown(PointerEventData eventData) {
-        if (Activate) {
+        if (Activate)
             return;
-        }
 
         if (m_pattern.Begin(this).Equals(AddBall.add)) {
             PunchScale();
-            m_beginAction
-                ?.Invoke();
+            m_beginAction?.Invoke();
             Activate = true;
         }
     }
@@ -66,12 +60,10 @@ IParent<BallPrefab> {
         
         switch (m_pattern.Append(this)) {
             case AddBall.remove:
-                m_removeAction
-                    ?.Invoke();
+                m_removeAction?.Invoke();
                 return;
             case AddBall.add: PunchScale();
-                m_addAction
-                    ?.Invoke();
+                m_addAction?.Invoke();
                 Vibrate.Do(CONST.DURATION_VIBRATE_ADD);
                 return;
             default: return;
@@ -80,9 +72,7 @@ IParent<BallPrefab> {
 
     public void OnPointerUp(PointerEventData eventData) {
         if (Activate && Input.touchCount <= 1) {
-            m_pattern
-                ?.InputEnd
-                ?.Invoke();
+            m_pattern.InputEnd();
             Activate = false;
         }
     }

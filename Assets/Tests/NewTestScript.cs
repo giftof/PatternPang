@@ -118,7 +118,11 @@ public class NewTestScript
     public IEnumerator NewTestScriptWithEnumeratorPasses4()
     {
         yield return new WaitForSecondsRealtime(.5f);
-        m_pattern.BEGIN_TEST();
+        
+        PointerEventData pointerEventData = new PointerEventData(m_pattern.m_eventSystem);
+        pointerEventData.selectedObject = m_pattern.m_generate.gameObject;
+        m_pattern.m_generate.OnPointerClick(pointerEventData);
+        // m_pattern.BEGIN_TEST();
 
         while(!m_pattern.ENABLE())
             yield return null;
@@ -252,9 +256,9 @@ public partial class Setup: MonoBehaviour
     public GameLogic m_gameLogic;
     private Camera m_camera;
     private Canvas m_canvas;
-    private Button m_generate;
+    public Button m_generate;
     private ScoreBar m_progressBar;
-    private EventSystem m_eventSystem;
+    public EventSystem m_eventSystem;
     public GameObject m_gameOverPannel;
     private GameObject m_fullBackground;
     private GameObject m_safeBackground;

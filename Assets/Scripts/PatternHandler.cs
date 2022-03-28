@@ -7,10 +7,7 @@ public class PatternHandler {
     private LinkedList<SlotPrefab> m_selected;
     public PatternHandler() => m_selected = new LinkedList<SlotPrefab>();
 
-    public Action InputEnd {
-        get;
-        set;
-    } = null;
+    public Action InputEnd { get; set; } = null;
 
     public AddBall Begin(SlotPrefab slot) {
         if (slot == null || slot.Child == null || slot.Generate != null || m_selected.Count > 0 || slot.Child.BallColor > SlotAttribute.color_count) 

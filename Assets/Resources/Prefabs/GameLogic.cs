@@ -88,24 +88,16 @@ public class GameLogic: MonoBehaviour {
         SlotPrefab.Activate = false;
     }
 
-    /*
-     * privates... complicated functions...
-     */
-    private int UnitScore => m_patternHandler
-        .Selected()
-        .Select((e, index) => (e, index))
-        .Sum(p => p.index) + m_patternHandler
-        .Selected()
-        .Count();
+    private int UnitScore 
+        => m_patternHandler.Selected().Select((e, index) => (e, index)).Sum(p => p.index)
+         + m_patternHandler.Selected().Count();
 
-    private int ModeScore => m_patternHandler
-        .Selected()
-        .Count - (int)CONST.MIN_SELECT;
+    private int ModeScore 
+        => m_patternHandler.Selected().Count
+         - (int)CONST.MIN_SELECT;
 
-    private void UpdateScore() => Score += m_unitScore * Multi(
-        ++m_matchCount,
-        m_modeScore
-    );
+    private void UpdateScore() 
+        => Score += m_unitScore * Multi(++m_matchCount, m_modeScore);
 
     private void FinishDrag() {
         m_unitScore = UnitScore;
@@ -150,8 +142,7 @@ public class GameLogic: MonoBehaviour {
     private void InitGame() {
         int height = m_boardHandler.Size.Column;
         m_boardHandler.Create();
-        m_board = m_boardHandler
-            .Data
+        m_board = m_boardHandler.Data
             .OrderBy(e => e.Value.id)
             .Select(e => e.Value)
             .ToArray();
@@ -230,9 +221,8 @@ public class GameLogic: MonoBehaviour {
         }
     }
 
-    private List<List<SlotPrefab>> Pattern() => (
-        from e in m_boardHandler.Data let line = DrawPatternedElement(e.Value)where line != null select line
-    ).ToList();
+    private List<List<SlotPrefab>> Pattern()
+        => (from e in m_boardHandler.Data let line = DrawPatternedElement(e.Value)where line != null select line).ToList();
 
     private List<SlotPrefab> DrawPatternedElement(SlotPrefab origin) {
         Vector3 position = origin.transform.position;
@@ -240,9 +230,10 @@ public class GameLogic: MonoBehaviour {
         if (origin.Generate != null) 
             return null;
         
-        var list = (
-            from offset in m_shape let hit = Ray.Instance.Shoot(position -= offset)where hit != null && hit.Generate == null && hit.Child.BallColor.Equals(origin.Child.BallColor)select hit
-        ).ToList();
+        var list = (from offset in m_shape 
+                    let hit = Ray.Instance.Shoot(position -= offset)
+                    where hit != null && hit.Generate == null && hit.Child.BallColor.Equals(origin.Child.BallColor)
+                    select hit).ToList();
 
         if (list.Count.Equals(m_shape.Length)) {
             list.Insert(0, origin);
