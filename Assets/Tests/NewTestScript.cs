@@ -40,6 +40,8 @@ public class NewTestScript
 
         while(!m_pattern.ENABLE())
             yield return null;
+        
+        m_pattern.BEGIN_SHORT_TEST();
     }
 
     [UnityTest]
@@ -47,10 +49,9 @@ public class NewTestScript
     {
         SlotPrefab[] match = m_pattern.MATCH();
         SlotPrefab[] first = m_pattern.FIRST_COLOR_SET();
+        SlotPrefab gene = m_pattern.FIRST_GENERATOR();
 
-        Debug.Log("I'll wait game over");
-
-        Debug.Log($"first cnt = {first.Length}");
+        gene.OnPointerDown(null);
 
         if (match != null)
         {
@@ -108,13 +109,9 @@ public class NewTestScript
 
         while (!m_pattern.m_gameOverPannel.activeSelf)
             yield return null;
-        
-        Debug.Log("game over");
 
         while (m_pattern.m_gameOverPannel.activeSelf)
             yield return null;
-
-        Debug.Log("enable restart");
     }
 
     [UnityTest]
@@ -143,9 +140,33 @@ public class NewTestScript
             yield return new WaitForSecondsRealtime(.5f);
             match[2].OnPointerUp(null);
         }
+
+        match[0].OnPointerDown(null);
         
         while(!m_pattern.ENABLE())
             yield return null;
+    }
+
+    [UnityTest]
+    public IEnumerator NewTestScriptWithEnumeratorPasses6()
+    {
+        SlotPrefab[] match = m_pattern.MATCH();
+
+        if (match != null)
+        {
+            yield return new WaitForSecondsRealtime(.5f);
+            match[1].OnPointerDown(null);
+            yield return new WaitForSecondsRealtime(.5f);
+            match[0].OnPointerEnter(null);
+            yield return new WaitForSecondsRealtime(.5f);
+            match[2].OnPointerEnter(null);
+            yield return new WaitForSecondsRealtime(.5f);
+            match[2].OnPointerUp(null);
+        }
+        
+        while(!m_pattern.ENABLE())
+            yield return null;
+
         Debug.Log("finish 5sec.");
         yield return new WaitForSecondsRealtime(1f);
         Debug.Log("finish 4sec.");
@@ -194,6 +215,11 @@ public partial class Setup
     {
         SlotPrefab begin = m_gameLogic.BoardManager.Data.First().Value;
         return m_gameLogic.BoardManager.Data.Where(e => e.Value.Child.BallColor.Equals(begin.Child.BallColor)).Select(e => e.Value).ToArray();
+    }
+
+    public SlotPrefab FIRST_GENERATOR()
+    {
+        return m_gameLogic.BoardManager.Data.First(e => e.Value.Generate != null).Value;
     }
 
     public SlotPrefab[] MATCH()

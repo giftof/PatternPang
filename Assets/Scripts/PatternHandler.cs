@@ -22,16 +22,16 @@ public class PatternHandler {
 
     /* -- check sequence --
          *
-         * if exception?        (yes : return begin),   (no : next)
+        //  * if exception?        (yes : return begin),   (no : next)
          * if not near?         (yes : return null),    (no : next)
          * if roll-back?        (yes : return remove),  (no : next)
          * if new && sameColor? (yes : return add),     (no : next)
          * return null
          */
     public AddBall Append(SlotPrefab slot) {
-        /* exception check */
-        if (m_selected.Count == 0) 
-            return Begin(slot);
+        // /* exception check */
+        // if (m_selected.Count == 0) 
+        //     return Begin(slot);
         
         /* is near? */
         if (slot.Generate != null || Vector3.Distance(m_selected.First.Value.transform.position, slot.transform.position) > CONST.MAX_DISTANCE) 

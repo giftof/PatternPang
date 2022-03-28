@@ -158,8 +158,8 @@ public class GameLogic: MonoBehaviour {
     }
 
     private void RequestBall() {
-        if (Finish) 
-            return;
+        // if (Finish)
+        //     return;
         
         m_eventSystem.enabled = false;
         bool flag = false;
