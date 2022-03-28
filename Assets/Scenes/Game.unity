@@ -220,13 +220,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 175879a10d829458d985012a476e8481, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_gameLogic: {fileID: 0}
-  m_generate: {fileID: 0}
-  m_progressBar: {fileID: 0}
-  m_eventSystem: {fileID: 0}
-  m_gameOverPannel: {fileID: 0}
-  m_fullBackground: {fileID: 0}
-  m_safeBackground: {fileID: 0}
 --- !u!1 &911393219
 GameObject:
   m_ObjectHideFlags: 0

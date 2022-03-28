@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<coverage version="1.0" date="2022-03-28_13-34-18" tag="">
+  <assembly name="MainAssembly">
+    <class name="BallManager" coveredlines="0" coverablelines="23" totallines="55" coveredbranches="0" totalbranches="0" />
+    <class name="BallPrefab" coveredlines="0" coverablelines="26" totallines="78" coveredbranches="0" totalbranches="0" />
+    <class name="BoardManager" coveredlines="0" coverablelines="65" totallines="128" coveredbranches="0" totalbranches="0" />
+    <class name="BulletManager" coveredlines="0" coverablelines="9" totallines="20" coveredbranches="0" totalbranches="0" />
+    <class name="CharactorManager" coveredlines="0" coverablelines="4" totallines="13" coveredbranches="0" totalbranches="0" />
+    <class name="CharactorPrefab" coveredlines="0" coverablelines="14" totallines="42" coveredbranches="0" totalbranches="0" />
+    <class name="ComboManager" coveredlines="0" coverablelines="14" totallines="24" coveredbranches="0" totalbranches="0" />
+    <class name="ComboPrefab" coveredlines="0" coverablelines="12" totallines="34" coveredbranches="0" totalbranches="0" />
+    <class name="CONST" coveredlines="0" coverablelines="31" totallines="69" coveredbranches="0" totalbranches="0" />
+    <class name="CoverManager" coveredlines="0" coverablelines="3" totallines="11" coveredbranches="0" totalbranches="0" />
+    <class name="Game" coveredlines="0" coverablelines="72" totallines="141" coveredbranches="0" totalbranches="0" />
+    <class name="GameLogic" coveredlines="0" coverablelines="136" totallines="267" coveredbranches="0" totalbranches="0" />
+    <class name="LineManager" coveredlines="0" coverablelines="19" totallines="51" coveredbranches="0" totalbranches="0" />
+    <class name="LinePrefab" coveredlines="0" coverablelines="5" totallines="14" coveredbranches="0" totalbranches="0" />
+    <class name="ManagedPool[T]" coveredlines="0" coverablelines="22" totallines="56" coveredbranches="0" totalbranches="0" />
+    <class name="ObjectPool" coveredlines="0" coverablelines="5" totallines="22" coveredbranches="0" totalbranches="0" />
+    <class name="PatternHandler" coveredlines="0" coverablelines="27" totallines="73" coveredbranches="0" totalbranches="0" />
+    <class name="ProgressBar" coveredlines="0" coverablelines="14" totallines="40" coveredbranches="0" totalbranches="0" />
+    <class name="Ray" coveredlines="0" coverablelines="5" totallines="20" coveredbranches="0" totalbranches="0" />
+    <class name="SafeScreen" coveredlines="0" coverablelines="5" totallines="15" coveredbranches="0" totalbranches="0" />
+    <class name="ScoreBar" coveredlines="0" coverablelines="3" totallines="18" coveredbranches="0" totalbranches="0" />
+    <class name="SlotPrefab" coveredlines="0" coverablelines="34" totallines="102" coveredbranches="0" totalbranches="0" />
+    <class name="Vibrate" coveredlines="0" coverablelines="4" totallines="52" coveredbranches="0" totalbranches="0" />
+  </assembly>
+  <assembly name="PluginsAssembly">
+    <class name="DG.DOTweenEditor.DOTweenAnimationInspector" coveredlines="0" coverablelines="316" totallines="750" coveredbranches="0" totalbranches="0" />
+    <class name="DG.DOTweenEditor.DOTweenPreviewManager" coveredlines="0" coverablelines="133" totallines="263" coveredbranches="0" totalbranches="0" />
+    <class name="DG.DOTweenEditor.Initializer" coveredlines="0" coverablelines="9" totallines="750" coveredbranches="0" totalbranches="0" />
+    <class name="DG.Tweening.DOTweenAnimation" coveredlines="0" coverablelines="289" totallines="884" coveredbranches="0" totalbranches="0" />
+    <class name="DG.Tweening.DOTweenAnimationExtensions" coveredlines="0" coverablelines="1" totallines="884" coveredbranches="0" totalbranches="0" />
+    <class name="DG.Tweening.DOTweenCYInstruction" coveredlines="0" coverablelines="26" totallines="403" coveredbranches="0" totalbranches="0" />
+    <class name="DG.Tweening.DOTweenModuleAudio" coveredlines="0" coverablelines="26" totallines="202" coveredbranches="0" totalbranches="0" />
+    <class name="DG.Tweening.DOTweenModulePhysics" coveredlines="0" coverablelines="60" totallines="216" coveredbranches="0" totalbranches="0" />
+    <class name="DG.Tweening.DOTweenModulePhysics2D" coveredlines="0" coverablelines="57" totallines="193" coveredbranches="0" totalbranches="0" />
+    <class name="DG.Tweening.DOTweenModuleSprite" coveredlines="0" coverablelines="25" totallines="93" coveredbranches="0" totalbranches="0" />
+    <class name="DG.Tweening.DOTweenModuleUI" coveredlines="0" coverablelines="178" totallines="660" coveredbranches="0" totalbranches="0" />
+    <class name="DG.Tweening.DOTweenModuleUnityVersion" coveredlines="0" coverablelines="90" totallines="403" coveredbranches="0" totalbranches="0" />
+    <class name="DG.Tweening.DOTweenModuleUtils" coveredlines="0" coverablelines="31" totallines="167" coveredbranches="0" totalbranches="0" />
+    <class name="DG.Tweening.DOTweenProShortcuts" coveredlines="0" coverablelines="20" totallines="90" coveredbranches="0" totalbranches="0" />
+  </assembly>
+  <assembly name="Tests">
+    <class name="NewTestScript" coveredlines="3" coverablelines="3" totallines="28" coveredbranches="0" totalbranches="0" />
+  </assembly>
+</coverage>

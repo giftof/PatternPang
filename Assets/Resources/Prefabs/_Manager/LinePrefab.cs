@@ -6,9 +6,11 @@ public class LinePrefab: MonoBehaviour {
     private void Awake() {
         line = GetComponent<LineRenderer>();
     }
-    
+
     private void Start() {
-        line.startColor = line.endColor = Color.grey;
-        line.startWidth = line.endWidth = CONST.LINE_WIDTH;
+        line.startColor = Color.grey;
+        line.endColor = Color.grey;
+        line.startWidth = CONST.LINE_WIDTH;
+        line.endWidth = CONST.LINE_WIDTH;
     }
 }

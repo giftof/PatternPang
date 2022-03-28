@@ -29,8 +29,8 @@ public class BallManager : ManagedPool<BallPrefab>
         base.Release(ball);
     }
 
-    public Dictionary<int, BallPrefab> Data
-        => dictionary;
+    // public Dictionary<int, BallPrefab> Data
+    //     => dictionary;
 
     public void ToPunch(List<SlotPrefab> list)
     {

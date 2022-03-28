@@ -174,15 +174,18 @@ public class GameLogic: MonoBehaviour {
             SlotPrefab upper = Ray
                 .Instance
                 .Shoot(e.transform.position + CONST.DIRECTION_OFFSET[(int)ClockWise.up]);
-            if (upper == null) {
-                if (e.Generate(e)) 
-                    flag = true;
-                }
-            else {
-                if (e.Child == null && upper.Child != null) {
-                    sequence.Join(upper.Child.MoveTo(e));
-                    upper.Child = null;
-                }
+            switch (upper)
+            {
+                case null:
+                    if (e.Generate(e))
+                        flag = true;
+                    break;
+                default:
+                    if (e.Child == null && upper.Child != null) {
+                        sequence.Join(upper.Child.MoveTo(e));
+                        upper.Child = null;
+                    }
+                    break;
             }
         }
 

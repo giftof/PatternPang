@@ -20,17 +20,17 @@ public class CharactorPrefab : MonoBehaviour
         get => center.transform.position;
     }
 
-    public float Duration
-    {
-        get => duration;
-        set => duration = value;
-    }
+    // public float Duration
+    // {
+    //     get => duration;
+    //     set => duration = value;
+    // }
 
-    public Vector2 JumpSize
-    {
-        get => jumpSize;
-        set => jumpSize = value;
-    }
+    // public Vector2 JumpSize
+    // {
+    //     get => jumpSize;
+    //     set => jumpSize = value;
+    // }
 
     public void Scaling()
     {

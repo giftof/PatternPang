@@ -6,13 +6,13 @@ using DG.Tweening;
 
 public class Game: MonoBehaviour {
     private Canvas m_canvas;
-    [SerializeField] GameLogic m_gameLogic;
-    [SerializeField] Button m_generate;
-    [SerializeField] ScoreBar m_progressBar;
-    [SerializeField] EventSystem m_eventSystem;
-    [SerializeField] GameObject m_gameOverPannel;
-    [SerializeField] GameObject m_fullBackground;
-    [SerializeField] GameObject m_safeBackground;
+    private GameLogic m_gameLogic;
+    private Button m_generate;
+    private ScoreBar m_progressBar;
+    private EventSystem m_eventSystem;
+    private GameObject m_gameOverPannel;
+    private GameObject m_fullBackground;
+    private GameObject m_safeBackground;
 
     private float m_timerDuration;
     private float m_fillAmount;
@@ -33,6 +33,9 @@ public class Game: MonoBehaviour {
         m_progressBar = Instantiate(Resources.Load<ScoreBar>("Prefabs/ScoreBar"), m_safeBackground.transform);
         m_generate = Instantiate(Resources.Load<Button>("Prefabs/Button"), m_safeBackground.transform);
 
+        m_gameOverPannel = Instantiate(Resources.Load<GameObject>("Prefabs/MessagePannel"), m_safeBackground.transform);
+        m_gameOverPannel.SetActive(false);
+
         Instantiate(Resources.Load<Ray>("Prefabs/Ray"), m_safeBackground.transform);
     }
 
@@ -40,7 +43,7 @@ public class Game: MonoBehaviour {
         SetGameLevel();
         SetDefaultTimer();
         SetButtonAction();
-        SafeScreen();
+        SetSafeScreen();
     }
 
     private void SetGameLevel() {
@@ -48,7 +51,7 @@ public class Game: MonoBehaviour {
         m_gameLogic.BallVariation = CONST.LEVEL3; // prefer is 1, 2
     }
 
-    private void SafeScreen() {
+    private void SetSafeScreen() {
         (Vector2 min, Vector2 max)safeArea = new SafeScreen().RectOffset();
         RectTransform safeRect = m_safeBackground.GetComponent<RectTransform>();
         RectTransform fullRect = m_fullBackground.GetComponent<RectTransform>();
