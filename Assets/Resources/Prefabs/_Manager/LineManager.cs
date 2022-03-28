@@ -36,12 +36,7 @@ public class LineManager: ManagedPool<LinePrefab> {
     public void ToLine(List<SlotPrefab> list) {
         LinePrefab unit = Request(transform, default);
 
-Debug.Log($"unit = {unit}");
-Debug.Log($"startWidth = {unit?.GetComponent<LineRenderer>().startWidth}");
-Debug.Log($"startColor = {unit?.GetComponent<LineRenderer>().startColor}");
-
         unit.line.positionCount = list.Count;
-
         list
             .Select((e, index) => (e, index))
             .Where(pair => {
