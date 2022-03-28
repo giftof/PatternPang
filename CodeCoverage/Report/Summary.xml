@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CoverageReport scope="Summary">
   <Summary>
-    <Generatedon>3/28/2022 - 4:21:37 PM</Generatedon>
+    <Generatedon>3/28/2022 - 4:27:30 PM</Generatedon>
     <Parser>MultiReportParser (11x OpenCoverParser)</Parser>
     <Assemblies>3</Assemblies>
     <Classes>39</Classes>
@@ -40,7 +40,7 @@
       <Class name="SlotPrefab" coverage="97.3" coveredlines="37" coverablelines="38" totallines="102" branchcoverage="" coveredbranches="0" totalbranches="0" />
       <Class name="Vibrate" coverage="25" coveredlines="2" coverablelines="8" totallines="52" branchcoverage="" coveredbranches="0" totalbranches="0" />
     </Assembly>
-    <Assembly name="PluginsAssembly" classes="14" coverage="0.9" coveredlines="15" coverablelines="1662" totallines="5958" branchcoverage="" coveredbranches="0" totalbranches="0">
+    <Assembly name="PluginsAssem" classes="14" coverage="0.9" coveredlines="15" coverablelines="1662" totallines="5958" branchcoverage="" coveredbranches="0" totalbranches="0">
       <Class name="DG.DOTweenEditor.DOTweenAnimationInspector" coverage="0" coveredlines="0" coverablelines="376" totallines="750" branchcoverage="" coveredbranches="0" totalbranches="0" />
       <Class name="DG.DOTweenEditor.DOTweenPreviewManager" coverage="0" coveredlines="0" coverablelines="155" totallines="263" branchcoverage="" coveredbranches="0" totalbranches="0" />
       <Class name="DG.DOTweenEditor.Initializer" coverage="0" coveredlines="0" coverablelines="11" totallines="750" branchcoverage="" coveredbranches="0" totalbranches="0" />
