@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CoverageReport scope="Summary">
   <Summary>
-    <Generatedon>3/28/2022 - 3:50:42 PM</Generatedon>
+    <Generatedon>3/28/2022 - 4:21:37 PM</Generatedon>
     <Parser>MultiReportParser (11x OpenCoverParser)</Parser>
     <Assemblies>3</Assemblies>
     <Classes>39</Classes>
     <Files>35</Files>
-    <Coveredlines>800</Coveredlines>
-    <Uncoveredlines>1686</Uncoveredlines>
+    <Coveredlines>799</Coveredlines>
+    <Uncoveredlines>1687</Uncoveredlines>
     <Coverablelines>2486</Coverablelines>
     <Totallines>5470</Totallines>
     <Linecoverage>32.1</Linecoverage>
@@ -56,9 +56,9 @@
       <Class name="DG.Tweening.DOTweenModuleUtils" coverage="21.7" coveredlines="10" coverablelines="46" totallines="167" branchcoverage="" coveredbranches="0" totalbranches="0" />
       <Class name="DG.Tweening.DOTweenProShortcuts" coverage="0" coveredlines="0" coverablelines="25" totallines="90" branchcoverage="" coveredbranches="0" totalbranches="0" />
     </Assembly>
-    <Assembly name="Tests" classes="2" coverage="97.2" coveredlines="141" coverablelines="145" totallines="388" branchcoverage="" coveredbranches="0" totalbranches="0">
+    <Assembly name="Tests" classes="2" coverage="96.5" coveredlines="140" coverablelines="145" totallines="388" branchcoverage="" coveredbranches="0" totalbranches="0">
       <Class name="NewTestScript" coverage="100" coveredlines="5" coverablelines="5" totallines="194" branchcoverage="" coveredbranches="0" totalbranches="0" />
-      <Class name="PatternTest" coverage="97.1" coveredlines="136" coverablelines="140" totallines="194" branchcoverage="" coveredbranches="0" totalbranches="0" />
+      <Class name="PatternTest" coverage="96.4" coveredlines="135" coverablelines="140" totallines="194" branchcoverage="" coveredbranches="0" totalbranches="0" />
     </Assembly>
   </Coverage>
 </CoverageReport>
