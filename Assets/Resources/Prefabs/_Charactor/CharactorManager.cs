@@ -8,6 +8,6 @@ public class CharactorManager : ManagedPool<CharactorPrefab>
         pool.prefab = Resources.Load<GameObject>("Prefabs/_Charactor/CharactorPrefab");
     }
 
-    public CharactorPrefab First()
+    public CharactorPrefab Target()
         => dictionary.FirstOrDefault(e => e.Value != null).Value;
 }

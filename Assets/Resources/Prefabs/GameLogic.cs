@@ -8,13 +8,13 @@ using DG.Tweening;
 
 public class GameLogic: MonoBehaviour {
     private EventSystem m_eventSystem;
-    private BoardManager m_boardHandler;
-    private BallManager m_ballHandler;
-    private LineManager m_lineHandler;
-    private CoverManager m_coverHandler;
-    private BulletManager m_bulletHandler;
-    private CharactorManager m_charactorHandler;
-    private ComboManager m_comboHandler;
+    private BoardManager m_boardManager;
+    private BallManager m_ballManager;
+    private LineManager m_lineManager;
+    private CoverManager m_coverManager;
+    private BulletManager m_bulletManager;
+    private CharactorManager m_charactorManager;
+    private ComboManager m_comboManager;
 
     private PatternHandler m_patternHandler;
     private int m_matchCount;
@@ -27,39 +27,38 @@ public class GameLogic: MonoBehaviour {
     public int Score { get; private set; } = 0;
     public bool Finish { get; set; } = true;
     public int BonusTimeSecond;
-    public BoardManager BoardManager => m_boardHandler;
+    public BoardManager BoardManager => m_boardManager;
 
     private void Awake() {
-        m_ballHandler = Instantiate(Resources.Load<BallManager>("Prefabs/_Manager/BallManager"), transform.parent);
-        m_boardHandler = Instantiate(Resources.Load<BoardManager>("Prefabs/_Manager/BoardManager"), transform.parent);
-        m_lineHandler = Instantiate(Resources.Load<LineManager>("Prefabs/_Manager/LineManager"), transform.parent);
-        m_coverHandler = Instantiate(Resources.Load<CoverManager>("Prefabs/_Manager/CoverManager"), transform.parent);
-        m_bulletHandler = Instantiate(Resources.Load<BulletManager>("Prefabs/_Bullet/BulletManager"), transform.parent);
-        m_charactorHandler = Instantiate(Resources.Load<CharactorManager>("Prefabs/_Charactor/CharactorManager"), transform.parent);
-        m_comboHandler = Instantiate(Resources.Load<ComboManager>("Prefabs/_Manager/ComboManager"), transform.parent);
+        m_ballManager = Instantiate(Resources.Load<BallManager>("Prefabs/_Manager/BallManager"), transform.parent);
+        m_boardManager = Instantiate(Resources.Load<BoardManager>("Prefabs/_Manager/BoardManager"), transform.parent);
+        m_lineManager = Instantiate(Resources.Load<LineManager>("Prefabs/_Manager/LineManager"), transform.parent);
+        m_coverManager = Instantiate(Resources.Load<CoverManager>("Prefabs/_Manager/CoverManager"), transform.parent);
+        m_bulletManager = Instantiate(Resources.Load<BulletManager>("Prefabs/_Bullet/BulletManager"), transform.parent);
+        m_charactorManager = Instantiate(Resources.Load<CharactorManager>("Prefabs/_Charactor/CharactorManager"), transform.parent);
+        m_comboManager = Instantiate(Resources.Load<ComboManager>("Prefabs/_Manager/ComboManager"), transform.parent);
         
-        m_boardHandler.ballManager = m_ballHandler;
-        m_boardHandler.coverManager = m_coverHandler;
+        m_boardManager.ballManager = m_ballManager;
+        m_boardManager.coverManager = m_coverManager;
     }
 
     private void Start() {
         m_patternHandler = new PatternHandler();
         m_patternHandler.InputEnd = FinishDrag;
-        m_lineHandler.SetPatternHandler = m_patternHandler;
-        m_boardHandler.SetPatternHandler = m_patternHandler;
-        m_boardHandler.SetBeginAction = m_lineHandler.Begin;
-        m_boardHandler.SetAddAction = m_lineHandler.Append;
-        m_boardHandler.SetRemoveAction = m_lineHandler.Remove;
-        m_coverHandler.transform.localScale = m_boardHandler.transform.localScale;
-        m_charactorHandler.Request(m_charactorHandler.transform);
+        m_lineManager.SetPatternHandler = m_patternHandler;
+        m_boardManager.SetPatternHandler = m_patternHandler;
+        m_boardManager.SetBeginAction = m_lineManager.Begin;
+        m_boardManager.SetAddAction = m_lineManager.Append;
+        m_boardManager.SetRemoveAction = m_lineManager.Remove;
+        m_coverManager.transform.localScale = m_boardManager.transform.localScale;
+        m_charactorManager.Request(m_charactorManager.transform);
 
         InitGame();
     }
 
     private void InitGame() {
-        int height = m_boardHandler.Size.Column;
-        m_boardHandler.Create();
-        Board = m_boardHandler.SlotArray();
+        m_boardManager.Create();
+        Board = m_boardManager.SlotArray();
     }
 
     public EventSystem EventSystem {
@@ -67,11 +66,11 @@ public class GameLogic: MonoBehaviour {
     }
 
     public (int Row, int Column)Size {
-        set => m_boardHandler.Size = value;
+        set => m_boardManager.Size = value;
     }
 
     public int BallVariation {
-        set => m_ballHandler.BallVariation = value;
+        set => m_ballManager.BallVariation = value;
     }
 
     public void CreateGame() {
@@ -79,16 +78,15 @@ public class GameLogic: MonoBehaviour {
         Finish = false;
         BonusTimeSecond = CONST.BONUS_TIMER_BEGIN_VALUE;
 
-        m_lineHandler.Clear();
+        m_lineManager.Clear();
         RequestBall();
     }
 
     public void ClearBall() {
-        m_lineHandler.Clear();
-        m_ballHandler.DropAndClear();
-        m_boardHandler.ClearChild();
+        m_lineManager.Clear();
+        m_ballManager.DropAndClear();
+        m_boardManager.ClearChild();
         m_patternHandler.Clear();
-        SlotPrefab.Activate = false;
     }
 
     private int UnitScore 
@@ -104,7 +102,7 @@ public class GameLogic: MonoBehaviour {
 
     private void ReleaseEventsystem() {
         m_eventSystem.enabled = true;
-        m_lineHandler.Clear();
+        m_lineManager.Clear();
         m_first = null;
         m_shape = null;
     }
@@ -121,17 +119,17 @@ public class GameLogic: MonoBehaviour {
             ReleaseEventsystem();
         else {
             m_eventSystem.enabled = false;
+            m_comboManager.Display(m_first.transform, m_matchCount);
             UpdateScore();
-            m_comboHandler.Display(m_first.transform, m_matchCount);
             StartCoroutine(DisposePatternSequentially());
         }
     }
 
     private void FireBullet(IGrouping<int, SlotPrefab> group)
-        => m_bulletHandler.FireTo(
+        => m_bulletManager.FireTo(
                 group.First().transform.position,
-                m_charactorHandler.First().transform.position,
-                () => m_charactorHandler.First().Scaling()
+                m_charactorManager.Target().transform.position,
+                () => m_charactorManager.Target().Scaling()
             );
 
     IEnumerator DisposePatternSequentially() {
@@ -140,7 +138,7 @@ public class GameLogic: MonoBehaviour {
             yield break;
         }
 
-        List<List<SlotPrefab>> m = m_boardHandler.Pattern(MatchedList);
+        List<List<SlotPrefab>> m = m_boardManager.Pattern(MatchedList);
         if (m.Count > 0) {
             foreach (var e in m) {
                 if (e.First().id.Equals(m_first?.id)) 
@@ -148,14 +146,14 @@ public class GameLogic: MonoBehaviour {
                 else {
                     yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_MATCH_BALL);
                     UpdateScore();
-                    m_comboHandler.Display(e.First().transform, m_matchCount);
-                    m_lineHandler.Clear();
-                    m_lineHandler.ToLine(e);
-                    m_ballHandler.ToPunch(e);
+                    m_comboManager.Display(e.First().transform, m_matchCount);
+                    m_lineManager.Clear();
+                    m_lineManager.ToLine(e);
+                    m_ballManager.ToPunch(e);
                 }
             }
             yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_MATCH_BALL);
-            m_lineHandler.Clear();
+            m_lineManager.Clear();
             DisposeMatchedAction(m);
             RequestBall();
         } else 
@@ -172,7 +170,7 @@ public class GameLogic: MonoBehaviour {
     private void RemoveBall(IGrouping<int, SlotPrefab> group) {
         SlotPrefab slot = group.First();
 
-        m_ballHandler.Release(slot.Child);
+        m_ballManager.Release(slot.Child);
         slot.Child = null;
     }
 

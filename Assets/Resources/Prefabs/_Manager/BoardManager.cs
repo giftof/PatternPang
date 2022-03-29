@@ -65,11 +65,10 @@ public class BoardManager: ManagedPool<SlotPrefab> {
 
     public void Create() {
         Clear();
+        SetSlotActions();
         PublishBoard();
         UnitOffset();
     }
-
-    public IReadOnlyDictionary<int, SlotPrefab> Data => dictionary; // for test
 
     private void PublishBoard() {
         Vector3 beginPosition = (Size.Row - 1) * .5f * m_widthUnit * Vector3.left;
@@ -81,12 +80,7 @@ public class BoardManager: ManagedPool<SlotPrefab> {
             for (int h = 0; h < Size.Column; ++h) {
                 SlotPrefab slot = Request(transform, currentPosition);
                 slot.id = Size.Column * w + h;
-                slot.SetPatternHandler = m_patternHandler;
-                slot.SetBeginAction = m_beginAction;
-                slot.SetAddAction = m_addAction;
-                slot.SetRemoveAction = m_removeAction;
                 currentPosition += Vector3.up * m_slotSize.y;
-                slot.name = slot.GetInstanceID().ToString();/* for test */
 
                 if (h.Equals(Size.Column - 1)) 
                     GeneratorCap(slot);
@@ -95,6 +89,13 @@ public class BoardManager: ManagedPool<SlotPrefab> {
             }
             currentPosition = beginPosition + (w + 1) * m_widthUnit * Vector3.right;
         }
+    }
+
+    private void SetSlotActions() {
+        SlotPrefab.SetPatternHandler = m_patternHandler;
+        SlotPrefab.SetBeginAction = m_beginAction;
+        SlotPrefab.SetAddAction = m_addAction;
+        SlotPrefab.SetRemoveAction = m_removeAction;
     }
 
     private void GeneratorCap(SlotPrefab cap) {

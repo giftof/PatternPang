@@ -130,7 +130,6 @@ public class NewTestScript
         PointerEventData pointerEventData = new PointerEventData(m_pattern.m_eventSystem);
         pointerEventData.selectedObject = m_pattern.m_generate.gameObject;
         m_pattern.m_generate.OnPointerClick(pointerEventData);
-        // m_pattern.BEGIN_TEST();
 
         while(!m_pattern.ENABLE())
             yield return null;
@@ -195,9 +194,7 @@ public class NewTestScript
         yield return new WaitForSecondsRealtime(1f);
         Debug.Log("finish 1sec.");
         yield return new WaitForSecondsRealtime(1f);
-
     }
-
 }
 
 
