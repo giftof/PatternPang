@@ -129,7 +129,7 @@ public class Game: MonoBehaviour {
     }
 
     private void Update() {
-        if (m_gameLogic.BonusTimeSecond > 0) 
+        if (m_gameLogic.BonusTimeSecond > 0)
             UpdateTimer();
         
         if (m_eventSystem.enabled) 

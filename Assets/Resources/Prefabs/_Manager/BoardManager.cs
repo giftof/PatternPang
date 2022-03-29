@@ -13,10 +13,7 @@ public class BoardManager: ManagedPool<SlotPrefab> {
     private float m_widthUnit;
     public float ScaleRatio = 1.8f;
 
-    public(int Row, int Column)Size {
-        get;
-        set;
-    } = (0, 0);
+    public (int Row, int Column) Size { get; set; } = (0, 0);
     public BallManager ballManager;
     public CoverManager coverManager;
 
@@ -43,6 +40,18 @@ public class BoardManager: ManagedPool<SlotPrefab> {
         set => m_beginAction = value;
     }
 
+    public SlotPrefab[] SlotArray()
+        => (from pair in dictionary
+            orderby pair.Value.id 
+            select pair.Value).ToArray();
+
+    public List<List<SlotPrefab>> Pattern(T_DELEGATE_T<List<SlotPrefab>, SlotPrefab> filter)
+        => (from pair in dictionary
+            let line = filter(pair.Value)
+            where line != null
+            select line).ToList();
+        
+
     public override void Clear() {
         ClearChild();
         ballManager.Clear();
@@ -60,18 +69,15 @@ public class BoardManager: ManagedPool<SlotPrefab> {
         UnitOffset();
     }
 
-    public IReadOnlyDictionary<int, SlotPrefab> Data => dictionary;
+    public IReadOnlyDictionary<int, SlotPrefab> Data => dictionary; // for test
 
     private void PublishBoard() {
         Vector3 beginPosition = (Size.Row - 1) * .5f * m_widthUnit * Vector3.left;
         Vector3 currentPosition = beginPosition;
 
         for (int w = 0; w < Size.Row; ++w) {
-            currentPosition += m_slotSize.y * Vector3.up * (
-                IsHalfFloating(w)
-                    ? 1
-                    : .5f
-            );
+            currentPosition += m_slotSize.y * Vector3.up 
+                            * (IsHalfFloating(w) ? 1 : .5f);
             for (int h = 0; h < Size.Column; ++h) {
                 SlotPrefab slot = Request(transform, currentPosition);
                 slot.id = Size.Column * w + h;
@@ -80,15 +86,13 @@ public class BoardManager: ManagedPool<SlotPrefab> {
                 slot.SetAddAction = m_addAction;
                 slot.SetRemoveAction = m_removeAction;
                 currentPosition += Vector3.up * m_slotSize.y;
-                slot.name = slot
-                    .GetInstanceID()
-                    .ToString();/* for test */
+                slot.name = slot.GetInstanceID().ToString();/* for test */
 
                 if (h.Equals(Size.Column - 1)) 
                     GeneratorCap(slot);
                 else 
                     slot.Generate = null;
-                }
+            }
             currentPosition = beginPosition + (w + 1) * m_widthUnit * Vector3.right;
         }
     }

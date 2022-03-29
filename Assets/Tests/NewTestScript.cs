@@ -13,8 +13,6 @@ public delegate bool TEST_DELEGATE();
 
 public class NewTestScript
 {
-    // MonoBehaviourTest<PatternSetup> m_pattern;
-    // PatternSetup m_pattern;
     Setup m_pattern;
 
     // A Test behaves as an ordinary method
@@ -29,12 +27,16 @@ public class NewTestScript
     [UnityTest]
     public IEnumerator NewTestScriptWithEnumeratorPasses()
     {
-        yield return m_pattern = (new GameObject()).AddComponent<Setup>();
+        if (m_pattern == null)
+            yield return m_pattern = (new GameObject()).AddComponent<Setup>();
     }
 
     [UnityTest]
     public IEnumerator NewTestScriptWithEnumeratorPasses2()
     {
+        if (m_pattern == null)
+            yield return m_pattern = (new GameObject()).AddComponent<Setup>();
+
         yield return new WaitForSecondsRealtime(.5f);
         m_pattern.BEGIN_SHORT_TEST();
 
@@ -47,7 +49,10 @@ public class NewTestScript
     [UnityTest]
     public IEnumerator NewTestScriptWithEnumeratorPasses3()
     {
-        SlotPrefab[] match = m_pattern.MATCH();
+        if (m_pattern == null)
+            yield return m_pattern = (new GameObject()).AddComponent<Setup>();
+
+        SlotPrefab[] match = m_pattern.FLOWER_SHAPE_MATCH();
         SlotPrefab[] first = m_pattern.FIRST_COLOR_SET();
         SlotPrefab gene = m_pattern.FIRST_GENERATOR();
 
@@ -117,6 +122,9 @@ public class NewTestScript
     [UnityTest]
     public IEnumerator NewTestScriptWithEnumeratorPasses4()
     {
+        if (m_pattern == null)
+            yield return m_pattern = (new GameObject()).AddComponent<Setup>();
+
         yield return new WaitForSecondsRealtime(.5f);
         
         PointerEventData pointerEventData = new PointerEventData(m_pattern.m_eventSystem);
@@ -131,10 +139,14 @@ public class NewTestScript
     [UnityTest]
     public IEnumerator NewTestScriptWithEnumeratorPasses5()
     {
-        SlotPrefab[] match = m_pattern.MATCH();
+        if (m_pattern == null)
+            yield return m_pattern = (new GameObject()).AddComponent<Setup>();
+
+        SlotPrefab[] match = m_pattern.FLOWER_SHAPE_MATCH();
 
         if (match != null)
         {
+            Debug.Log("step 1");
             yield return new WaitForSecondsRealtime(.5f);
             match[1].OnPointerDown(null);
             yield return new WaitForSecondsRealtime(.5f);
@@ -144,8 +156,6 @@ public class NewTestScript
             yield return new WaitForSecondsRealtime(.5f);
             match[2].OnPointerUp(null);
         }
-
-        match[0].OnPointerDown(null);
         
         while(!m_pattern.ENABLE())
             yield return null;
@@ -154,10 +164,14 @@ public class NewTestScript
     [UnityTest]
     public IEnumerator NewTestScriptWithEnumeratorPasses6()
     {
-        SlotPrefab[] match = m_pattern.MATCH();
+        if (m_pattern == null)
+            yield return m_pattern = (new GameObject()).AddComponent<Setup>();
+
+        SlotPrefab[] match = m_pattern.FLOWER_SHAPE_MATCH();
 
         if (match != null)
         {
+            Debug.Log("step 2");
             yield return new WaitForSecondsRealtime(.5f);
             match[1].OnPointerDown(null);
             yield return new WaitForSecondsRealtime(.5f);
@@ -217,23 +231,21 @@ public partial class Setup
 
     public SlotPrefab[] FIRST_COLOR_SET()
     {
-        SlotPrefab begin = m_gameLogic.BoardManager.Data.First().Value;
-        return m_gameLogic.BoardManager.Data.Where(e => e.Value.Child.BallColor.Equals(begin.Child.BallColor)).Select(e => e.Value).ToArray();
+        SlotPrefab begin = m_gameLogic.Board.First();
+        return m_gameLogic.Board.Where(e => e.Child.BallColor.Equals(begin.Child.BallColor)).Select(e => e).ToArray();
     }
 
     public SlotPrefab FIRST_GENERATOR()
-    {
-        return m_gameLogic.BoardManager.Data.First(e => e.Value.Generate != null).Value;
-    }
+        => m_gameLogic.Board.First(e => e.Generate != null);
 
-    public SlotPrefab[] MATCH()
+    public SlotPrefab[] FLOWER_SHAPE_MATCH()
     {
-        foreach (var slot in m_gameLogic.BoardManager.Data)
+        foreach (var slot in m_gameLogic.Board)
         {
-            if (slot.Value.Generate != null)
+            if (slot.Generate != null)
                 continue;
             
-            SlotPrefab begin = slot.Value;
+            SlotPrefab begin = slot;
 
             var list = (from offset in CONST.DIRECTION_OFFSET
                         let hit = Ray.Instance.Shoot(begin.transform.position + offset)
