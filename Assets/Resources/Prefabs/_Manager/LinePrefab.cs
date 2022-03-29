@@ -1,13 +1,16 @@
 using UnityEngine;
 
-public class LinePrefab: MonoBehaviour {
+public class LinePrefab: MonoBehaviour 
+{
     public LineRenderer line;
 
-    private void Awake() {
+    private void Awake() 
+    {
         line = GetComponent<LineRenderer>();
     }
 
-    private void Start() {
+    private void Start() 
+    {
         line.startColor = Color.grey;
         line.endColor = Color.grey;
         line.startWidth = CONST.LINE_WIDTH;

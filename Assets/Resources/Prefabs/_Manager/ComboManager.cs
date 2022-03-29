@@ -1,13 +1,16 @@
 using UnityEngine;
 using DG.Tweening;
 
-public class ComboManager:ManagedPool < ComboPrefab > {
-    protected override void Awake() {
+public class ComboManager:ManagedPool < ComboPrefab > 
+{
+    protected override void Awake() 
+    {
         base.Awake();
         pool.prefab = Resources.Load<GameObject>("Prefabs/_Manager/ComboPrefab");
     }
 
-    public void Display(Transform transform, int combo) {
+    public void Display(Transform transform, int combo) 
+    {
         ComboPrefab prefab = Request(this.transform);
         Sequence sequence = DOTween.Sequence();
 

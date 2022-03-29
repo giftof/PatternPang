@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public static class CONST {
+public static class CONST 
+{
     public static float OFFSET = 0;
     public static readonly int MIN_SELECT = 3;
     public static readonly int BOMB = 3;
@@ -39,13 +40,15 @@ public static class CONST {
     public static readonly(int, int)SIZE911 = (9, 11 + GENERATOR_LINE);
 }
 
-public enum AddBall {
+public enum AddBall 
+{
     remove = -1,
     none,
     add
 }
 
-public enum SlotAttribute {
+public enum SlotAttribute 
+{
     none = -1,
     red,
     green,
@@ -58,7 +61,8 @@ public enum SlotAttribute {
     bomb3
 }
 
-public enum ClockWise {
+public enum ClockWise 
+{
     up,
     upRight,
     downRight,

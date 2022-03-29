@@ -24,14 +24,14 @@ public class NewTestScript
 
     // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
     // `yield return null;` to skip a frame.
-    [UnityTest]
-    public IEnumerator NewTestScriptWithEnumeratorPasses()
+    [UnityTest, Order(0)]
+    public IEnumerator MakeScene()
     {
         if (m_pattern == null)
             yield return m_pattern = (new GameObject()).AddComponent<Setup>();
     }
 
-    [UnityTest]
+    [UnityTest, Order(1)]
     public IEnumerator NewTestScriptWithEnumeratorPasses2()
     {
         if (m_pattern == null)
@@ -46,7 +46,7 @@ public class NewTestScript
         m_pattern.BEGIN_SHORT_TEST();
     }
 
-    [UnityTest]
+    [UnityTest, Order(2)]
     public IEnumerator NewTestScriptWithEnumeratorPasses3()
     {
         if (m_pattern == null)
@@ -122,9 +122,6 @@ public class NewTestScript
     [UnityTest]
     public IEnumerator NewTestScriptWithEnumeratorPasses4()
     {
-        if (m_pattern == null)
-            yield return m_pattern = (new GameObject()).AddComponent<Setup>();
-
         yield return new WaitForSecondsRealtime(.5f);
         
         PointerEventData pointerEventData = new PointerEventData(m_pattern.m_eventSystem);
@@ -138,9 +135,6 @@ public class NewTestScript
     [UnityTest]
     public IEnumerator NewTestScriptWithEnumeratorPasses5()
     {
-        if (m_pattern == null)
-            yield return m_pattern = (new GameObject()).AddComponent<Setup>();
-
         SlotPrefab[] match = m_pattern.FLOWER_SHAPE_MATCH();
 
         if (match != null)
@@ -163,9 +157,6 @@ public class NewTestScript
     [UnityTest]
     public IEnumerator NewTestScriptWithEnumeratorPasses6()
     {
-        if (m_pattern == null)
-            yield return m_pattern = (new GameObject()).AddComponent<Setup>();
-
         SlotPrefab[] match = m_pattern.FLOWER_SHAPE_MATCH();
 
         if (match != null)
@@ -202,7 +193,8 @@ public partial class Setup
 {
     public void BEGIN_TEST()
     {
-        if (m_gameLogic.Finish) {
+        if (m_gameLogic.Finish) 
+        {
             m_gameLogic.CreateGame();
             SetDefaultTimer();
             BeginTimer();
@@ -211,7 +203,8 @@ public partial class Setup
 
     public void BEGIN_SHORT_TEST()
     {
-        if (m_gameLogic.Finish) {
+        if (m_gameLogic.Finish) 
+        {
             m_gameLogic.CreateGame();
             SetShortTimer();
             BeginTimer();
@@ -275,7 +268,8 @@ public partial class Setup: MonoBehaviour
     private float m_timerDuration;
     private float m_fillAmount;
 
-    void Awake() {
+    void Awake() 
+    {
         m_camera = (new GameObject()).AddComponent<Camera>();
         m_camera.orthographic = true;
 
@@ -299,19 +293,22 @@ public partial class Setup: MonoBehaviour
         Instantiate(Resources.Load<Ray>("Prefabs/Ray"), m_safeBackground.transform);
     }
 
-    void Start() {
+    void Start() 
+    {
         SetGameLevel();
         SetDefaultTimer();
         SetButtonAction();
         SetSafeScreen();
     }
 
-    private void SetGameLevel() {
+    private void SetGameLevel() 
+    {
         m_gameLogic.Size = CONST.SIZE75;
         m_gameLogic.BallVariation = CONST.LEVEL3; // prefer is 1, 2
     }
 
-    private void SetTimer(float fillAmount, float duration) {
+    private void SetTimer(float fillAmount, float duration) 
+    {
         m_timerDuration = duration;
         m_fillAmount = fillAmount;
     }
@@ -319,7 +316,8 @@ public partial class Setup: MonoBehaviour
     private void SetDefaultTimer() => SetTimer(1, CONST.DURATION_PLAY_TIME);
     private void SetShortTimer() => SetTimer(1, 10);
 
-    private void SetButtonAction() {
+    private void SetButtonAction() 
+    {
         m_generate
             .onClick
             .AddListener(() => {
@@ -331,7 +329,8 @@ public partial class Setup: MonoBehaviour
             });
     }
 
-    private void SetSafeScreen() {
+    private void SetSafeScreen() 
+    {
         (Vector2 min, Vector2 max)safeArea = new SafeScreen().RectOffset();
         RectTransform safeRect = m_safeBackground.GetComponent<RectTransform>();
         RectTransform fullRect = m_fullBackground.GetComponent<RectTransform>();
@@ -343,7 +342,8 @@ public partial class Setup: MonoBehaviour
         fullRect.offsetMax = Vector2.zero;
     }
 
-    private void BeginTimer() {
+    private void BeginTimer() 
+    {
         m_progressBar.FillAmount = m_fillAmount;
 
         DOTween.Kill(m_progressBar.GetInstanceID());
@@ -362,7 +362,8 @@ public partial class Setup: MonoBehaviour
             });
     }
 
-    IEnumerator FIN() {
+    IEnumerator FIN() 
+    {
         m_eventSystem.enabled = false;
         m_gameOverPannel.SetActive(true);
         m_gameOverPannel.transform.SetAsLastSibling();
@@ -377,7 +378,8 @@ public partial class Setup: MonoBehaviour
         m_eventSystem.enabled = true;
     }
 
-    private void UpdateTimer() {
+    private void UpdateTimer() 
+    {
         float increment = 1 / CONST.DURATION_PLAY_TIME;
 
         m_fillAmount = m_progressBar.FillAmount;
@@ -389,7 +391,8 @@ public partial class Setup: MonoBehaviour
         BeginTimer();
     }
 
-    private void Update() {
+    private void Update() 
+    {
         if (m_gameLogic.BonusTimeSecond > 0) 
             UpdateTimer();
         
@@ -398,8 +401,6 @@ public partial class Setup: MonoBehaviour
         else 
             DOTween.Pause(m_progressBar.GetInstanceID());
         
-        m_progressBar.Score = m_gameLogic
-            .Score
-            .ToString();
+        m_progressBar.Score = m_gameLogic.Score.ToString();
     }
 }

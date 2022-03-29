@@ -4,7 +4,8 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 
-public class Game: MonoBehaviour {
+public class Game: MonoBehaviour
+{
     private Canvas m_canvas;
     private GameLogic m_gameLogic;
     private Button m_generate;
@@ -17,7 +18,8 @@ public class Game: MonoBehaviour {
     private float m_timerDuration;
     private float m_fillAmount;
 
-    void Awake() {
+    void Awake()
+    {
         m_canvas = Instantiate(Resources.Load<Canvas>("Prefabs/Canvas"));
         m_canvas.worldCamera = Camera.main;
 
@@ -39,19 +41,22 @@ public class Game: MonoBehaviour {
         Instantiate(Resources.Load<Ray>("Prefabs/Ray"), m_safeBackground.transform);
     }
 
-    void Start() {
+    void Start()
+    {
         SetGameLevel();
         SetDefaultTimer();
         SetButtonAction();
         SetSafeScreen();
     }
 
-    private void SetGameLevel() {
+    private void SetGameLevel()
+    {
         m_gameLogic.Size = CONST.SIZE75;
         m_gameLogic.BallVariation = CONST.LEVEL3; // prefer is 1, 2
     }
 
-    private void SetSafeScreen() {
+    private void SetSafeScreen()
+    {
         (Vector2 min, Vector2 max)safeArea = new SafeScreen().RectOffset();
         RectTransform safeRect = m_safeBackground.GetComponent<RectTransform>();
         RectTransform fullRect = m_fullBackground.GetComponent<RectTransform>();
@@ -63,7 +68,8 @@ public class Game: MonoBehaviour {
         fullRect.offsetMax = Vector2.zero;
     }
 
-    private void SetButtonAction() {
+    private void SetButtonAction()
+    {
         m_generate
             .onClick
             .AddListener(() => {
@@ -75,14 +81,17 @@ public class Game: MonoBehaviour {
             });
     }
 
-    private void SetDefaultTimer() => SetTimer(1, CONST.DURATION_PLAY_TIME);
+    private void SetDefaultTimer() 
+        => SetTimer(1, CONST.DURATION_PLAY_TIME);
 
-    private void SetTimer(float fillAmount, float duration) {
+    private void SetTimer(float fillAmount, float duration) 
+    {
         m_timerDuration = duration;
         m_fillAmount = fillAmount;
     }
 
-    private void BeginTimer() {
+    private void BeginTimer() 
+    {
         m_progressBar.FillAmount = m_fillAmount;
 
         DOTween.Kill(m_progressBar.GetInstanceID());
@@ -101,7 +110,8 @@ public class Game: MonoBehaviour {
             });
     }
 
-    private void UpdateTimer() {
+    private void UpdateTimer() 
+    {
         float increment = 1 / CONST.DURATION_PLAY_TIME;
 
         m_fillAmount = m_progressBar.FillAmount;
@@ -113,7 +123,8 @@ public class Game: MonoBehaviour {
         BeginTimer();
     }
 
-    IEnumerator FIN() {
+    IEnumerator FIN() 
+    {
         m_eventSystem.enabled = false;
         m_gameOverPannel.SetActive(true);
         m_gameOverPannel.transform.SetAsLastSibling();
@@ -128,7 +139,8 @@ public class Game: MonoBehaviour {
         m_eventSystem.enabled = true;
     }
 
-    private void Update() {
+    private void Update() 
+    {
         if (m_gameLogic.BonusTimeSecond > 0)
             UpdateTimer();
         

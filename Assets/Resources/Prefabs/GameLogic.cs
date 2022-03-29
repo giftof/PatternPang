@@ -6,7 +6,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 
-public class GameLogic: MonoBehaviour {
+public class GameLogic: MonoBehaviour
+{
     private EventSystem m_eventSystem;
     private BoardManager m_boardManager;
     private BallManager m_ballManager;
@@ -29,7 +30,8 @@ public class GameLogic: MonoBehaviour {
     public int BonusTimeSecond;
     public BoardManager BoardManager => m_boardManager;
 
-    private void Awake() {
+    private void Awake()
+    {
         m_ballManager = Instantiate(Resources.Load<BallManager>("Prefabs/_Manager/BallManager"), transform.parent);
         m_boardManager = Instantiate(Resources.Load<BoardManager>("Prefabs/_Manager/BoardManager"), transform.parent);
         m_lineManager = Instantiate(Resources.Load<LineManager>("Prefabs/_Manager/LineManager"), transform.parent);
@@ -42,7 +44,8 @@ public class GameLogic: MonoBehaviour {
         m_boardManager.coverManager = m_coverManager;
     }
 
-    private void Start() {
+    private void Start()
+    {
         m_patternHandler = new PatternHandler();
         m_patternHandler.InputEnd = FinishDrag;
         m_lineManager.SetPatternHandler = m_patternHandler;
@@ -56,24 +59,29 @@ public class GameLogic: MonoBehaviour {
         InitGame();
     }
 
-    private void InitGame() {
+    private void InitGame()
+    {
         m_boardManager.Create();
         Board = m_boardManager.SlotArray();
     }
 
-    public EventSystem EventSystem {
+    public EventSystem EventSystem
+    {
         set => m_eventSystem = value;
     }
 
-    public (int Row, int Column)Size {
+    public (int Row, int Column) Size
+    {
         set => m_boardManager.Size = value;
     }
 
-    public int BallVariation {
+    public int BallVariation
+    {
         set => m_ballManager.BallVariation = value;
     }
 
-    public void CreateGame() {
+    public void CreateGame()
+    {
         Score = 0;
         Finish = false;
         BonusTimeSecond = CONST.BONUS_TIMER_BEGIN_VALUE;
@@ -82,7 +90,8 @@ public class GameLogic: MonoBehaviour {
         RequestBall();
     }
 
-    public void ClearBall() {
+    public void ClearBall()
+    {
         m_lineManager.Clear();
         m_ballManager.DropAndClear();
         m_boardManager.ClearChild();
@@ -100,14 +109,16 @@ public class GameLogic: MonoBehaviour {
     private void UpdateScore() 
         => Score += m_unitScore * Multi(++m_matchCount, m_modeScore);
 
-    private void ReleaseEventsystem() {
+    private void ReleaseEventsystem()
+    {
         m_eventSystem.enabled = true;
         m_lineManager.Clear();
         m_first = null;
         m_shape = null;
     }
 
-    private void FinishDrag() {
+    private void FinishDrag()
+    {
         m_unitScore = UnitScore;
         m_modeScore = ModeScore;
         m_first = m_patternHandler.First();
@@ -117,7 +128,8 @@ public class GameLogic: MonoBehaviour {
 
         if (m_shape == null)
             ReleaseEventsystem();
-        else {
+        else
+        {
             m_eventSystem.enabled = false;
             m_comboManager.Display(m_first.transform, m_matchCount);
             UpdateScore();
@@ -132,18 +144,23 @@ public class GameLogic: MonoBehaviour {
                 () => m_charactorManager.Target().Scaling()
             );
 
-    IEnumerator DisposePatternSequentially() {
-        if (m_shape == null) {
+    IEnumerator DisposePatternSequentially() 
+    {
+        if (m_shape == null) 
+        {
             ReleaseEventsystem();
             yield break;
         }
 
         List<List<SlotPrefab>> m = m_boardManager.Pattern(MatchedList);
-        if (m.Count > 0) {
-            foreach (var e in m) {
+        if (m.Count > 0) 
+        {
+            foreach (var e in m) 
+            {
                 if (e.First().id.Equals(m_first?.id)) 
                     m_first = null;
-                else {
+                else 
+                {
                     yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_MATCH_BALL);
                     UpdateScore();
                     m_comboManager.Display(e.First().transform, m_matchCount);
@@ -156,25 +173,30 @@ public class GameLogic: MonoBehaviour {
             m_lineManager.Clear();
             DisposeMatchedAction(m);
             RequestBall();
-        } else 
+        }
+        else
             ReleaseEventsystem();
     }
     
-    private void DisposeMatchedAction(List<List<SlotPrefab>> matchedList) {
-        foreach (var e in matchedList.SelectMany(e1 => e1.Select(e2 => e2)).GroupBy(e => e.id)) {
+    private void DisposeMatchedAction(List<List<SlotPrefab>> matchedList) 
+    {
+        foreach (var e in matchedList.SelectMany(e1 => e1.Select(e2 => e2)).GroupBy(e => e.id)) 
+        {
             FireBullet(e);
             RemoveBall(e);
         }
     }
 
-    private void RemoveBall(IGrouping<int, SlotPrefab> group) {
+    private void RemoveBall(IGrouping<int, SlotPrefab> group) 
+    {
         SlotPrefab slot = group.First();
 
         m_ballManager.Release(slot.Child);
         slot.Child = null;
     }
 
-    private List<SlotPrefab> MatchedList(SlotPrefab origin) {
+    private List<SlotPrefab> MatchedList(SlotPrefab origin) 
+    {
         Vector3 position = origin.transform.position;
 
         if (origin.Generate != null) 
@@ -185,7 +207,8 @@ public class GameLogic: MonoBehaviour {
                     where hit != null && hit.Generate == null && hit.Child.BallColor.Equals(origin.Child.BallColor)
                     select hit).ToList();
 
-        if (list.Count.Equals(m_shape.Length)) {
+        if (list.Count.Equals(m_shape.Length)) 
+        {
             list.Insert(0, origin);
             return list;
         }
@@ -193,21 +216,26 @@ public class GameLogic: MonoBehaviour {
         return null;
     }
 
-    private void RequestBall() {
+    private void RequestBall() 
+    {
         bool flag = false;
-        m_eventSystem.enabled = false;
         Sequence sequence = DOTween.Sequence();
 
-        foreach (var e in Board) {
+        m_eventSystem.enabled = false;
+
+        foreach (var e in Board) 
+        {
             SlotPrefab upper = Ray.Instance.Shoot(e.transform.position + CONST.DIRECTION_OFFSET[(int)ClockWise.up]);
 
-            switch (upper) {
+            switch (upper) 
+            {
                 case null:
                     if (e.Generate(e))
                         flag = true;
                     break;
                 default:
-                    if (e.Child == null && upper.Child != null) {
+                    if (e.Child == null && upper.Child != null)
+                    {
                         sequence.Join(upper.Child.MoveTo(e));
                         upper.Child = null;
                     }
@@ -216,7 +244,8 @@ public class GameLogic: MonoBehaviour {
         }
 
         sequence.OnComplete(() => {
-            switch (flag) {
+            switch (flag) 
+            {
                 case true:
                     RequestBall();
                     break;
@@ -227,7 +256,8 @@ public class GameLogic: MonoBehaviour {
         }).Play();
     }
 
-    private int Multi(int count, int mode) {
+    private int Multi(int count, int mode) 
+    {
         int rst = count * (int)Math.Pow(count * 2, mode);
 
         if (1 < count)

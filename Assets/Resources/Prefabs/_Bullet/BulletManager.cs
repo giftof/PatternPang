@@ -4,7 +4,8 @@ using DG.Tweening;
 
 public class BulletManager : ManagedPool<BulletPrefab>
 {
-    protected override void Awake() {
+    protected override void Awake() 
+    {
         base.Awake();
         pool.prefab = Resources.Load<GameObject>("Prefabs/_Bullet/BulletPrefab");
     }

@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ScoreBar: MonoBehaviour {
+public class ScoreBar: MonoBehaviour 
+{
     public Text score;
     public Image image;
 
-    public string Score {
+    public string Score 
+    {
         set => score.text = value;
     }
 
-    public float FillAmount {
+    public float FillAmount 
+    {
         get => image.fillAmount;
         set => image.fillAmount = value;
     }

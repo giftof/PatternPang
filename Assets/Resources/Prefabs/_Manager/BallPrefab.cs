@@ -2,11 +2,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 
-public class BallPrefab: MonoBehaviour {
+public class BallPrefab: MonoBehaviour 
+{
     [SerializeField] Image m_image;
     [SerializeField] Sprite[] m_spriteArray;
 
-    private static Color[] m_palette = new Color[8]{
+    private static Color[] m_palette = new Color[8] 
+    {
         Color.red,
         Color.green,
         Color.blue,
@@ -16,21 +18,22 @@ public class BallPrefab: MonoBehaviour {
         Color.white,
         Color.white
     };
-    private SlotAttribute m_color {
-        get;
-        set;
-    }
 
-    public SlotAttribute BallColor {
+    private SlotAttribute m_color { get; set; }
+
+    public SlotAttribute BallColor 
+    {
         get => m_color;
-        set {
+        set 
+        {
             m_color = value;
             m_image.color = ConvertToColor();
             m_image.sprite = ConvertImage();
         }
     }
 
-    public Tweener MoveTo(IParent<BallPrefab> destination) {
+    public Tweener MoveTo(IParent<BallPrefab> destination)
+    {
         DOTween.Kill(GetInstanceID());
         MonoBehaviour dest = destination as MonoBehaviour;
         float duration = (transform.position.y - dest.transform.position.y) / CONST.OFFSET * CONST.DURATION_MOVE;
@@ -41,7 +44,8 @@ public class BallPrefab: MonoBehaviour {
             .SetEase(Ease.Linear);
     }
 
-    public void Drop<T>(DELEGATE_T<T> finishAction, T obj) {
+    public void Drop<T>(DELEGATE_T<T> finishAction, T obj)
+    {
         transform
             .DOMoveY(
                 transform.position.y - CONST.TEMP_DROP_DISTANCE,
@@ -54,25 +58,19 @@ public class BallPrefab: MonoBehaviour {
             });
     }
 
-    // public bool IsBomb() => BallColor > SlotAttribute.color_count;
-
-    private Color ConvertToColor() {
-        if (m_color < 0) {
+    private Color ConvertToColor()
+    {
+        if (m_color < 0)
             return Color.grey;
-        }
-        // if (m_color > SlotAttribute.color_count) {
-        //     return m_palette[(int)m_color - 1];
-        // }
+
         return m_palette[(int)m_color];
     }
 
-    private Sprite ConvertImage() {
-        if (m_color < 0) {
+    private Sprite ConvertImage()
+    {
+        if (m_color < 0)
             return m_spriteArray[0];
-        }
-        // if (m_color > SlotAttribute.color_count) {
-        //     return m_spriteArray[(int)m_color - 1];
-        // }
+
         return m_spriteArray[(int)m_color];
     }
 }

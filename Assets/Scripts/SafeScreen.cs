@@ -1,9 +1,13 @@
 using UnityEngine;
 
-public class SafeScreen {
-    public SafeScreen() {}
+public class SafeScreen 
+{
+    public SafeScreen() 
+    {
+    }
 
-    public (Vector2, Vector2) RectOffset() {
+    public (Vector2, Vector2) RectOffset() 
+    {
         Rect screenSafeArea = Screen.safeArea;
         (Vector2 min, Vector2 max) safeArea;
 
