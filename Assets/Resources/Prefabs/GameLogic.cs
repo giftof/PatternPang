@@ -107,7 +107,7 @@ public class GameLogic: MonoBehaviour
          - (int)CONST.MIN_SELECT;
 
     private void UpdateScore() 
-        => Score += m_unitScore * Multi(++m_matchCount, m_modeScore);
+        => Score += m_unitScore * Multi(m_matchCount, m_modeScore);
 
     private void ReleaseEventsystem()
     {
@@ -131,7 +131,7 @@ public class GameLogic: MonoBehaviour
         else
         {
             m_eventSystem.enabled = false;
-            m_comboManager.Display(m_first.transform, m_matchCount);
+            m_comboManager.Display(m_first.transform, ++m_matchCount);
             UpdateScore();
             StartCoroutine(DisposePatternSequentially());
         }
@@ -163,7 +163,7 @@ public class GameLogic: MonoBehaviour
                 {
                     yield return new WaitForSecondsRealtime(CONST.DURATION_WAIT_MATCH_BALL);
                     UpdateScore();
-                    m_comboManager.Display(e.First().transform, m_matchCount);
+                    m_comboManager.Display(e.First().transform, ++m_matchCount);
                     m_lineManager.Clear();
                     m_lineManager.ToLine(e);
                     m_ballManager.ToPunch(e);
